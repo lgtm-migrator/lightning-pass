@@ -1,12 +1,10 @@
 import sys
 from PyQt5 import QtWidgets
-from lightning_pass.gui.gui import UiLightningPass
+from lightning_pass.gui.gui import Ui_LightningPass
 
 
 if __name__ == "__main__":
     app = QtWidgets.QApplication(sys.argv)
-    ex = UiLightningPass()
-    window = QtWidgets.QMainWindow()
-    ex.setup_ui(window)
+    window = Ui_LightningPass()
     window.show()
     sys.exit(app.exec_())
