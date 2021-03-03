@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QWidget
 
 class Ui_login_widget(QWidget):
     def __init__(self, parent=None):
-        super(Ui_login_widget, self).__init__(parent)
+        super().__init__(parent)
         app = QtWidgets.QApplication(sys.argv)
         ex = Ui_login_widget()
         window = QtWidgets.QMainWindow()

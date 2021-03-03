@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import QMainWindow
 
 class Ui_LightningPass(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        super(Ui_LightningPass, self).__init__(parent)
+        super().__init__(parent)
         self.main_win = QMainWindow()
         self.setupUi(self.main_win)
         self.stackedWidget.setCurrentWidget(self.home)
