@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1038</width>
-    <height>592</height>
+    <width>644</width>
+    <height>299</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,11 +20,11 @@
       <x>0</x>
       <y>0</y>
       <width>612</width>
-      <height>213</height>
+      <height>247</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="home">
      <layout class="QGridLayout" name="gridLayout">
@@ -89,7 +89,7 @@
     </widget>
     <widget class="QWidget" name="login">
      <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
+      <item row="0" column="0" colspan="2">
        <widget class="QLabel" name="log_login_lbl">
         <property name="font">
          <font>
@@ -103,44 +103,81 @@
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLineEdit" name="lineEdit_2">
+       <widget class="QLabel" name="log_entry_username_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>Username</string>
+         <string>Username:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="log_username_line_edit">
+        <property name="text">
+         <string/>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLineEdit" name="lineEdit">
+       <widget class="QLabel" name="log_entry_register_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>Password</string>
+         <string>Password:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="log_password_line_edit">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
        <widget class="QPushButton" name="log_login_btn_2">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Login</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
+      <item row="3" column="2">
        <widget class="QPushButton" name="log_forgot_pass_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Forgot Password?</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2">
+      <item row="3" column="3">
        <widget class="QPushButton" name="log_main_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Main Menu</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="3">
-       <widget class="QProgressBar" name="log_progress_bar">
-        <property name="value">
-         <number>24</number>
         </property>
        </widget>
       </item>
@@ -148,43 +185,175 @@
     </widget>
     <widget class="QWidget" name="register_2">
      <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0" colspan="2">
+      <item row="3" column="0">
+       <widget class="QLabel" name="reg_conf_pass_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Confirm Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="4">
        <widget class="QLabel" name="reg_register_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Register</string>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
-       <widget class="QLineEdit" name="lineEdit_3">
+       <widget class="QLabel" name="reg_username_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>username</string>
+         <string>Username:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
-       <widget class="QLineEdit" name="lineEdit_4">
+       <widget class="QLabel" name="reg_password_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>password</string>
+         <string>Password:</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="4" column="0">
+       <widget class="QLabel" name="reg_email_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Email:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="reg_conf_pass_line">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="reg_email_line">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="reg_password_line"/>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="reg_username_line">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
        <widget class="QPushButton" name="reg_register_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Register</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="1">
-       <widget class="QPushButton" name="reg_login_btn">
+      <item row="5" column="2" colspan="3">
+       <widget class="QPushButton" name="reg_main_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
-         <string>Login</string>
+         <string>Main Menu</string>
         </property>
        </widget>
       </item>
-      <item row="3" column="2">
-       <widget class="QPushButton" name="reg_main_btn">
+     </layout>
+    </widget>
+    <widget class="QWidget" name="forgot_password">
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="forgot_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Forgot Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="forgot_pass_email_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Email:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="forgot_pass_email_line"/>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QPushButton" name="forgot_pass_reset_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Send reset token</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="forgot_pass_main_menu_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Main Menu</string>
         </property>
@@ -199,7 +368,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1038</width>
+     <width>644</width>
      <height>26</height>
     </rect>
    </property>
@@ -207,8 +376,21 @@
     <property name="title">
      <string>users</string>
     </property>
-    <addaction name="actionlogin"/>
-    <addaction name="actionregister"/>
+    <widget class="QMenu" name="menuaccount">
+     <property name="font">
+      <font>
+       <family>Segoe UI Light</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>account</string>
+     </property>
+     <addaction name="actionlogin_2"/>
+     <addaction name="actionregister_2"/>
+     <addaction name="actionforgot_password"/>
+    </widget>
+    <addaction name="menuaccount"/>
    </widget>
    <widget class="QMenu" name="menupassword">
     <property name="title">
@@ -224,15 +406,66 @@
    <property name="text">
     <string>login</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
   </action>
   <action name="actionregister">
    <property name="text">
     <string>register</string>
    </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
   </action>
   <action name="actiongenerate">
    <property name="text">
     <string>generate</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="actionlogin_2">
+   <property name="text">
+    <string>login</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="actionregister_2">
+   <property name="text">
+    <string>register</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="actionforgot_password">
+   <property name="text">
+    <string>forgot_password</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
    </property>
   </action>
  </widget>
