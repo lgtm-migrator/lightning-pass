@@ -1,5 +1,6 @@
 import pathlib
 
+import clipboard
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
@@ -11,7 +12,7 @@ from lightning_pass.password_generator.generator import Generator
 
 class Ui_LightningPass(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        """ Main window constructor """
+        """ Main window constructor. """
         super().__init__(parent)
         self.main_win = QMainWindow()
         self.setupUi(self.main_win)
@@ -23,15 +24,15 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.toggle_stylesheet_dark()
 
     def show(self):
-        """ Show window """
+        """ Show main window. """
         self.main_win.show()
 
     def toggle_stylesheet_light(self, *args):
-        """ Change stylesheet to light mode """
+        """ Change stylesheet to light mode. """
         self.main_win.setStyleSheet("")
 
     def toggle_stylesheet_dark(self, *args):
-        """ Change stylesheet to dark mode """
+        """ Change stylesheet to dark mode. """
         self.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
 
     def setupUi(self, lightning_pass):
@@ -40,7 +41,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.centralwidget = QtWidgets.QWidget(lightning_pass)
         self.centralwidget.setObjectName("centralwidget")
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(0, 0, 641, 281))
+        self.stackedWidget.setGeometry(QtCore.QRect(0, 0, 612, 281))
         self.stackedWidget.setObjectName("stackedWidget")
         self.home = QtWidgets.QWidget()
         self.home.setObjectName("home")
@@ -352,7 +353,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             "generate_pass_p2_tracking_lbl"
         )
         self.generate_pass_p2_final_lbl = QtWidgets.QLabel(self.generate_pass_phase2)
-        self.generate_pass_p2_final_lbl.setGeometry(QtCore.QRect(10, 180, 161, 21))
+        self.generate_pass_p2_final_lbl.setGeometry(QtCore.QRect(10, 170, 161, 41))
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
@@ -362,7 +363,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             self.generate_pass_phase2
         )
         self.generate_pass_p2_final_pass_line.setGeometry(
-            QtCore.QRect(170, 180, 431, 22)
+            QtCore.QRect(170, 170, 431, 41)
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -376,7 +377,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_copy_btn = QtWidgets.QPushButton(
             self.generate_pass_phase2
         )
-        self.generate_pass_p2_copy_btn.setGeometry(QtCore.QRect(10, 210, 481, 28))
+        self.generate_pass_p2_copy_btn.setGeometry(QtCore.QRect(10, 220, 481, 28))
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
@@ -385,7 +386,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_main_btn = QtWidgets.QPushButton(
             self.generate_pass_phase2
         )
-        self.generate_pass_p2_main_btn.setGeometry(QtCore.QRect(500, 210, 101, 28))
+        self.generate_pass_p2_main_btn.setGeometry(QtCore.QRect(500, 220, 101, 28))
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
@@ -494,7 +495,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stackedWidget.setCurrentIndex(4)
+        self.stackedWidget.setCurrentIndex(5)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):
@@ -674,10 +675,11 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
 
     def copy_password_event(self):
         """ Copy generated password into clipboard. """
-        ...
+        clipboard.copy(self.generate_pass_p2_final_pass_line.text())
 
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_position_changed(self, pos):
+        """ Handler for changes in mouse position over connected label. """
         val = self.pass_vals.collect_position(pos)
         if val == "Done":
             if not self.password_generated:

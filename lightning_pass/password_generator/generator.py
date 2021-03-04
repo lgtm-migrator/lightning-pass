@@ -20,16 +20,16 @@ class Generator:
 
     def generate_password(self):
         if self.lowercase and self.uppercase:
-            case = "both"
+            case_type = "both"
         elif self.lowercase is False:
-            case = "upper"
+            case_type = "upper"
         elif self.uppercase is False:
-            case = "lower"
+            case_type = "lower"
 
         password = passgen(
             length=self.length,
             punctuation=self.symbols,
             digits=self.numbers,
-            case=case,
+            case=case_type,
         )
         return password
