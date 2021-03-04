@@ -1,0 +1,36 @@
+image: python:latest
+
+before_script:
+      - python --version
+        - pip install -r requirements.txt
+
+stages:
+    - Static Analysis
+    - Test
+
+shed:
+    stage: Static Analysis
+    script:
+        - shed *.py
+
+flake8:
+    stage: Static Analysis
+    script:
+        - flake8 *.py
+
+mypy:
+    stage: Static Analysis
+    allow_failure: true
+    script:
+        - mypy *.py
+
+pylint:
+    stage: Static Analysis
+    allow_failure: true
+    script:
+        - pylint *.py
+
+pytest:
+    stage: Test
+    script:
+        - pytest
