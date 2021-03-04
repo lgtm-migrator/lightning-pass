@@ -11,31 +11,31 @@ stages:
 black:
     stage: Static Analysis
     script:
-        - black ./
+    - black ./
 
 shed:
     stage: Static Analysis
     script:
-        - shed *.py
+    - shed
 
 flake8:
     stage: Static Analysis
     script:
-        - flake8 *.py
+    - flake8 *.py
 
 mypy:
     stage: Static Analysis
     allow_failure: true
     script:
-        - mypy *.py
+    - mypy *.py
 
 pylint:
     stage: Static Analysis
     allow_failure: true
     script:
-        - pylint *.py
+    - pylint *.py
 
 pytest:
     stage: Test
     script:
-        - pytest
+    - pytest

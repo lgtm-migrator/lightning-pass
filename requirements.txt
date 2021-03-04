@@ -1,6 +1,7 @@
 pytest~=6.2.2
 PyQt5~=5.15.3
 
+black
 shed
 
 flake8
