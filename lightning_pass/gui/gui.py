@@ -1,5 +1,7 @@
+import pathlib
+
+import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtCore import QFile, QTextStream
 from PyQt5.QtWidgets import QMainWindow
 
 from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
@@ -7,6 +9,7 @@ from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
 
 class Ui_LightningPass(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
+        """ Main window constructor """
         super().__init__(parent)
         self.main_win = QMainWindow()
         self.setupUi(self.main_win)
@@ -14,15 +17,19 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.setup_buttons()
         self.setup_menu_bar()
         self.setup_tracker()
+        self.toggle_stylesheet_dark()
 
     def show(self):
+        """ Show window """
         self.main_win.show()
 
-    def toggle_stylesheet(self, path):
-        file = QFile(path)
-        file.open(QFile.ReadOnly | QFile.Text)
-        stream = QTextStream(file)
-        self.setStyleSheet(stream.readAll())
+    def toggle_stylesheet_light(self, *args):
+        """ Change stylesheet to light mode """
+        self.main_win.setStyleSheet("")
+
+    def toggle_stylesheet_dark(self, *args):
+        """ Change stylesheet to dark mode """
+        self.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
 
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
@@ -609,10 +616,17 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             lambda: self.stackedWidget.setCurrentWidget(self.home)
         )
         self.action_light.triggered.connect(
-            lambda: self.toggle_stylesheet("static/light.qss")
+            lambda: self.toggle_stylesheet_light(
+                f"{pathlib.Path(__file__).parent}\\static\\light.qss"
+            )
         )
         self.action_dark.triggered.connect(
-            lambda: self.toggle_stylesheet("static/dark.qss")
+            lambda: self.toggle_stylesheet_dark(
+                f"{pathlib.Path(__file__).parent}\\static\\dark.qss"
+            )
+        )
+        self.action_generate.triggered.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.generate_pass)
         )
         self.action_login.triggered.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.login)
