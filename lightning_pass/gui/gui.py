@@ -1,6 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
+from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
+
 
 class Ui_LightningPass(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
@@ -10,6 +12,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.stackedWidget.setCurrentWidget(self.home)
         self.setup_buttons()
         self.setup_menu_bar()
+        self.setup_tracker()
 
     def show(self):
         self.main_win.show()
@@ -575,3 +578,12 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.action_forgot_password.triggered.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.forgot_password)
         )
+
+    @QtCore.pyqtSlot(QtCore.QPoint)
+    def on_position_changed(self, pos):
+        print(pos)
+        self.generate_pass_p2_final_pass_line.setText("(%d, %d)" % (pos.x(), pos.y()))
+
+    def setup_tracker(self):
+        tracker = MouseTracker(self.generate_pass_p2_tracking_lbl)
+        tracker.positionChanged.connect(self.on_position_changed)
