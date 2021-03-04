@@ -8,24 +8,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.main_win = QMainWindow()
         self.setupUi(self.main_win)
         self.stackedWidget.setCurrentWidget(self.home)
-        self.home_login_btn.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.login)
-        )
-        self.home_register_btn.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.register_2)
-        )
-        self.log_main_btn.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.home)
-        )
-        self.reg_main_btn.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.home)
-        )
-        self.forgot_pass_main_menu_btn.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.home)
-        )
-        self.log_forgot_pass_btn.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.forgot_password)
-        )
+        self.setup_buttons()
 
     def show(self):
         self.main_win.show()
@@ -348,4 +331,24 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.actionregister_2.setText(_translate("lightning_pass", "register"))
         self.actionforgot_password.setText(
             _translate("lightning_pass", "forgot_password")
+        )
+
+    def setup_buttons(self):
+        self.home_login_btn.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.login)
+        )
+        self.home_register_btn.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.register_2)
+        )
+        self.log_main_btn.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.home)
+        )
+        self.reg_main_btn.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.home)
+        )
+        self.forgot_pass_main_menu_btn.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.home)
+        )
+        self.log_forgot_pass_btn.clicked.connect(
+            lambda: self.stackedWidget.setCurrentWidget(self.forgot_password)
         )
