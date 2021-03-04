@@ -5,6 +5,8 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow
 
 from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
+from lightning_pass.password_generator.collector import Collector
+from lightning_pass.password_generator.generator import Generator
 
 
 class Ui_LightningPass(QtWidgets.QMainWindow):
@@ -33,11 +35,11 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
 
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
-        lightning_pass.resize(645, 295)
+        lightning_pass.resize(671, 352)
         self.centralwidget = QtWidgets.QWidget(lightning_pass)
         self.centralwidget.setObjectName("centralwidget")
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(0, 0, 612, 247))
+        self.stackedWidget.setGeometry(QtCore.QRect(0, 0, 641, 281))
         self.stackedWidget.setObjectName("stackedWidget")
         self.home = QtWidgets.QWidget()
         self.home.setObjectName("home")
@@ -108,6 +110,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.gridLayout_2.addWidget(self.log_entry_register_lbl, 2, 0, 1, 1)
         self.log_password_line_edit = QtWidgets.QLineEdit(self.login)
         self.log_password_line_edit.setText("")
+        self.log_password_line_edit.setEchoMode(QtWidgets.QLineEdit.Password)
         self.log_password_line_edit.setObjectName("log_password_line_edit")
         self.gridLayout_2.addWidget(self.log_password_line_edit, 2, 1, 1, 1)
         self.log_login_btn_2 = QtWidgets.QPushButton(self.login)
@@ -173,6 +176,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.gridLayout_3.addWidget(self.reg_email_entry_lbl, 4, 0, 1, 1)
         self.reg_conf_pass_line = QtWidgets.QLineEdit(self.register_2)
         self.reg_conf_pass_line.setText("")
+        self.reg_conf_pass_line.setEchoMode(QtWidgets.QLineEdit.Password)
         self.reg_conf_pass_line.setObjectName("reg_conf_pass_line")
         self.gridLayout_3.addWidget(self.reg_conf_pass_line, 3, 1, 1, 1)
         self.reg_email_line = QtWidgets.QLineEdit(self.register_2)
@@ -180,6 +184,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.reg_email_line.setObjectName("reg_email_line")
         self.gridLayout_3.addWidget(self.reg_email_line, 4, 1, 1, 1)
         self.reg_password_line = QtWidgets.QLineEdit(self.register_2)
+        self.reg_password_line.setEchoMode(QtWidgets.QLineEdit.Password)
         self.reg_password_line.setObjectName("reg_password_line")
         self.gridLayout_3.addWidget(self.reg_password_line, 2, 1, 1, 1)
         self.reg_username_line = QtWidgets.QLineEdit(self.register_2)
@@ -384,7 +389,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.stackedWidget.addWidget(self.generate_pass_phase2)
         lightning_pass.setCentralWidget(self.centralwidget)
         self.menu_bar = QtWidgets.QMenuBar(lightning_pass)
-        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 645, 26))
+        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 671, 26))
         self.menu_bar.setObjectName("menu_bar")
         self.menu_users = QtWidgets.QMenu(self.menu_bar)
         font = QtGui.QFont()
@@ -484,7 +489,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stackedWidget.setCurrentIndex(5)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):
@@ -562,7 +567,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_main_btn.setText(
             _translate("lightning_pass", "Main Menu")
         )
-        self.menu_users.setTitle(_translate("lightning_pass", "users"))
+        self.menu_users.setTitle(_translate("lightning_pass", "test_users"))
         self.menu_account.setTitle(_translate("lightning_pass", "account"))
         self.menu_password.setTitle(_translate("lightning_pass", "password"))
         self.menu_general.setTitle(_translate("lightning_pass", "general"))
@@ -580,15 +585,14 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.action_dark.setText(_translate("lightning_pass", "dark"))
 
     def setup_buttons(self):
+        """ Connect buttons """
         self.home_login_btn.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.login)
         )
         self.home_register_btn.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.register_2)
         )
-        self.home_generate_password_btn.clicked.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.generate_pass)
-        )
+        self.home_generate_password_btn.clicked.connect(self.generate_pass_event)
         self.log_main_btn.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.home)
         )
@@ -610,8 +614,10 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_main_btn.clicked.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.home)
         )
+        self.generate_pass_p2_copy_btn.clicked.connect(self.copy_password_event)
 
     def setup_menu_bar(self):
+        """ Connect menu bar """
         self.action_main_menu.triggered.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.home)
         )
@@ -625,9 +631,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
                 f"{pathlib.Path(__file__).parent}\\static\\dark.qss"
             )
         )
-        self.action_generate.triggered.connect(
-            lambda: self.stackedWidget.setCurrentWidget(self.generate_pass)
-        )
+        self.action_generate.triggered.connect(self.generate_pass_event)
         self.action_login.triggered.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.login)
         )
@@ -638,10 +642,25 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             lambda: self.stackedWidget.setCurrentWidget(self.forgot_password)
         )
 
+    def generate_pass_event(self):
+        self.stackedWidget.setCurrentWidget(self.generate_pass)
+        self.pass_vals = Collector()
+        self.progress = 0
+
+    def copy_password_event(self):
+        ...
+
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_position_changed(self, pos):
-        print(pos)
-        self.generate_pass_p2_final_pass_line.setText("(%d, %d)" % (pos.x(), pos.y()))
+        val = self.pass_vals.collect_position(pos)
+        if val == "Done":
+            self.pass_gen = Generator(self.pass_vals.randomness_lst)
+            self.generate_pass_p2_final_pass_line.setText(
+                self.pass_gen.generate_password()
+            )
+        elif val is True:
+            self.progress += 1
+            self.generate_pass_p2_prgrs_bar.setValue(self.progress)
 
     def setup_tracker(self):
         tracker = MouseTracker(self.generate_pass_p2_tracking_lbl)

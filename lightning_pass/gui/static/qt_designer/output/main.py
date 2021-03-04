@@ -12,11 +12,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_lightning_pass:
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
-        lightning_pass.resize(645, 295)
+        lightning_pass.resize(671, 352)
         self.centralwidget = QtWidgets.QWidget(lightning_pass)
         self.centralwidget.setObjectName("centralwidget")
         self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(0, 0, 612, 247))
+        self.stackedWidget.setGeometry(QtCore.QRect(0, 0, 641, 281))
         self.stackedWidget.setObjectName("stackedWidget")
         self.home = QtWidgets.QWidget()
         self.home.setObjectName("home")
@@ -87,6 +87,7 @@ class Ui_lightning_pass:
         self.gridLayout_2.addWidget(self.log_entry_register_lbl, 2, 0, 1, 1)
         self.log_password_line_edit = QtWidgets.QLineEdit(self.login)
         self.log_password_line_edit.setText("")
+        self.log_password_line_edit.setEchoMode(QtWidgets.QLineEdit.Password)
         self.log_password_line_edit.setObjectName("log_password_line_edit")
         self.gridLayout_2.addWidget(self.log_password_line_edit, 2, 1, 1, 1)
         self.log_login_btn_2 = QtWidgets.QPushButton(self.login)
@@ -152,6 +153,7 @@ class Ui_lightning_pass:
         self.gridLayout_3.addWidget(self.reg_email_entry_lbl, 4, 0, 1, 1)
         self.reg_conf_pass_line = QtWidgets.QLineEdit(self.register_2)
         self.reg_conf_pass_line.setText("")
+        self.reg_conf_pass_line.setEchoMode(QtWidgets.QLineEdit.Password)
         self.reg_conf_pass_line.setObjectName("reg_conf_pass_line")
         self.gridLayout_3.addWidget(self.reg_conf_pass_line, 3, 1, 1, 1)
         self.reg_email_line = QtWidgets.QLineEdit(self.register_2)
@@ -159,6 +161,7 @@ class Ui_lightning_pass:
         self.reg_email_line.setObjectName("reg_email_line")
         self.gridLayout_3.addWidget(self.reg_email_line, 4, 1, 1, 1)
         self.reg_password_line = QtWidgets.QLineEdit(self.register_2)
+        self.reg_password_line.setEchoMode(QtWidgets.QLineEdit.Password)
         self.reg_password_line.setObjectName("reg_password_line")
         self.gridLayout_3.addWidget(self.reg_password_line, 2, 1, 1, 1)
         self.reg_username_line = QtWidgets.QLineEdit(self.register_2)
@@ -363,7 +366,7 @@ class Ui_lightning_pass:
         self.stackedWidget.addWidget(self.generate_pass_phase2)
         lightning_pass.setCentralWidget(self.centralwidget)
         self.menu_bar = QtWidgets.QMenuBar(lightning_pass)
-        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 645, 26))
+        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 671, 26))
         self.menu_bar.setObjectName("menu_bar")
         self.menu_users = QtWidgets.QMenu(self.menu_bar)
         font = QtGui.QFont()
@@ -463,7 +466,7 @@ class Ui_lightning_pass:
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stackedWidget.setCurrentIndex(5)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):
@@ -541,7 +544,7 @@ class Ui_lightning_pass:
         self.generate_pass_p2_main_btn.setText(
             _translate("lightning_pass", "Main Menu")
         )
-        self.menu_users.setTitle(_translate("lightning_pass", "users"))
+        self.menu_users.setTitle(_translate("lightning_pass", "test_users"))
         self.menu_account.setTitle(_translate("lightning_pass", "account"))
         self.menu_password.setTitle(_translate("lightning_pass", "password"))
         self.menu_general.setTitle(_translate("lightning_pass", "general"))
