@@ -340,6 +340,10 @@ class Ui_lightning_pass:
         self.generate_pass_p2_final_pass_line.setGeometry(
             QtCore.QRect(170, 180, 431, 22)
         )
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.generate_pass_p2_final_pass_line.setFont(font)
         self.generate_pass_p2_final_pass_line.setText("")
         self.generate_pass_p2_final_pass_line.setReadOnly(True)
         self.generate_pass_p2_final_pass_line.setObjectName(
@@ -466,7 +470,7 @@ class Ui_lightning_pass:
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(4)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):
@@ -544,7 +548,7 @@ class Ui_lightning_pass:
         self.generate_pass_p2_main_btn.setText(
             _translate("lightning_pass", "Main Menu")
         )
-        self.menu_users.setTitle(_translate("lightning_pass", "test_users"))
+        self.menu_users.setTitle(_translate("lightning_pass", "users"))
         self.menu_account.setTitle(_translate("lightning_pass", "account"))
         self.menu_password.setTitle(_translate("lightning_pass", "password"))
         self.menu_general.setTitle(_translate("lightning_pass", "general"))
