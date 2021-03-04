@@ -656,6 +656,12 @@
     </rect>
    </property>
    <widget class="QMenu" name="menu_users">
+    <property name="font">
+     <font>
+      <family>Segoe UI Light</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>users</string>
     </property>
@@ -682,10 +688,30 @@
     <addaction name="action_generate"/>
    </widget>
    <widget class="QMenu" name="menu_general">
+    <property name="font">
+     <font>
+      <family>Segoe UI Light</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
     <property name="title">
      <string>general</string>
     </property>
+    <widget class="QMenu" name="menu_theme">
+     <property name="font">
+      <font>
+       <family>Segoe UI Light</family>
+       <pointsize>10</pointsize>
+      </font>
+     </property>
+     <property name="title">
+      <string>theme</string>
+     </property>
+     <addaction name="action_light"/>
+     <addaction name="action_dark"/>
+    </widget>
     <addaction name="action_main_menu"/>
+    <addaction name="menu_theme"/>
    </widget>
    <addaction name="menu_general"/>
    <addaction name="menu_password"/>
@@ -761,6 +787,28 @@
   <action name="action_main_menu">
    <property name="text">
     <string>main menu</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="action_light">
+   <property name="text">
+    <string>light</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="action_dark">
+   <property name="text">
+    <string>dark</string>
    </property>
    <property name="font">
     <font>

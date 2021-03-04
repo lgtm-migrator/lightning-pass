@@ -1,4 +1,5 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtCore import QFile, QTextStream
 from PyQt5.QtWidgets import QMainWindow
 
 from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
@@ -16,6 +17,12 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
 
     def show(self):
         self.main_win.show()
+
+    def toggle_stylesheet(self, path):
+        file = QFile(path)
+        file.open(QFile.ReadOnly | QFile.Text)
+        stream = QTextStream(file)
+        self.setStyleSheet(stream.readAll())
 
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
@@ -373,6 +380,10 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.menu_bar.setGeometry(QtCore.QRect(0, 0, 645, 26))
         self.menu_bar.setObjectName("menu_bar")
         self.menu_users = QtWidgets.QMenu(self.menu_bar)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.menu_users.setFont(font)
         self.menu_users.setObjectName("menu_users")
         self.menu_account = QtWidgets.QMenu(self.menu_users)
         font = QtGui.QFont()
@@ -383,7 +394,17 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.menu_password = QtWidgets.QMenu(self.menu_bar)
         self.menu_password.setObjectName("menu_password")
         self.menu_general = QtWidgets.QMenu(self.menu_bar)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.menu_general.setFont(font)
         self.menu_general.setObjectName("menu_general")
+        self.menu_theme = QtWidgets.QMenu(self.menu_general)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.menu_theme.setFont(font)
+        self.menu_theme.setObjectName("menu_theme")
         lightning_pass.setMenuBar(self.menu_bar)
         self.statusbar = QtWidgets.QStatusBar(lightning_pass)
         self.statusbar.setObjectName("statusbar")
@@ -430,12 +451,27 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         font.setPointSize(10)
         self.action_main_menu.setFont(font)
         self.action_main_menu.setObjectName("action_main_menu")
+        self.action_light = QtWidgets.QAction(lightning_pass)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.action_light.setFont(font)
+        self.action_light.setObjectName("action_light")
+        self.action_dark = QtWidgets.QAction(lightning_pass)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.action_dark.setFont(font)
+        self.action_dark.setObjectName("action_dark")
         self.menu_account.addAction(self.action_login)
         self.menu_account.addAction(self.action_register)
         self.menu_account.addAction(self.action_forgot_password)
         self.menu_users.addAction(self.menu_account.menuAction())
         self.menu_password.addAction(self.action_generate)
+        self.menu_theme.addAction(self.action_light)
+        self.menu_theme.addAction(self.action_dark)
         self.menu_general.addAction(self.action_main_menu)
+        self.menu_general.addAction(self.menu_theme.menuAction())
         self.menu_bar.addAction(self.menu_general.menuAction())
         self.menu_bar.addAction(self.menu_password.menuAction())
         self.menu_bar.addAction(self.menu_users.menuAction())
@@ -523,6 +559,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.menu_account.setTitle(_translate("lightning_pass", "account"))
         self.menu_password.setTitle(_translate("lightning_pass", "password"))
         self.menu_general.setTitle(_translate("lightning_pass", "general"))
+        self.menu_theme.setTitle(_translate("lightning_pass", "theme"))
         self.actionlogin.setText(_translate("lightning_pass", "login"))
         self.actionregister.setText(_translate("lightning_pass", "register"))
         self.action_generate.setText(_translate("lightning_pass", "generate"))
@@ -532,6 +569,8 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             _translate("lightning_pass", "forgot_password")
         )
         self.action_main_menu.setText(_translate("lightning_pass", "main menu"))
+        self.action_light.setText(_translate("lightning_pass", "light"))
+        self.action_dark.setText(_translate("lightning_pass", "dark"))
 
     def setup_buttons(self):
         self.home_login_btn.clicked.connect(
@@ -568,6 +607,12 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
     def setup_menu_bar(self):
         self.action_main_menu.triggered.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.home)
+        )
+        self.action_light.triggered.connect(
+            lambda: self.toggle_stylesheet("static/light.qss")
+        )
+        self.action_dark.triggered.connect(
+            lambda: self.toggle_stylesheet("static/dark.qss")
         )
         self.action_login.triggered.connect(
             lambda: self.stackedWidget.setCurrentWidget(self.login)
