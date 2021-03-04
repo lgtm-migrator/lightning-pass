@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>644</width>
-    <height>299</height>
+    <width>645</width>
+    <height>295</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>Lightning Pass</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QStackedWidget" name="stackedWidget">
@@ -24,7 +24,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>5</number>
     </property>
     <widget class="QWidget" name="home">
      <layout class="QGridLayout" name="gridLayout">
@@ -361,22 +361,305 @@
       </item>
      </layout>
     </widget>
+    <widget class="QWidget" name="generate_pass">
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="0" column="0" colspan="6">
+       <widget class="QLabel" name="generate_pas_main_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Generate Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="generate_pass_length_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Password length:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QSpinBox" name="generate_pass_spin_box">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="minimum">
+         <number>16</number>
+        </property>
+        <property name="maximum">
+         <number>64</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="generate_pass_numbers_check">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Numbers</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QCheckBox" name="generate_pass_symbols_check">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Symbols</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QCheckBox" name="generate_pass_lower_check">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Lowercase</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QCheckBox" name="generate_pass_upper_check">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Uppercase</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="5">
+       <widget class="QPushButton" name="generate_pass_generate_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Generate</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="QPushButton" name="generate_pass_main_menu_btn">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="generate_pass_phase2">
+     <widget class="QProgressBar" name="generate_pass_p2_prgrs_bar">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>140</y>
+        <width>591</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI Light</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="value">
+       <number>0</number>
+      </property>
+      <property name="textVisible">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QLabel" name="generate_pass_p2_rnd_lbl">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>0</y>
+        <width>471</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI Light</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Generate randomness by moving the mouse over the blue area.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="generate_pass_p2_tracking_lbl">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>40</y>
+        <width>591</width>
+        <height>91</height>
+       </rect>
+      </property>
+      <property name="mouseTracking">
+       <bool>true</bool>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">background-color: blue; border: 3px solid black</string>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="generate_pass_p2_final_lbl">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>180</y>
+        <width>161</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI Light</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Generated password:</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="generate_pass_p2_final_pass_line">
+      <property name="geometry">
+       <rect>
+        <x>170</x>
+        <y>180</y>
+        <width>431</width>
+        <height>22</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="generate_pass_p2_copy_btn">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>210</y>
+        <width>481</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI Light</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Copy Password</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="generate_pass_p2_main_btn">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>210</y>
+        <width>101</width>
+        <height>28</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI Light</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Main Menu</string>
+      </property>
+     </widget>
+    </widget>
    </widget>
   </widget>
-  <widget class="QMenuBar" name="menubar">
+  <widget class="QMenuBar" name="menu_bar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>644</width>
+     <width>645</width>
      <height>26</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menulogin">
+   <widget class="QMenu" name="menu_users">
     <property name="title">
      <string>users</string>
     </property>
-    <widget class="QMenu" name="menuaccount">
+    <widget class="QMenu" name="menu_account">
      <property name="font">
       <font>
        <family>Segoe UI Light</family>
@@ -386,20 +669,27 @@
      <property name="title">
       <string>account</string>
      </property>
-     <addaction name="actionlogin_2"/>
-     <addaction name="actionregister_2"/>
-     <addaction name="actionforgot_password"/>
+     <addaction name="action_login"/>
+     <addaction name="action_register"/>
+     <addaction name="action_forgot_password"/>
     </widget>
-    <addaction name="menuaccount"/>
+    <addaction name="menu_account"/>
    </widget>
-   <widget class="QMenu" name="menupassword">
+   <widget class="QMenu" name="menu_password">
     <property name="title">
      <string>password</string>
     </property>
-    <addaction name="actiongenerate"/>
+    <addaction name="action_generate"/>
    </widget>
-   <addaction name="menupassword"/>
-   <addaction name="menulogin"/>
+   <widget class="QMenu" name="menu_general">
+    <property name="title">
+     <string>general</string>
+    </property>
+    <addaction name="action_main_menu"/>
+   </widget>
+   <addaction name="menu_general"/>
+   <addaction name="menu_password"/>
+   <addaction name="menu_users"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionlogin">
@@ -424,7 +714,7 @@
     </font>
    </property>
   </action>
-  <action name="actiongenerate">
+  <action name="action_generate">
    <property name="text">
     <string>generate</string>
    </property>
@@ -435,7 +725,7 @@
     </font>
    </property>
   </action>
-  <action name="actionlogin_2">
+  <action name="action_login">
    <property name="text">
     <string>login</string>
    </property>
@@ -446,7 +736,7 @@
     </font>
    </property>
   </action>
-  <action name="actionregister_2">
+  <action name="action_register">
    <property name="text">
     <string>register</string>
    </property>
@@ -457,9 +747,20 @@
     </font>
    </property>
   </action>
-  <action name="actionforgot_password">
+  <action name="action_forgot_password">
    <property name="text">
     <string>forgot_password</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="action_main_menu">
+   <property name="text">
+    <string>main menu</string>
    </property>
    <property name="font">
     <font>
