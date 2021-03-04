@@ -8,6 +8,11 @@ stages:
     - Static Analysis
     - Test
 
+black:
+    stage: Static Analysis
+    script:
+        - black ./
+
 shed:
     stage: Static Analysis
     script:
