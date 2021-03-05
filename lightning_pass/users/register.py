@@ -79,7 +79,7 @@ class RegisterUser:
     def insert_into_db(self):
         """Insert user into a database.
         If credentials check fails, a custom exception is raised."""
-        self.credentials_eligibility()
+        self.credentials_eligibility()  # Exception expected here
         sql = "INSERT INTO lightning_pass.credentials (username, password, email) VALUES (%s, %s, %s)"
         val = [self.username, self.password, self.email]
         cursor.execute(sql, val)

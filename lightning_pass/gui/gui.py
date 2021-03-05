@@ -9,7 +9,9 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
 from lightning_pass.password_generator.collector import Collector
 from lightning_pass.password_generator.generator import Generator
+from lightning_pass.users.account import Account
 from lightning_pass.users.exceptions import (
+    AccountDoesNotExist,
     EmailAlreadyExists,
     InvalidEmail,
     InvalidPassword,
@@ -17,7 +19,12 @@ from lightning_pass.users.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
+from lightning_pass.users.login import LoginUser
 from lightning_pass.users.register import RegisterUser
+
+default_picture = (
+    f"{pathlib.Path(__file__).parent}\\static\\profile_pictures\\default.png"
+)
 
 
 class Ui_LightningPass(QtWidgets.QMainWindow):
@@ -26,11 +33,16 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         super().__init__(parent)
         self.main_win = QMainWindow()
         self.setupUi(self.main_win)
-        self.stackedWidget.setCurrentWidget(self.home)
+        self.stacked_widget.setCurrentWidget(self.home)
         self.setup_buttons()
         self.setup_menu_bar()
         # Dark mode is the default theme.
         self.toggle_stylesheet_dark()
+
+    def __repr__(self):
+        """__repr__"""
+        self.current_user = None
+        return str(self.current_user)
 
     def show(self):
         """Show main window."""
@@ -46,12 +58,12 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
 
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
-        lightning_pass.resize(671, 352)
+        lightning_pass.resize(623, 347)
         self.centralwidget = QtWidgets.QWidget(lightning_pass)
         self.centralwidget.setObjectName("centralwidget")
-        self.stackedWidget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stackedWidget.setGeometry(QtCore.QRect(0, 0, 612, 281))
-        self.stackedWidget.setObjectName("stackedWidget")
+        self.stacked_widget = QtWidgets.QStackedWidget(self.centralwidget)
+        self.stacked_widget.setGeometry(QtCore.QRect(0, 0, 611, 281))
+        self.stacked_widget.setObjectName("stacked_widget")
         self.home = QtWidgets.QWidget()
         self.home.setObjectName("home")
         self.gridLayout = QtWidgets.QGridLayout(self.home)
@@ -89,7 +101,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.home_generate_password_btn.setFont(font)
         self.home_generate_password_btn.setObjectName("home_generate_password_btn")
         self.gridLayout.addWidget(self.home_generate_password_btn, 1, 0, 2, 1)
-        self.stackedWidget.addWidget(self.home)
+        self.stacked_widget.addWidget(self.home)
         self.login = QtWidgets.QWidget()
         self.login.setObjectName("login")
         self.gridLayout_2 = QtWidgets.QGridLayout(self.login)
@@ -145,7 +157,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.log_main_btn.setFont(font)
         self.log_main_btn.setObjectName("log_main_btn")
         self.gridLayout_2.addWidget(self.log_main_btn, 3, 3, 1, 1)
-        self.stackedWidget.addWidget(self.login)
+        self.stacked_widget.addWidget(self.login)
         self.register_2 = QtWidgets.QWidget()
         self.register_2.setObjectName("register_2")
         self.gridLayout_3 = QtWidgets.QGridLayout(self.register_2)
@@ -216,7 +228,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.reg_main_btn.setFont(font)
         self.reg_main_btn.setObjectName("reg_main_btn")
         self.gridLayout_3.addWidget(self.reg_main_btn, 5, 2, 1, 3)
-        self.stackedWidget.addWidget(self.register_2)
+        self.stacked_widget.addWidget(self.register_2)
         self.forgot_password = QtWidgets.QWidget()
         self.forgot_password.setObjectName("forgot_password")
         self.gridLayout_4 = QtWidgets.QGridLayout(self.forgot_password)
@@ -252,7 +264,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.forgot_pass_main_menu_btn.setFont(font)
         self.forgot_pass_main_menu_btn.setObjectName("forgot_pass_main_menu_btn")
         self.gridLayout_4.addWidget(self.forgot_pass_main_menu_btn, 2, 2, 1, 1)
-        self.stackedWidget.addWidget(self.forgot_password)
+        self.stacked_widget.addWidget(self.forgot_password)
         self.generate_pass = QtWidgets.QWidget()
         self.generate_pass.setObjectName("generate_pass")
         self.gridLayout_5 = QtWidgets.QGridLayout(self.generate_pass)
@@ -327,14 +339,14 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_main_menu_btn.setFont(font)
         self.generate_pass_main_menu_btn.setObjectName("generate_pass_main_menu_btn")
         self.gridLayout_5.addWidget(self.generate_pass_main_menu_btn, 2, 5, 1, 1)
-        self.stackedWidget.addWidget(self.generate_pass)
+        self.stacked_widget.addWidget(self.generate_pass)
         self.generate_pass_phase2 = QtWidgets.QWidget()
         self.generate_pass_phase2.setObjectName("generate_pass_phase2")
         self.generate_pass_p2_prgrs_bar = QtWidgets.QProgressBar(
             self.generate_pass_phase2
         )
         self.generate_pass_p2_prgrs_bar.setEnabled(True)
-        self.generate_pass_p2_prgrs_bar.setGeometry(QtCore.QRect(10, 140, 591, 20))
+        self.generate_pass_p2_prgrs_bar.setGeometry(QtCore.QRect(10, 170, 591, 20))
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
@@ -352,7 +364,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_rnd_lbl.setObjectName("generate_pass_p2_rnd_lbl")
         self.generate_pass_p2_tracking_lbl = QtWidgets.QLabel(self.generate_pass_phase2)
         self.generate_pass_p2_tracking_lbl.setEnabled(True)
-        self.generate_pass_p2_tracking_lbl.setGeometry(QtCore.QRect(10, 40, 591, 91))
+        self.generate_pass_p2_tracking_lbl.setGeometry(QtCore.QRect(10, 30, 591, 131))
         self.generate_pass_p2_tracking_lbl.setMouseTracking(True)
         self.generate_pass_p2_tracking_lbl.setStyleSheet(
             "background-color: blue; border: 3px solid black"
@@ -362,7 +374,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             "generate_pass_p2_tracking_lbl"
         )
         self.generate_pass_p2_final_lbl = QtWidgets.QLabel(self.generate_pass_phase2)
-        self.generate_pass_p2_final_lbl.setGeometry(QtCore.QRect(10, 170, 161, 41))
+        self.generate_pass_p2_final_lbl.setGeometry(QtCore.QRect(10, 200, 161, 41))
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
@@ -372,7 +384,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             self.generate_pass_phase2
         )
         self.generate_pass_p2_final_pass_line.setGeometry(
-            QtCore.QRect(170, 170, 431, 41)
+            QtCore.QRect(170, 200, 431, 41)
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -386,7 +398,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_copy_btn = QtWidgets.QPushButton(
             self.generate_pass_phase2
         )
-        self.generate_pass_p2_copy_btn.setGeometry(QtCore.QRect(10, 220, 481, 28))
+        self.generate_pass_p2_copy_btn.setGeometry(QtCore.QRect(10, 250, 481, 28))
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
@@ -395,16 +407,96 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_main_btn = QtWidgets.QPushButton(
             self.generate_pass_phase2
         )
-        self.generate_pass_p2_main_btn.setGeometry(QtCore.QRect(500, 220, 101, 28))
+        self.generate_pass_p2_main_btn.setGeometry(QtCore.QRect(490, 250, 101, 28))
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
         self.generate_pass_p2_main_btn.setFont(font)
         self.generate_pass_p2_main_btn.setObjectName("generate_pass_p2_main_btn")
-        self.stackedWidget.addWidget(self.generate_pass_phase2)
+        self.stacked_widget.addWidget(self.generate_pass_phase2)
+        self.account = QtWidgets.QWidget()
+        self.account.setObjectName("account")
+        self.account_lbl = QtWidgets.QLabel(self.account)
+        self.account_lbl.setGeometry(QtCore.QRect(10, 20, 421, 61))
+        font = QtGui.QFont()
+        font.setFamily("Segoe Print")
+        font.setPointSize(26)
+        self.account_lbl.setFont(font)
+        self.account_lbl.setObjectName("account_lbl")
+        self.account_username_line = QtWidgets.QLineEdit(self.account)
+        self.account_username_line.setGeometry(QtCore.QRect(100, 130, 201, 22))
+        self.account_username_line.setReadOnly(False)
+        self.account_username_line.setObjectName("account_username_line")
+        self.account_email_line = QtWidgets.QLineEdit(self.account)
+        self.account_email_line.setGeometry(QtCore.QRect(100, 160, 201, 22))
+        self.account_email_line.setReadOnly(False)
+        self.account_email_line.setObjectName("account_email_line")
+        self.account_email_lbl = QtWidgets.QLabel(self.account)
+        self.account_email_lbl.setGeometry(QtCore.QRect(10, 160, 71, 16))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.account_email_lbl.setFont(font)
+        self.account_email_lbl.setObjectName("account_email_lbl")
+        self.account_username_lbl = QtWidgets.QLabel(self.account)
+        self.account_username_lbl.setGeometry(QtCore.QRect(10, 130, 81, 21))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.account_username_lbl.setFont(font)
+        self.account_username_lbl.setObjectName("account_username_lbl")
+        self.account_pfp_pixmap_lbl = QtWidgets.QLabel(self.account)
+        self.account_pfp_pixmap_lbl.setGeometry(QtCore.QRect(420, 10, 171, 91))
+        self.account_pfp_pixmap_lbl.setText("")
+        self.account_pfp_pixmap_lbl.setPixmap(QtGui.QPixmap(default_picture))
+        self.account_pfp_pixmap_lbl.setScaledContents(True)
+        self.account_pfp_pixmap_lbl.setObjectName("account_pfp_pixmap_lbl")
+        self.account_change_pfp_btn = QtWidgets.QPushButton(self.account)
+        self.account_change_pfp_btn.setGeometry(QtCore.QRect(420, 110, 171, 31))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.account_change_pfp_btn.setFont(font)
+        self.account_change_pfp_btn.setObjectName("account_change_pfp_btn")
+        self.account_edit_details_btn = QtWidgets.QPushButton(self.account)
+        self.account_edit_details_btn.setGeometry(QtCore.QRect(10, 190, 121, 31))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.account_edit_details_btn.setFont(font)
+        self.account_edit_details_btn.setObjectName("account_edit_details_btn")
+        self.account_change_pass_btn = QtWidgets.QPushButton(self.account)
+        self.account_change_pass_btn.setGeometry(QtCore.QRect(140, 190, 151, 31))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.account_change_pass_btn.setFont(font)
+        self.account_change_pass_btn.setObjectName("account_change_pass_btn")
+        self.account_main_menu_btn = QtWidgets.QPushButton(self.account)
+        self.account_main_menu_btn.setGeometry(QtCore.QRect(500, 240, 93, 41))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.account_main_menu_btn.setFont(font)
+        self.account_main_menu_btn.setObjectName("account_main_menu_btn")
+        self.account_logout_btn = QtWidgets.QPushButton(self.account)
+        self.account_logout_btn.setGeometry(QtCore.QRect(400, 240, 93, 41))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.account_logout_btn.setFont(font)
+        self.account_logout_btn.setObjectName("account_logout_btn")
+        self.account_last_log_date = QtWidgets.QLabel(self.account)
+        self.account_last_log_date.setGeometry(QtCore.QRect(10, 230, 281, 31))
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.account_last_log_date.setFont(font)
+        self.account_last_log_date.setObjectName("account_last_log_date")
+        self.stacked_widget.addWidget(self.account)
         lightning_pass.setCentralWidget(self.centralwidget)
         self.menu_bar = QtWidgets.QMenuBar(lightning_pass)
-        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 671, 26))
+        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 623, 26))
         self.menu_bar.setObjectName("menu_bar")
         self.menu_users = QtWidgets.QMenu(self.menu_bar)
         font = QtGui.QFont()
@@ -490,8 +582,15 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         font.setPointSize(10)
         self.action_dark.setFont(font)
         self.action_dark.setObjectName("action_dark")
+        self.action_account = QtWidgets.QAction(lightning_pass)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.action_account.setFont(font)
+        self.action_account.setObjectName("action_account")
         self.menu_account.addAction(self.action_login)
         self.menu_account.addAction(self.action_register)
+        self.menu_account.addAction(self.action_account)
         self.menu_account.addAction(self.action_forgot_password)
         self.menu_users.addAction(self.menu_account.menuAction())
         self.menu_password.addAction(self.action_generate)
@@ -504,7 +603,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stackedWidget.setCurrentIndex(5)
+        self.stacked_widget.setCurrentIndex(6)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):
@@ -582,6 +681,23 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_main_btn.setText(
             _translate("lightning_pass", "Main Menu")
         )
+        self.account_lbl.setText(_translate("lightning_pass", "Account"))
+        self.account_email_lbl.setText(_translate("lightning_pass", "Email:"))
+        self.account_username_lbl.setText(_translate("lightning_pass", "Username:"))
+        self.account_change_pfp_btn.setText(
+            _translate("lightning_pass", "Change Profile Picture")
+        )
+        self.account_edit_details_btn.setText(
+            _translate("lightning_pass", "Edit Details")
+        )
+        self.account_change_pass_btn.setText(
+            _translate("lightning_pass", "Change Password?")
+        )
+        self.account_main_menu_btn.setText(_translate("lightning_pass", "Main Menu"))
+        self.account_logout_btn.setText(_translate("lightning_pass", "Logout"))
+        self.account_last_log_date.setText(
+            _translate("lightning_pass", "Last login date is: ")
+        )
         self.menu_users.setTitle(_translate("lightning_pass", "users"))
         self.menu_account.setTitle(_translate("lightning_pass", "account"))
         self.menu_password.setTitle(_translate("lightning_pass", "password"))
@@ -598,6 +714,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.action_main_menu.setText(_translate("lightning_pass", "main menu"))
         self.action_light.setText(_translate("lightning_pass", "light"))
         self.action_dark.setText(_translate("lightning_pass", "dark"))
+        self.action_account.setText(_translate("lightning_pass", "account"))
 
     def setup_buttons(self):
         """Connect all buttons."""
@@ -618,6 +735,12 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_p2_main_btn.clicked.connect(self.home_event)
         self.generate_pass_p2_copy_btn.clicked.connect(self.copy_password_event)
 
+        self.account_main_menu_btn.clicked.connect(self.home_event)
+        self.account_change_pfp_btn.clicked.connect(self.change_pfp_event)
+        self.account_logout_btn.clicked.connect(self.logout_event)
+        self.account_change_pass_btn.clicked.connect(self.change_pass_event)
+        self.account_edit_details_btn.clicked.connect(self.edit_details_event)
+
     def setup_menu_bar(self):
         """Connect menu bar."""
         self.action_main_menu.triggered.connect(self.home_event)
@@ -634,17 +757,37 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.action_generate.triggered.connect(self.generate_pass_event)
         self.action_login.triggered.connect(self.login_event)
         self.action_register.triggered.connect(self.register_event)
+        self.action_account.triggered.connect(self.account_event)
         self.action_forgot_password.triggered.connect(self.forgot_password_event)
 
     def home_event(self):
         """Switch to home widget."""
-        self.stackedWidget.setCurrentWidget(self.home)
+        self.stacked_widget.setCurrentWidget(self.home)
 
     def login_event(self):
         """Switch to login widget and reset previous values."""
         self.log_username_line_edit.setText("")
         self.log_password_line_edit.setText("")
-        self.stackedWidget.setCurrentWidget(self.login)
+        self.stacked_widget.setCurrentWidget(self.login)
+
+    def login_user_event(self):
+        """Try to login a user. If successful, show account widget."""
+        user_to_login = LoginUser(
+            self.log_username_line_edit, self.log_password_line_edit
+        )
+        try:
+            user_to_login.log_in()
+        except AccountDoesNotExist:
+            self.show_message_box(
+                "Lightning Pass - Login",
+                "Account does not exist, please try again.",
+                QMessageBox.Warning,
+            )
+        else:
+            self.current_user = Account(
+                self.log_username_line_edit, self.log_password_line_edit
+            )
+            self.account_event(self.current_user)
 
     def register_event(self):
         """Switch to register widget and reset previous values."""
@@ -652,11 +795,10 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.reg_password_line.setText("")
         self.reg_conf_pass_line.setText("")
         self.reg_email_line.setText("")
-        self.stackedWidget.setCurrentWidget(self.register_2)
+        self.stacked_widget.setCurrentWidget(self.register_2)
 
     def register_user_event(self):
-        """Try to register a user. If succesful, show login widget."""
-
+        """Try to register a user. If successful, show login widget."""
         user_to_register = RegisterUser(
             self.reg_username_line.text(),
             self.reg_password_line.text(),
@@ -713,7 +855,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
     def forgot_password_event(self):
         """Switch to forgot password widget and reset previous email."""
         self.forgot_pass_email_line.setText("")
-        self.stackedWidget.setCurrentWidget(self.forgot_password)
+        self.stacked_widget.setCurrentWidget(self.forgot_password)
 
     def generate_pass_event(self):
         """Switch to first password generation widget and reset previous password options."""
@@ -723,7 +865,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.generate_pass_symbols_check.setChecked(True)
         self.generate_pass_lower_check.setChecked(True)
         self.generate_pass_upper_check.setChecked(True)
-        self.stackedWidget.setCurrentWidget(self.generate_pass)
+        self.stacked_widget.setCurrentWidget(self.generate_pass)
 
     def generate_pass_phase2_event(self):
         """Switch to second password generation widget and reset previous values."""
@@ -745,11 +887,28 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             )
         else:
             self.password_generated = False
-            self.stackedWidget.setCurrentWidget(self.generate_pass_phase2)
+            self.stacked_widget.setCurrentWidget(self.generate_pass_phase2)
 
     def copy_password_event(self):
         """Copy generated password into clipboard."""
         clipboard.copy(self.generate_pass_p2_final_pass_line.text())
+
+    def account_event(self):
+        """Switch to account widget and reset previous values"""
+        print(self)
+        self.stacked_widget.setCurrentWidget(self.account)
+
+    def change_pfp_event(self):
+        ...
+
+    def logout_event(self):
+        ...
+
+    def change_pass_event(self):
+        ...
+
+    def edit_details_event(self):
+        ...
 
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_position_changed(self, pos):

@@ -20,3 +20,7 @@ class EmailAlreadyExists(Exception):
 
 class PasswordsDoNotMatch(Exception):
     """Raised when 2 password don't match."""
+
+
+class AccountDoesNotExist(Exception):
+    """Raised when user tries to login with incorrect login details."""
