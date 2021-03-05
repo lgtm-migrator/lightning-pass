@@ -1,5 +1,6 @@
 import os
 import re
+from secrets import compare_digest
 
 import mysql.connector as mysql
 from dotenv import load_dotenv
@@ -9,6 +10,7 @@ from lightning_pass.users.exceptions import (
     InvalidEmail,
     InvalidPassword,
     InvalidUsername,
+    PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
 
@@ -26,15 +28,11 @@ cursor = connection.cursor()
 
 # noinspection SqlInjection
 class RegisterUser:
-    def __init__(
-        self,
-        username,
-        password,
-        email,
-    ):
-        """ Constructor for user. """
+    def __init__(self, username, password, confirm_password, email):
+        """Constructor for user"""
         self.username = username
         self.password = password
+        self.confirm_password = confirm_password
         self.email = email
 
     @staticmethod
@@ -50,13 +48,15 @@ class RegisterUser:
             raise InvalidUsername
 
     @staticmethod
-    def check_password(password):
+    def check_password(password, confirm_password):
         if (
             len(password) < 8
             or len(re.findall(r"[A-Z]", password)) <= 0
             or len(re.findall(r"[0-9~!@#$%^&*()_+/\[\]{}:'\"<>?|;-\\]", password)) <= 0
         ):
             raise InvalidPassword
+        elif not compare_digest(password, confirm_password):
+            raise PasswordsDoNotMatch
 
     @staticmethod
     def check_email(email):
@@ -73,7 +73,7 @@ class RegisterUser:
     def credentials_eligibility(self):
         """Used to check whether submitted credentials meet the desired requirements."""
         self.check_username(self.username)
-        self.check_password(self.password)
+        self.check_password(self.password, self.confirm_password)
         self.check_email(self.email)
 
     def insert_into_db(self):

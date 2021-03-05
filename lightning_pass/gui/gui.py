@@ -1,4 +1,5 @@
 import pathlib
+import re
 
 import clipboard
 import qdarkstyle
@@ -13,6 +14,7 @@ from lightning_pass.users.exceptions import (
     InvalidEmail,
     InvalidPassword,
     InvalidUsername,
+    PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
 from lightning_pass.users.register import RegisterUser
@@ -20,7 +22,7 @@ from lightning_pass.users.register import RegisterUser
 
 class Ui_LightningPass(QtWidgets.QMainWindow):
     def __init__(self, parent=None):
-        """ Main window constructor. """
+        """Main window constructor"""
         super().__init__(parent)
         self.main_win = QMainWindow()
         self.setupUi(self.main_win)
@@ -31,11 +33,11 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.toggle_stylesheet_dark()
 
     def show(self):
-        """ Show main window. """
+        """Show main window."""
         self.main_win.show()
 
     def toggle_stylesheet_light(self, *args):
-        """ Change stylesheet to light mode. """
+        """Change stylesheet to light mode."""
         self.main_win.setStyleSheet("")
 
     def toggle_stylesheet_dark(self, *args):
@@ -658,6 +660,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         user_to_register = RegisterUser(
             self.reg_username_line.text(),
             self.reg_password_line.text(),
+            self.reg_conf_pass_line.text(),
             self.reg_email_line.text(),
         )
         title_register = "Lightning Pass - Register"
@@ -693,8 +696,19 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
                 "This email already exists.",
                 QMessageBox.Warning,
             )
+        except PasswordsDoNotMatch:
+            self.show_message_box(
+                title_register,
+                "The passwords you entered do not match.",
+                QMessageBox.Warning,
+            )
         else:
-            self.login_event()
+            self.show_message_box(
+                title_register,
+                "Account successfully created!",
+                QMessageBox.Question,
+                successful_registration=True,
+            )
 
     def forgot_password_event(self):
         """Switch to forgot password widget and reset previous email."""
@@ -759,10 +773,23 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             self.progress += 1
             self.generate_pass_p2_prgrs_bar.setValue(self.progress)
 
-    @staticmethod
-    def show_message_box(title, text, warning):
-        er = QMessageBox()
+    def message_box_event(self, btn):
+        """Handler for clicks on message box window"""
+        print(btn.text())
+        if re.findall("Yes", btn.text()):
+            self.login_event()
+        if re.findall("Cancel", btn.text()):
+            self.register_event()
+
+    def show_message_box(self, title, text, icon, successful_registration=False):
+        """Show message box with information about registration process"""
+        er = QMessageBox(self.main_win)
         er.setWindowTitle(title)
         er.setText(text)
-        er.setIcon(warning)
+        er.setIcon(icon)
+        if successful_registration is True:
+            er.setInformativeText("Would you like to move to the login page?")
+            er.setStandardButtons(QMessageBox.Yes | QMessageBox.Close)
+            er.setDefaultButton(QMessageBox.Yes)
+            er.buttonClicked.connect(self.message_box_event)
         _ = er.exec_()

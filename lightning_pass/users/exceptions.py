@@ -7,7 +7,7 @@ class InvalidPassword(Exception):
 
 
 class InvalidEmail(Exception):
-    """Raised when an email doesn't meet a required email pattern """
+    """Raised when an email doesn't meet a required email pattern."""
 
 
 class UsernameAlreadyExists(Exception):
@@ -16,3 +16,7 @@ class UsernameAlreadyExists(Exception):
 
 class EmailAlreadyExists(Exception):
     """Raised when an email is already registered in a database."""
+
+
+class PasswordsDoNotMatch(Exception):
+    """Raised when 2 password don't match."""
