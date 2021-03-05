@@ -20,7 +20,7 @@
       <x>0</x>
       <y>0</y>
       <width>611</width>
-      <height>281</height>
+      <height>291</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -683,7 +683,7 @@
      <widget class="QLineEdit" name="account_username_line">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>110</x>
         <y>130</y>
         <width>201</width>
         <height>22</height>
@@ -696,7 +696,7 @@
      <widget class="QLineEdit" name="account_email_line">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>110</x>
         <y>160</y>
         <width>201</width>
         <height>22</height>
@@ -712,7 +712,7 @@
         <x>10</x>
         <y>160</y>
         <width>71</width>
-        <height>16</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="font">
@@ -862,9 +862,9 @@
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>230</y>
+        <y>240</y>
         <width>281</width>
-        <height>31</height>
+        <height>21</height>
        </rect>
       </property>
       <property name="font">

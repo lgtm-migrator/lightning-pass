@@ -4,7 +4,7 @@ import re
 import clipboard
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
 
 from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
 from lightning_pass.password_generator.collector import Collector
@@ -724,6 +724,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
 
         self.log_main_btn.clicked.connect(self.home_event)
         self.log_forgot_pass_btn.clicked.connect(self.forgot_password_event)
+        self.log_login_btn_2.clicked.connect(self.login_user_event)
 
         self.reg_main_btn.clicked.connect(self.home_event)
         self.reg_register_btn.clicked.connect(self.register_user_event)
@@ -742,7 +743,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         self.account_edit_details_btn.clicked.connect(self.edit_details_event)
 
     def setup_menu_bar(self):
-        """Connect menu bar."""
+        """Connect all menu bar actions."""
         self.action_main_menu.triggered.connect(self.home_event)
         self.action_light.triggered.connect(
             lambda: self.toggle_stylesheet_light(
@@ -773,7 +774,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
     def login_user_event(self):
         """Try to login a user. If successful, show account widget."""
         user_to_login = LoginUser(
-            self.log_username_line_edit, self.log_password_line_edit
+            self.log_username_line_edit.text(), self.log_password_line_edit.text()
         )
         try:
             user_to_login.log_in()
@@ -787,7 +788,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             self.current_user = Account(
                 self.log_username_line_edit, self.log_password_line_edit
             )
-            self.account_event(self.current_user)
+            self.account_event()
 
     def register_event(self):
         """Switch to register widget and reset previous values."""
@@ -895,11 +896,17 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
 
     def account_event(self):
         """Switch to account widget and reset previous values"""
-        print(self)
         self.stacked_widget.setCurrentWidget(self.account)
 
     def change_pfp_event(self):
-        ...
+        fname, _ = QFileDialog.getOpenFileName(
+            self,
+            "Lightning Pass - Open your new profile picture",
+            "c:\\",
+            "Image files (*.jpg *.png)",
+        )
+        if fname:
+            self.current_user
 
     def logout_event(self):
         ...

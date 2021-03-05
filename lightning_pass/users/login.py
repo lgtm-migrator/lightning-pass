@@ -22,11 +22,16 @@ class LoginUser:
         self.username = username
         self.password = password
 
+    def __repr__(self):
+        return f"Username = {self.username}, Password = {self.password}"
+
     def update_last_login_date(self):
+        """update last login date whenever a user logs into their account."""
         sql = f"SELECT id FROM lightning_pass.credentials WHERE username = '{self.username}'"
         cursor.execute(sql)
         primary_key = cursor.fetchone()
-        sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = '{primary_key}'"
+        primary_key = int(primary_key[0])
+        sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = {primary_key}"
         cursor.execute(sql)
         connection.commit()
 
