@@ -7,3 +7,9 @@ shed
 flake8
 mypy
 pylint
+clipboard~=0.0.4
+QDarkStyle~=2.8.1
+mysql~=0.0.2
+mysql-connector-python~=8.0.23
+python-dotenv~=0.15.0
+passgen~=1.1.1

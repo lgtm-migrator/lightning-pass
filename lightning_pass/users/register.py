@@ -5,14 +5,7 @@ from secrets import compare_digest
 import mysql.connector as mysql
 from dotenv import load_dotenv
 
-from lightning_pass.users.exceptions import (
-    EmailAlreadyExists,
-    InvalidEmail,
-    InvalidPassword,
-    InvalidUsername,
-    PasswordsDoNotMatch,
-    UsernameAlreadyExists,
-)
+from lightning_pass.users.exceptions import Exceptions as E
 
 REGEX_EMAIL = r"^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
 
@@ -43,9 +36,9 @@ class RegisterUser:
         row = cursor.fetchall()
 
         if not len(row) <= 0:
-            raise UsernameAlreadyExists
+            raise E.UsernameAlreadyExists
         elif len(username) < 5:
-            raise InvalidUsername
+            raise E.InvalidUsername
 
     @staticmethod
     def check_password(password, confirm_password):
@@ -54,9 +47,9 @@ class RegisterUser:
             or len(re.findall(r"[A-Z]", password)) <= 0
             or len(re.findall(r"[0-9~!@#$%^&*()_+/\[\]{}:'\"<>?|;-\\]", password)) <= 0
         ):
-            raise InvalidPassword
+            raise E.InvalidPassword
         elif not compare_digest(password, confirm_password):
-            raise PasswordsDoNotMatch
+            raise E.PasswordsDoNotMatch
 
     @staticmethod
     def check_email(email):
@@ -66,9 +59,9 @@ class RegisterUser:
         row = cursor.fetchall()
 
         if not len(row) <= 0:
-            raise EmailAlreadyExists
+            raise E.EmailAlreadyExists
         elif not re.search(REGEX_EMAIL, email):
-            raise InvalidEmail
+            raise E.InvalidEmail
 
     def credentials_eligibility(self):
         """Used to check whether submitted credentials meet the desired requirements."""

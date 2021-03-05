@@ -3,7 +3,7 @@ import os
 import mysql.connector as mysql
 from dotenv import load_dotenv
 
-from lightning_pass.users.exceptions import AccountDoesNotExist
+from lightning_pass.users.exceptions import Exceptions as E
 
 load_dotenv()
 connection = mysql.connect(
@@ -42,7 +42,7 @@ class LoginUser:
         cursor.execute(sql)
         row = cursor.fetchall()
         if len(row) <= 0:
-            raise AccountDoesNotExist
+            raise E.AccountDoesNotExist
 
     def log_in(self):
         """Validate login."""

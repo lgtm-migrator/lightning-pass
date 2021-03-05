@@ -1,43 +1,33 @@
 import pathlib
-import re
 
 import clipboard
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QFileDialog, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QDesktopWidget, QFileDialog, QMainWindow, QMessageBox
 
 from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
 from lightning_pass.password_generator.collector import Collector
 from lightning_pass.password_generator.generator import Generator
 from lightning_pass.users.account import Account
-from lightning_pass.users.exceptions import (
-    AccountDoesNotExist,
-    EmailAlreadyExists,
-    InvalidEmail,
-    InvalidPassword,
-    InvalidUsername,
-    PasswordsDoNotMatch,
-    UsernameAlreadyExists,
-)
+from lightning_pass.users.exceptions import Exceptions as E
 from lightning_pass.users.login import LoginUser
 from lightning_pass.users.register import RegisterUser
+from lightning_pass.users.utils import get_user_id
 
 default_picture = (
     f"{pathlib.Path(__file__).parent}\\static\\profile_pictures\\default.png"
 )
 
 
-class Ui_LightningPass(QtWidgets.QMainWindow):
+class UiLightningPass(QMainWindow):
     def __init__(self, parent=None):
         """Main window constructor"""
         super().__init__(parent)
+        self.parent = parent
         self.main_win = QMainWindow()
-        self.setupUi(self.main_win)
-        self.stacked_widget.setCurrentWidget(self.home)
-        self.setup_buttons()
-        self.setup_menu_bar()
-        # Dark mode is the default theme.
-        self.toggle_stylesheet_dark()
+        self.setup_ui(self.main_win)
+        self.setup_ui_utils()
+        self.message_boxes = MessageBoxes(parent=self.main_win)
 
     def __repr__(self):
         """__repr__"""
@@ -48,15 +38,30 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         """Show main window."""
         self.main_win.show()
 
+    def center(self):
+        """Center main window."""
+        qr = self.frameGeometry()
+        cp = QDesktopWidget().availableGeometry().center()
+        qr.moveCenter(cp)
+        self.move(qr.topLeft())
+
     def toggle_stylesheet_light(self, *args):
         """Change stylesheet to light mode."""
         self.main_win.setStyleSheet("")
 
     def toggle_stylesheet_dark(self, *args):
-        """ Change stylesheet to dark mode. """
+        """Change stylesheet to dark mode."""
         self.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
 
-    def setupUi(self, lightning_pass):
+    def setup_ui_utils(self):
+        self.stacked_widget.setCurrentWidget(self.home)
+        self.setup_buttons()
+        self.setup_menu_bar()
+        self.center()
+        # Dark mode is the default theme.
+        self.toggle_stylesheet_dark()
+
+    def setup_ui(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
         lightning_pass.resize(623, 347)
         self.centralwidget = QtWidgets.QWidget(lightning_pass)
@@ -778,16 +783,15 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
         )
         try:
             user_to_login.log_in()
-        except AccountDoesNotExist:
+        except E.AccountDoesNotExist:
             self.show_message_box(
                 "Lightning Pass - Login",
                 "Account does not exist, please try again.",
                 QMessageBox.Warning,
             )
         else:
-            self.current_user = Account(
-                self.log_username_line_edit, self.log_password_line_edit
-            )
+            user_id = get_user_id(self.log_username_line_edit.text(), "username")
+            self.current_user = Account(user_id)
             self.account_event()
 
     def register_event(self):
@@ -806,52 +810,22 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             self.reg_conf_pass_line.text(),
             self.reg_email_line.text(),
         )
-        title_register = "Lightning Pass - Register"
         try:
             user_to_register.insert_into_db()
-        except InvalidUsername:
-            self.show_message_box(
-                title_register,
-                "This username is invalid.",
-                QMessageBox.Warning,
-            )
-        except InvalidPassword:
-            self.show_message_box(
-                title_register,
-                "This password is invalid.",
-                QMessageBox.Warning,
-            )
-        except InvalidEmail:
-            self.show_message_box(
-                title_register,
-                "This email is invalid.",
-                QMessageBox.Warning,
-            )
-        except UsernameAlreadyExists:
-            self.show_message_box(
-                title_register,
-                "This username already exists.",
-                QMessageBox.Warning,
-            )
-        except EmailAlreadyExists:
-            self.show_message_box(
-                title_register,
-                "This email already exists.",
-                QMessageBox.Warning,
-            )
-        except PasswordsDoNotMatch:
-            self.show_message_box(
-                title_register,
-                "The passwords you entered do not match.",
-                QMessageBox.Warning,
-            )
+        except E.InvalidUsername:
+            MessageBoxes.invalid_username_box(self.message_boxes, "Register")
+        except E.InvalidPassword:
+            MessageBoxes.invalid_password_box(self.message_boxes, "Register")
+        except E.InvalidEmail:
+            MessageBoxes.invalid_email_box(self.message_boxes, "Register")
+        except E.UsernameAlreadyExists:
+            MessageBoxes.username_already_exists_box(self.message_boxes, "Register")
+        except E.EmailAlreadyExists:
+            MessageBoxes.email_already_exists_box(self.message_boxes, "Register")
+        except E.PasswordsDoNotMatch:
+            MessageBoxes.passwords_do_not_match_box(self.message_boxes, "Register")
         else:
-            self.show_message_box(
-                title_register,
-                "Account successfully created!",
-                QMessageBox.Question,
-                successful_registration=True,
-            )
+            MessageBoxes.account_creation_box(self.message_boxes, "Register")
 
     def forgot_password_event(self):
         """Switch to forgot password widget and reset previous email."""
@@ -881,11 +855,7 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             not self.generate_pass_lower_check.isChecked()
             and not self.generate_pass_upper_check.isChecked()
         ):
-            self.show_message_box(
-                "Lightning Pass - Generator",
-                "Can't generate password without any case type.",
-                QMessageBox.Warning,
-            )
+            MessageBoxes.no_case_type_box(self.message_boxes, "Generator")
         else:
             self.password_generated = False
             self.stacked_widget.setCurrentWidget(self.generate_pass_phase2)
@@ -896,6 +866,11 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
 
     def account_event(self):
         """Switch to account widget and reset previous values"""
+        self.account_username_line.setText(self.current_user.username)
+        self.account_email_line.setText(self.current_user.email)
+        self.account_last_log_date.setText(
+            f"Last login was {self.current_user.last_login_date}."
+        )
         self.stacked_widget.setCurrentWidget(self.account)
 
     def change_pfp_event(self):
@@ -906,16 +881,29 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             "Image files (*.jpg *.png)",
         )
         if fname:
-            self.current_user
+            self.current_user.profile_picture = fname
 
     def logout_event(self):
-        ...
+        del self.current_user
+        self.home_event()
 
     def change_pass_event(self):
         ...
 
     def edit_details_event(self):
-        ...
+        try:
+            self.current_user.username = self.account_username_line.text()
+            self.current_user.email = self.account_email_line.text()
+        except E.InvalidUsername:
+            MessageBoxes.invalid_username_box(self.message_boxes, "Account")
+        except E.InvalidEmail:
+            MessageBoxes.invalid_email_box(self.message_boxes, "Account")
+        except E.UsernameAlreadyExists:
+            MessageBoxes.username_already_exists_box(self.message_boxes, "Account")
+        except E.EmailAlreadyExists:
+            MessageBoxes.email_already_exists_box(self.message_boxes, "Account")
+        else:
+            MessageBoxes.details_updated_box(self.message_boxes, "Account")
 
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_position_changed(self, pos):
@@ -939,23 +927,5 @@ class Ui_LightningPass(QtWidgets.QMainWindow):
             self.progress += 1
             self.generate_pass_p2_prgrs_bar.setValue(self.progress)
 
-    def message_box_event(self, btn):
-        """Handler for clicks on message box window"""
-        print(btn.text())
-        if re.findall("Yes", btn.text()):
-            self.login_event()
-        if re.findall("Cancel", btn.text()):
-            self.register_event()
 
-    def show_message_box(self, title, text, icon, successful_registration=False):
-        """Show message box with information about registration process"""
-        er = QMessageBox(self.main_win)
-        er.setWindowTitle(title)
-        er.setText(text)
-        er.setIcon(icon)
-        if successful_registration is True:
-            er.setInformativeText("Would you like to move to the login page?")
-            er.setStandardButtons(QMessageBox.Yes | QMessageBox.Close)
-            er.setDefaultButton(QMessageBox.Yes)
-            er.buttonClicked.connect(self.message_box_event)
-        _ = er.exec_()
+from lightning_pass.gui.message_boxes import MessageBoxes
