@@ -3,8 +3,9 @@ import pathlib
 import clipboard
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDesktopWidget, QFileDialog, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QDesktopWidget, QFileDialog, QMainWindow
 
+from lightning_pass.gui.message_boxes import MessageBoxes
 from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
 from lightning_pass.password_generator.collector import Collector
 from lightning_pass.password_generator.generator import Generator
@@ -12,7 +13,7 @@ from lightning_pass.users.account import Account
 from lightning_pass.users.exceptions import Exceptions as E
 from lightning_pass.users.login import LoginUser
 from lightning_pass.users.register import RegisterUser
-from lightning_pass.users.utils import get_user_id
+from lightning_pass.users.utils import get_user_id, save_picture
 
 default_picture = (
     f"{pathlib.Path(__file__).parent}\\static\\profile_pictures\\default.png"
@@ -777,18 +778,14 @@ class UiLightningPass(QMainWindow):
         self.stacked_widget.setCurrentWidget(self.login)
 
     def login_user_event(self):
-        """Try to login a user. If successful, show account widget."""
+        """Try to login a user. If successful, show the account widget."""
         user_to_login = LoginUser(
             self.log_username_line_edit.text(), self.log_password_line_edit.text()
         )
         try:
             user_to_login.log_in()
         except E.AccountDoesNotExist:
-            self.show_message_box(
-                "Lightning Pass - Login",
-                "Account does not exist, please try again.",
-                QMessageBox.Warning,
-            )
+            MessageBoxes.invalid_login_box(self.message_boxes, "Login")
         else:
             user_id = get_user_id(self.log_username_line_edit.text(), "username")
             self.current_user = Account(user_id)
@@ -866,10 +863,15 @@ class UiLightningPass(QMainWindow):
 
     def account_event(self):
         """Switch to account widget and reset previous values"""
+        user_id = get_user_id(self.log_username_line_edit.text(), "username")
+        self.current_user = Account(user_id)
         self.account_username_line.setText(self.current_user.username)
         self.account_email_line.setText(self.current_user.email)
         self.account_last_log_date.setText(
             f"Last login was {self.current_user.last_login_date}."
+        )
+        self.account_pfp_pixmap_lbl.setPixmap(
+            QtGui.QPixmap(self.current_user.profile_picture_path)
         )
         self.stacked_widget.setCurrentWidget(self.account)
 
@@ -881,7 +883,8 @@ class UiLightningPass(QMainWindow):
             "Image files (*.jpg *.png)",
         )
         if fname:
-            self.current_user.profile_picture = fname
+            self.current_user.profile_picture = save_picture(pathlib.Path(fname))
+            self.account_event()
 
     def logout_event(self):
         del self.current_user
@@ -926,6 +929,3 @@ class UiLightningPass(QMainWindow):
         elif val is True:
             self.progress += 1
             self.generate_pass_p2_prgrs_bar.setValue(self.progress)
-
-
-from lightning_pass.gui.message_boxes import MessageBoxes

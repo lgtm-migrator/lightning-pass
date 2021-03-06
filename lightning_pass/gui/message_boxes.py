@@ -31,6 +31,13 @@ class MessageBoxes(QWidget):
             QMessageBox.Warning,
         )
 
+    def invalid_login_box(self, widget):
+        self.show_message_box(
+            f"Lightning Pass - {widget}",
+            "An account with that username or password doesn't exist.",
+            QMessageBox.Warning,
+        )
+
     def username_already_exists_box(self, widget):
         self.show_message_box(
             f"Lightning Pass - {widget}",

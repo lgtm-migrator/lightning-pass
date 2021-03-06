@@ -1,18 +1,5 @@
-import os
-
-import mysql.connector as mysql
-from dotenv import load_dotenv
-
-from lightning_pass.users.exceptions import Exceptions as E
-
-load_dotenv()
-connection = mysql.connect(
-    host=os.getenv("LOGINSDB_HOST"),
-    user=os.getenv("LOGINSDB_USER"),
-    password=os.getenv("LOGINSDB_PASS"),
-    database=os.getenv("LOGINSDB_DB"),
-)
-cursor = connection.cursor()
+import lightning_pass
+from lightning_pass.users.exceptions import Exceptions as Exc
 
 
 # noinspection SqlInjection
@@ -21,6 +8,7 @@ class LoginUser:
         """Constructor for user"""
         self.username = username
         self.password = password
+        self.cursor, self.connection = lightning_pass.connect_to_database()
 
     def __repr__(self):
         return f"Username = {self.username}, Password = {self.password}"
@@ -28,23 +16,25 @@ class LoginUser:
     def update_last_login_date(self):
         """update last login date whenever a user logs into their account."""
         sql = f"SELECT id FROM lightning_pass.credentials WHERE username = '{self.username}'"
-        cursor.execute(sql)
-        primary_key = cursor.fetchone()
+        self.cursor.execute(sql)
+        primary_key = self.cursor.fetchone()
         primary_key = int(primary_key[0])
         sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = {primary_key}"
-        cursor.execute(sql)
-        connection.commit()
+        self.cursor.execute(sql)
+        self.connection.commit()
 
     @staticmethod
-    def check_details(username, password):
+    def check_details(cursor, username, password):
         """Check if login details match with a user in the database."""
         sql = f"SELECT 1 FROM lightning_pass.credentials WHERE (username, password) = ('{username}', '{password}')"
         cursor.execute(sql)
         row = cursor.fetchall()
         if len(row) <= 0:
-            raise E.AccountDoesNotExist
+            raise Exc.AccountDoesNotExist
 
     def log_in(self):
         """Validate login."""
-        self.check_details(self.username, self.password)  # Expecting an exception here.
+        self.check_details(
+            self.cursor, self.username, self.password
+        )  # Expecting an exception here.
         self.update_last_login_date()
