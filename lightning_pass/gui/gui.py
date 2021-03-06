@@ -31,9 +31,7 @@ class UiLightningPass(QMainWindow):
         self.message_boxes = MessageBoxes(parent=self.main_win)
 
     def __repr__(self):
-        """__repr__"""
-        self.current_user = None
-        return str(self.current_user)
+        return "Lightning Pass :)"
 
     def show(self):
         """Show main window."""
@@ -894,6 +892,7 @@ class UiLightningPass(QMainWindow):
             self.account_event()
 
     def logout_event(self):
+        """Delete current user."""
         del self.current_user
         self.home_event()
 
@@ -901,6 +900,7 @@ class UiLightningPass(QMainWindow):
         ...
 
     def edit_details_event(self):
+        """Edit user details by changing them on their respective edit lines."""
         if self.current_user.username != self.account_username_line.text():
             try:
                 self.current_user.username = self.account_username_line.text()

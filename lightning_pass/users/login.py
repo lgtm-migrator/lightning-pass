@@ -11,10 +11,10 @@ class LoginUser:
         self.cursor, self.connection = lightning_pass.connect_to_database()
 
     def __repr__(self):
-        return f"Username = {self.username}, Password = {self.password}"
+        return f"LoginUser({self.username}, {self.password})"
 
     def update_last_login_date(self):
-        """update last login date whenever a user logs into their account."""
+        """Update last login date whenever a user logs into their account."""
         sql = f"SELECT id FROM lightning_pass.credentials WHERE username = '{self.username}'"
         self.cursor.execute(sql)
         primary_key = self.cursor.fetchone()

@@ -12,6 +12,9 @@ class RegisterUser:
         self.email = email
         self.cursor, self.connection = lightning_pass.connect_to_database()
 
+    def __repr__(self):
+        return f"RegisterUser({self.username}, {self.password}, {self.confirm_password}, {self.email})"
+
     def credentials_eligibility(self):
         """Used to check whether submitted credentials meet the desired requirements."""
         utils.check_username(self.username)

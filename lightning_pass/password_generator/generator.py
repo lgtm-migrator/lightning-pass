@@ -18,6 +18,15 @@ class Generator:
         self.lowercase = lowercase
         self.uppercase = uppercase
 
+    def __repr__(self):
+        return f"""Generator(
+               {self.val_lst},
+               {self.length},
+               {self.numbers},
+               {self.symbols},
+               {self.lowercase},
+               {self.uppercase})"""
+
     def generate_password(self):
         if self.lowercase and self.uppercase:
             case_type = "both"
