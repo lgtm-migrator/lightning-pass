@@ -3,6 +3,8 @@ import re
 import secrets
 from secrets import compare_digest
 
+from bcrypt import gensalt, hashpw
+
 import lightning_pass
 from lightning_pass.users.exceptions import Exceptions as Exc
 
@@ -42,6 +44,11 @@ def check_password(password, confirm_password):
         raise Exc.InvalidPassword
     elif not compare_digest(password, confirm_password):
         raise Exc.PasswordsDoNotMatch
+
+
+def hash_password(password):
+    """Return a hashed password."""
+    return hashpw(password.encode("utf-8"), gensalt())
 
 
 def check_email(email):

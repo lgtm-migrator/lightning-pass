@@ -10,7 +10,7 @@ from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
 from lightning_pass.password_generator.collector import Collector
 from lightning_pass.password_generator.generator import Generator
 from lightning_pass.users.account import Account
-from lightning_pass.users.exceptions import Exceptions as E
+from lightning_pass.users.exceptions import Exceptions as Exc
 from lightning_pass.users.login import LoginUser
 from lightning_pass.users.register import RegisterUser
 from lightning_pass.users.utils import get_user_id, save_picture
@@ -57,8 +57,7 @@ class UiLightningPass(QMainWindow):
         self.setup_buttons()
         self.setup_menu_bar()
         self.center()
-        # Dark mode is the default theme.
-        self.toggle_stylesheet_dark()
+        self.toggle_stylesheet_dark()  # Dark mode is the default theme.
 
     def setup_ui(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
@@ -751,12 +750,12 @@ class UiLightningPass(QMainWindow):
         self.action_main_menu.triggered.connect(self.home_event)
         self.action_light.triggered.connect(
             lambda: self.toggle_stylesheet_light(
-                f"{pathlib.Path(__file__).parent}\\static\\light.qss"
+                pathlib.Path.joinpath(pathlib.Path(__file__).parent, "static/light.qss")
             )
         )
         self.action_dark.triggered.connect(
             lambda: self.toggle_stylesheet_dark(
-                f"{pathlib.Path(__file__).parent}\\static\\dark.qss"
+                pathlib.Path.joinpath(pathlib.Path(__file__).parent, "static/light.qss")
             )
         )
         self.action_generate.triggered.connect(self.generate_pass_event)
@@ -782,7 +781,7 @@ class UiLightningPass(QMainWindow):
         )
         try:
             user_to_login.log_in()
-        except E.AccountDoesNotExist:
+        except Exc.AccountDoesNotExist:
             MessageBoxes.invalid_login_box(self.message_boxes, "Login")
         else:
             user_id = get_user_id(self.log_username_line_edit.text(), "username")
@@ -807,17 +806,17 @@ class UiLightningPass(QMainWindow):
         )
         try:
             user_to_register.insert_into_db()
-        except E.InvalidUsername:
+        except Exc.InvalidUsername:
             MessageBoxes.invalid_username_box(self.message_boxes, "Register")
-        except E.InvalidPassword:
+        except Exc.InvalidPassword:
             MessageBoxes.invalid_password_box(self.message_boxes, "Register")
-        except E.InvalidEmail:
+        except Exc.InvalidEmail:
             MessageBoxes.invalid_email_box(self.message_boxes, "Register")
-        except E.UsernameAlreadyExists:
+        except Exc.UsernameAlreadyExists:
             MessageBoxes.username_already_exists_box(self.message_boxes, "Register")
-        except E.EmailAlreadyExists:
+        except Exc.EmailAlreadyExists:
             MessageBoxes.email_already_exists_box(self.message_boxes, "Register")
-        except E.PasswordsDoNotMatch:
+        except Exc.PasswordsDoNotMatch:
             MessageBoxes.passwords_do_not_match_box(self.message_boxes, "Register")
         else:
             MessageBoxes.account_creation_box(self.message_boxes, "Register")
@@ -881,6 +880,7 @@ class UiLightningPass(QMainWindow):
             self.stacked_widget.setCurrentWidget(self.account)
 
     def change_pfp_event(self):
+        """Change profile picture of current user."""
         fname, _ = QFileDialog.getOpenFileName(
             self,
             "Lightning Pass - Open your new profile picture",
@@ -892,11 +892,12 @@ class UiLightningPass(QMainWindow):
             self.account_event()
 
     def logout_event(self):
-        """Delete current user."""
+        """Logout current user."""
         del self.current_user
         self.home_event()
 
     def change_pass_event(self):
+        """Change password for current user."""
         ...
 
     def edit_details_event(self):
@@ -904,9 +905,9 @@ class UiLightningPass(QMainWindow):
         if self.current_user.username != self.account_username_line.text():
             try:
                 self.current_user.username = self.account_username_line.text()
-            except E.InvalidUsername:
+            except Exc.InvalidUsername:
                 MessageBoxes.invalid_username_box(self.message_boxes, "Account")
-            except E.UsernameAlreadyExists:
+            except Exc.UsernameAlreadyExists:
                 MessageBoxes.username_already_exists_box(self.message_boxes, "Account")
             else:
                 MessageBoxes.details_updated_box(
@@ -915,9 +916,9 @@ class UiLightningPass(QMainWindow):
         if self.current_user.email != self.account_email_line.text():
             try:
                 self.current_user.email = self.account_email_line.text()
-            except E.InvalidEmail:
+            except Exc.InvalidEmail:
                 MessageBoxes.invalid_email_box(self.message_boxes, "Account")
-            except E.EmailAlreadyExists:
+            except Exc.EmailAlreadyExists:
                 MessageBoxes.email_already_exists_box(self.message_boxes, "Account")
             else:
                 MessageBoxes.details_updated_box(self.message_boxes, "email", "Account")

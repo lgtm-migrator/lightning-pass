@@ -1,5 +1,8 @@
+from bcrypt import checkpw
+
 import lightning_pass
 from lightning_pass.users.exceptions import Exceptions as Exc
+from lightning_pass.users.utils import get_user_id
 
 
 # noinspection SqlInjection
@@ -26,10 +29,16 @@ class LoginUser:
     @staticmethod
     def check_details(cursor, username, password):
         """Check if login details match with a user in the database."""
-        sql = f"SELECT 1 FROM lightning_pass.credentials WHERE (username, password) = ('{username}', '{password}')"
+        sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}')"
         cursor.execute(sql)
         row = cursor.fetchall()
         if len(row) <= 0:
+            raise Exc.AccountDoesNotExist
+        user_id = get_user_id(username, "username")
+        sql = f"SELECT password FROM lightning_pass.credentials WHERE id is {user_id}"
+        cursor.execute(sql)
+        hashed_password = cursor.fetchone()
+        if not checkpw(password, hashed_password):
             raise Exc.AccountDoesNotExist
 
     def log_in(self):

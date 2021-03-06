@@ -10,7 +10,7 @@ from lightning_pass.gui.gui import UiLightningPass
 
 
 def _copy(self, target):
-    """Monkey Patching copy functionality."""
+    """Monkey Patching copy functionality into pathlib.Path object."""
     import shutil
 
     assert self.is_file()

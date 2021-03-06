@@ -90,7 +90,6 @@ class MessageBoxes(QWidget):
 
     def message_box_event(self, btn):
         """Handler for clicks on message box window"""
-        print(btn.text())
         if re.findall("Yes", btn.text()):
             self.login_event()
         if re.findall("Cancel", btn.text()):

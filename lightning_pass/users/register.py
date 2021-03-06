@@ -8,6 +8,7 @@ class RegisterUser:
         """Constructor for user"""
         self.username = username
         self.password = password
+        self.hashed_password = utils.hash_password(self.password)
         self.confirm_password = confirm_password
         self.email = email
         self.cursor, self.connection = lightning_pass.connect_to_database()
@@ -25,6 +26,6 @@ class RegisterUser:
         """Insert user into a database. If credentials check fails, a custom exception is raised."""
         self.credentials_eligibility()  # Exception expected here
         sql = "INSERT INTO lightning_pass.credentials (username, password, email) VALUES (%s, %s, %s)"
-        val = [self.username, self.password, self.email]
+        val = [self.username, self.hashed_password, self.email]
         self.cursor.execute(sql, val)
         self.connection.commit()
