@@ -15,8 +15,8 @@ from lightning_pass.users.login import LoginUser
 from lightning_pass.users.register import RegisterUser
 from lightning_pass.users.utils import get_user_id, save_picture
 
-default_picture = (
-    f"{pathlib.Path(__file__).parent}\\static\\profile_pictures\\default.png"
+default_picture = str(
+    pathlib.Path(__file__).parent / "static/profile_pictures/default.png"
 )
 
 
@@ -862,18 +862,25 @@ class UiLightningPass(QMainWindow):
         clipboard.copy(self.generate_pass_p2_final_pass_line.text())
 
     def account_event(self):
-        """Switch to account widget and reset previous values"""
-        user_id = get_user_id(self.log_username_line_edit.text(), "username")
-        self.current_user = Account(user_id)
-        self.account_username_line.setText(self.current_user.username)
-        self.account_email_line.setText(self.current_user.email)
-        self.account_last_log_date.setText(
-            f"Last login was {self.current_user.last_login_date}."
-        )
-        self.account_pfp_pixmap_lbl.setPixmap(
-            QtGui.QPixmap(self.current_user.profile_picture_path)
-        )
-        self.stacked_widget.setCurrentWidget(self.account)
+        """Switch to account widget and reset previous values.
+        Raises log in required error if an user tries to access the page without being logged in."""
+        try:
+            if self.current_user.user_id is None:
+                raise AttributeError
+        except AttributeError:
+            MessageBoxes.login_required_box(self.message_boxes, "Account")
+            self.login_event()
+        else:
+            self.current_user = Account(self.current_user.user_id)
+            self.account_username_line.setText(self.current_user.username)
+            self.account_email_line.setText(self.current_user.email)
+            self.account_last_log_date.setText(
+                f"Last login was {self.current_user.last_login_date}."
+            )
+            self.account_pfp_pixmap_lbl.setPixmap(
+                QtGui.QPixmap(self.current_user.profile_picture_path)
+            )
+            self.stacked_widget.setCurrentWidget(self.account)
 
     def change_pfp_event(self):
         fname, _ = QFileDialog.getOpenFileName(
@@ -894,19 +901,26 @@ class UiLightningPass(QMainWindow):
         ...
 
     def edit_details_event(self):
-        try:
-            self.current_user.username = self.account_username_line.text()
-            self.current_user.email = self.account_email_line.text()
-        except E.InvalidUsername:
-            MessageBoxes.invalid_username_box(self.message_boxes, "Account")
-        except E.InvalidEmail:
-            MessageBoxes.invalid_email_box(self.message_boxes, "Account")
-        except E.UsernameAlreadyExists:
-            MessageBoxes.username_already_exists_box(self.message_boxes, "Account")
-        except E.EmailAlreadyExists:
-            MessageBoxes.email_already_exists_box(self.message_boxes, "Account")
-        else:
-            MessageBoxes.details_updated_box(self.message_boxes, "Account")
+        if self.current_user.username != self.account_username_line.text():
+            try:
+                self.current_user.username = self.account_username_line.text()
+            except E.InvalidUsername:
+                MessageBoxes.invalid_username_box(self.message_boxes, "Account")
+            except E.UsernameAlreadyExists:
+                MessageBoxes.username_already_exists_box(self.message_boxes, "Account")
+            else:
+                MessageBoxes.details_updated_box(
+                    self.message_boxes, "username", "Account"
+                )
+        if self.current_user.email != self.account_email_line.text():
+            try:
+                self.current_user.email = self.account_email_line.text()
+            except E.InvalidEmail:
+                MessageBoxes.invalid_email_box(self.message_boxes, "Account")
+            except E.EmailAlreadyExists:
+                MessageBoxes.email_already_exists_box(self.message_boxes, "Account")
+            else:
+                MessageBoxes.details_updated_box(self.message_boxes, "email", "Account")
 
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_position_changed(self, pos):

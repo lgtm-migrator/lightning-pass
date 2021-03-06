@@ -8,60 +8,60 @@ class MessageBoxes(QWidget):
         """MessageBoxes constructor"""
         super().__init__(parent)
         self.main_win = parent
-        self.title_register = "Lightning Pass - Register"
+        self.title = "Lightning Pass"
 
     def invalid_username_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "This username is invalid.",
             QMessageBox.Warning,
         )
 
     def invalid_password_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "This password is invalid.",
             QMessageBox.Warning,
         )
 
     def invalid_email_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "This email is invalid.",
             QMessageBox.Warning,
         )
 
     def invalid_login_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "An account with that username or password doesn't exist.",
             QMessageBox.Warning,
         )
 
     def username_already_exists_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "This username already exists.",
             QMessageBox.Warning,
         )
 
     def email_already_exists_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "This email already exists.",
             QMessageBox.Warning,
         )
 
     def passwords_do_not_match_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "The passwords you entered do not match.",
             QMessageBox.Warning,
         )
 
     def account_creation_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "Account successfully created!",
             QMessageBox.Question,
             successful_registration=True,
@@ -69,15 +69,22 @@ class MessageBoxes(QWidget):
 
     def no_case_type_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
+            f"{self.title} - {widget}",
             "Can't generate password without any case type.",
             QMessageBox.Warning,
         )
 
-    def details_updated_box(self, widget):
+    def login_required_box(self, widget):
         self.show_message_box(
-            f"Lightning Pass - {widget}",
-            "Your details have been successfully updated!",
+            f"{self.title} - {widget}",
+            "Please log in to access that page.",
+            QMessageBox.Warning,
+        )
+
+    def details_updated_box(self, detail, widget):
+        self.show_message_box(
+            f"{self.title} - {widget}",
+            f"Your {detail} has been successfully updated!",
             QMessageBox.Question,
         )
 
