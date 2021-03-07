@@ -16,7 +16,7 @@ shed:
 flake8:
     stage: Static Analysis
     script:
-    - flake8
+    - flake8 --ignore=E501,W391,W503
 
 mypy:
     stage: Static Analysis
