@@ -3,6 +3,10 @@ image: python:latest
 before_script:
     - apt-get update
     - apt-get install ffmpeg libsm6 libxext6  -y
+
+    - mkdir /usr/bin/platforms
+    - ln -s /our/local/libqxcb.so /usr/bin/platforms/libqxcb.so
+
     - python --version
     - pip install -r requirements.txt
 
