@@ -34,4 +34,4 @@ mypy:
 pytest:
     stage: Test
     script:
-        - pytest
+        - pytest -s --no-qt-log
