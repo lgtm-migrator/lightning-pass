@@ -4,6 +4,7 @@ before_script:
     - apt-get update
     - apt-get install ffmpeg libsm6 libxext6  -y
     - apt-get install -y xvfb herbstluftwm
+    - apt-get install libxkbcommon-x11-0
 
     - QT_DEBUG_PLUGINS=1
     - mkdir /usr/bin/platforms
