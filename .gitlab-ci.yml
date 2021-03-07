@@ -1,7 +1,7 @@
 image: python:latest
 
 before_script:
-    - apk install libgl1-mesa-glx
+    - apt-get install libgl1-mesa-glx
     - python --version
     - pip install -r requirements.txt
 
