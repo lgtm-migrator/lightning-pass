@@ -17,7 +17,7 @@ def _copy(self, target):
     shutil.copy(str(self), str(target))  # str() only there for Python --version < 3.6
 
 
-pathlib.Path.copy = _copy
+pathlib.Path.copy = _copy  # type: ignore
 
 
 def connect_to_database():

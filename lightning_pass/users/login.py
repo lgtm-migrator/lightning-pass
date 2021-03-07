@@ -29,16 +29,19 @@ class LoginUser:
     @staticmethod
     def check_details(cursor, username, password):
         """Check if login details match with a user in the database."""
-        sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}')"
+        sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
         cursor.execute(sql)
-        row = cursor.fetchall()
+        row = cursor.fetchone()
         if len(row) <= 0:
             raise Exc.AccountDoesNotExist
         user_id = get_user_id(username, "username")
-        sql = f"SELECT password FROM lightning_pass.credentials WHERE id is {user_id}"
+        sql = f"SELECT password FROM lightning_pass.credentials WHERE id = {user_id}"
         cursor.execute(sql)
         hashed_password = cursor.fetchone()
-        if not checkpw(password, hashed_password):
+        try:
+            if not checkpw(password.encode("utf-8"), hashed_password):
+                raise Exc.AccountDoesNotExist
+        except TypeError:
             raise Exc.AccountDoesNotExist
 
     def log_in(self):

@@ -8,11 +8,6 @@ stages:
     - Static Analysis
     - Test
 
-black:
-    stage: Static Analysis
-    script:
-    - python -m black .
-
 shed:
     stage: Static Analysis
     script:
@@ -21,13 +16,13 @@ shed:
 flake8:
     stage: Static Analysis
     script:
-    - flake8 *.py
+    - flake8
 
 mypy:
     stage: Static Analysis
     allow_failure: true
     script:
-    - mypy *.py
+    - mypy lightning_pass --ignore-missing-imports
 
 pytest:
     stage: Test
