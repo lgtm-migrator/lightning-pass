@@ -4,7 +4,6 @@ before_script:
     - apt-get update
     - apt-get install ffmpeg libsm6 libxext6  -y
     - apt-get install -y xvfb herbstluftwm
-    - "herbstluftwm &"
 
     - QT_DEBUG_PLUGINS=1
     - mkdir /usr/bin/platforms
@@ -36,4 +35,5 @@ mypy:
 pytest:
     stage: Test
     script:
+        - "herbstluftwm &"
         - pytest -s --no-qt-log
