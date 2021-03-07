@@ -2,6 +2,8 @@ image: python:latest
 
 before_script:
     - python --version
+    - RUN apt-get update
+    - RUN apt-get install ffmpeg libsm6 libxext6  -y
     - pip install -r requirements.txt
 
 stages:
@@ -27,6 +29,4 @@ mypy:
 pytest:
     stage: Test
     script:
-        - RUN apt-get update
-        - RUN apt-get install ffmpeg libsm6 libxext6  -y
         - pytest
