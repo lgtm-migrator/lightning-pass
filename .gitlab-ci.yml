@@ -13,7 +13,7 @@ stages:
 shed:
     stage: Static Analysis
     script:
-        - shed
+        - shed --refactor
 
 flake8:
     stage: Static Analysis
