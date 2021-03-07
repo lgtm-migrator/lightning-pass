@@ -1,6 +1,7 @@
 image: python:latest
 
 before_script:
+    - apt-get update
     - apt-get install ffmpeg libsm6 libxext6  -y
     - python --version
     - pip install -r requirements.txt
