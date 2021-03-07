@@ -1,0 +1,47 @@
+language: python
+python:
+  - "3.9.1"
+
+sudo: required
+
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install ffmpeg libsm6 libxext6  -y
+  - sudo apt-get install -y xvfb herbstluftwm
+
+install:
+  - "export DISPLAY=:99.0"
+  - "/sbin/start-stop-daemon --start --quiet --pidfile /tmp/custom_xvfb_99.pid --make-pidfile --background --exec /usr/bin/Xvfb -- :99 -screen 0 1920x1200x24 -ac +extension GLX +render -noreset"
+
+before_script:
+  - QT_DEBUG_PLUGINS=1
+  - mkdir /usr/bin/platforms
+  - ln -s /our/local/libqxcb.so /usr/bin/platforms/libqxcb.so
+
+  - python --version
+  - pip install -r requirements.txt
+
+stages:
+  - Static Analysis
+  - Test
+
+shed:
+  stage: Static Analysis
+  script:
+    - shed --refactor
+
+flake8:
+  stage: Static Analysis
+  script:
+    - flake8 --ignore=E501,W391,W503
+
+mypy:
+  stage: Static Analysis
+  allow_failure: true
+  script:
+    - mypy lightning_pass --ignore-missing-imports
+
+pytest:
+  stage: Test
+  script:
+    - pytest -s --no-qt-log
