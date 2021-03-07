@@ -11,21 +11,22 @@ stages:
 shed:
     stage: Static Analysis
     script:
-    - shed
+        - shed
 
 flake8:
     stage: Static Analysis
     script:
-    - flake8 --ignore=E501,W391,W503
+        - flake8 --ignore=E501,W391,W503
 
 mypy:
     stage: Static Analysis
     allow_failure: true
     script:
-    - mypy lightning_pass --ignore-missing-imports
+        - mypy lightning_pass --ignore-missing-imports
 
 pytest:
     stage: Test
     script:
-    - sudo apt install libgl1-mesa-glx --yes
-    - pytest
+        - sudo apt update
+        - sudo apt install libgl1-mesa-glx
+        - pytest
