@@ -27,4 +27,5 @@ mypy:
 pytest:
     stage: Test
     script:
+    - sudo apt install libgl1-mesa-glx --yes
     - pytest
