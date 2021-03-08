@@ -42,7 +42,7 @@ pytest:
         - mkdir /usr/bin/platforms
          - ln -s /our/local/libqxcb.so /usr/bin/platforms/libqxcb.so
     script:
-        - "herbstluftwm &"
+        - herbstluftwm
         - pytest -s --no-qt-log
     tags:
         - ci
