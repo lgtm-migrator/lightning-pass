@@ -5,7 +5,7 @@ class MouseTracker(QtCore.QObject):
     positionChanged = QtCore.pyqtSignal(QtCore.QPoint)
 
     def __init__(self, widget):
-        """Mouse Tracker contructor"""
+        """Class contructor."""
         super().__init__(widget)
         self._widget = widget
         self.widget.setMouseTracking(True)
@@ -16,6 +16,7 @@ class MouseTracker(QtCore.QObject):
         return self._widget
 
     def eventFilter(self, o, e):
+        """Event filter."""
         if o is self.widget and e.type() == QtCore.QEvent.MouseMove:
             self.positionChanged.emit(e.pos())
         return super().eventFilter(o, e)

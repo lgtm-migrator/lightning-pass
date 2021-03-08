@@ -10,10 +10,18 @@ from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
 from lightning_pass.password_generator.collector import Collector
 from lightning_pass.password_generator.generator import Generator
 from lightning_pass.users.account import Account
-from lightning_pass.users.exceptions import Exceptions as Exc
 from lightning_pass.users.login import LoginUser
 from lightning_pass.users.register import RegisterUser
-from lightning_pass.users.utils import get_user_id, save_picture
+from lightning_pass.util.exceptions import (
+    AccountDoesNotExist,
+    EmailAlreadyExists,
+    InvalidEmail,
+    InvalidPassword,
+    InvalidUsername,
+    PasswordsDoNotMatch,
+    UsernameAlreadyExists,
+)
+from lightning_pass.util.utils import get_user_id, save_picture
 
 default_picture = str(
     pathlib.Path(__file__).parent / "static/profile_pictures/default.png"
@@ -781,7 +789,7 @@ class UiLightningPass(QMainWindow):
         )
         try:
             user_to_login.log_in()
-        except Exc.AccountDoesNotExist:
+        except AccountDoesNotExist:
             MessageBoxes.invalid_login_box(self.message_boxes, "Login")
         else:
             user_id = get_user_id(self.log_username_line_edit.text(), "username")
@@ -806,17 +814,17 @@ class UiLightningPass(QMainWindow):
         )
         try:
             user_to_register.insert_into_db()
-        except Exc.InvalidUsername:
+        except InvalidUsername:
             MessageBoxes.invalid_username_box(self.message_boxes, "Register")
-        except Exc.InvalidPassword:
+        except InvalidPassword:
             MessageBoxes.invalid_password_box(self.message_boxes, "Register")
-        except Exc.InvalidEmail:
+        except InvalidEmail:
             MessageBoxes.invalid_email_box(self.message_boxes, "Register")
-        except Exc.UsernameAlreadyExists:
+        except UsernameAlreadyExists:
             MessageBoxes.username_already_exists_box(self.message_boxes, "Register")
-        except Exc.EmailAlreadyExists:
+        except EmailAlreadyExists:
             MessageBoxes.email_already_exists_box(self.message_boxes, "Register")
-        except Exc.PasswordsDoNotMatch:
+        except PasswordsDoNotMatch:
             MessageBoxes.passwords_do_not_match_box(self.message_boxes, "Register")
         else:
             MessageBoxes.account_creation_box(self.message_boxes, "Register")
@@ -905,9 +913,9 @@ class UiLightningPass(QMainWindow):
         if self.current_user.username != self.account_username_line.text():
             try:
                 self.current_user.username = self.account_username_line.text()
-            except Exc.InvalidUsername:
+            except InvalidUsername:
                 MessageBoxes.invalid_username_box(self.message_boxes, "Account")
-            except Exc.UsernameAlreadyExists:
+            except UsernameAlreadyExists:
                 MessageBoxes.username_already_exists_box(self.message_boxes, "Account")
             else:
                 MessageBoxes.details_updated_box(
@@ -916,9 +924,9 @@ class UiLightningPass(QMainWindow):
         if self.current_user.email != self.account_email_line.text():
             try:
                 self.current_user.email = self.account_email_line.text()
-            except Exc.InvalidEmail:
+            except InvalidEmail:
                 MessageBoxes.invalid_email_box(self.message_boxes, "Account")
-            except Exc.EmailAlreadyExists:
+            except EmailAlreadyExists:
                 MessageBoxes.email_already_exists_box(self.message_boxes, "Account")
             else:
                 MessageBoxes.details_updated_box(self.message_boxes, "email", "Account")

@@ -5,7 +5,7 @@ from PyQt5.QtWidgets import QMessageBox, QWidget
 
 class MessageBoxes(QWidget):
     def __init__(self, parent):
-        """MessageBoxes constructor"""
+        """Class constructor."""
         super().__init__(parent)
         self.main_win = parent
         self.title = "Lightning Pass"
