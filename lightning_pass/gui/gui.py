@@ -3,12 +3,12 @@ import pathlib
 import clipboard
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QDesktopWidget, QFileDialog, QMainWindow
+from PyQt5.QtWidgets import QDesktopWidget, QFileDialog, QMainWindow, QMessageBox
 
 from lightning_pass.gui.message_boxes import MessageBoxes
+from lightning_pass.gui.mouse_randomness.collector import Collector
+from lightning_pass.gui.mouse_randomness.generator import Generator
 from lightning_pass.gui.mouse_randomness.mouse_tracker import MouseTracker
-from lightning_pass.password_generator.collector import Collector
-from lightning_pass.password_generator.generator import Generator
 from lightning_pass.users.account import Account
 from lightning_pass.users.login import LoginUser
 from lightning_pass.users.register import RegisterUser
@@ -771,6 +771,19 @@ class UiLightningPass(QMainWindow):
         self.action_register.triggered.connect(self.register_event)
         self.action_account.triggered.connect(self.account_event)
         self.action_forgot_password.triggered.connect(self.forgot_password_event)
+
+    def closeEvent(self, event):
+        print("closed")
+        result = QMessageBox.question(
+            self,
+            "Confirm Exit...",
+            "Are you sure you want to exit ?",
+            QtGui.QMessageBox.Yes | QtGui.QMessageBox.No,
+        )
+        event.ignore()
+
+        if result == QtGui.QMessageBox.Yes:
+            event.accept()
 
     def home_event(self):
         """Switch to home widget."""

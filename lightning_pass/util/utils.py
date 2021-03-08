@@ -69,7 +69,8 @@ def check_password(password, confirm_password):
     if (
         len(password) < 8
         or len(re.findall(r"[A-Z]", password)) <= 0
-        or len(re.findall(r"[0-9~!@#$%^&*()_+/\[\]{}:'\"<>?|;-\\]", password)) <= 0
+        or len(password) - len(re.findall(r"[A-Za-z0-9]", password))
+        <= 0  # Negative check for special characters
     ):
         raise InvalidPassword
     elif not compare_digest(password, confirm_password):

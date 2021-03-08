@@ -1,12 +1,8 @@
 import os
-import sys
 from pathlib import Path
 
 import mysql.connector as mysql
 from dotenv import load_dotenv
-from PyQt5.QtWidgets import QApplication
-
-from lightning_pass.gui.gui import UiLightningPass
 
 
 def _copy(self, target):
@@ -52,16 +48,3 @@ def connect_to_database():
              """
     cursor.execute(sql)
     return cursor, connection
-
-
-def create_app():
-    """App creation.
-
-    :returns app: app instance
-    :rtype QApplication
-
-    """
-    app = QApplication(sys.argv)
-    window = UiLightningPass()
-    window.show()
-    return app

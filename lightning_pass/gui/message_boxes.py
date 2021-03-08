@@ -4,10 +4,11 @@ from PyQt5.QtWidgets import QMessageBox, QWidget
 
 
 class MessageBoxes(QWidget):
-    def __init__(self, parent):
+    def __init__(self, child, parent):
         """Class constructor."""
         super().__init__(parent)
-        self.main_win = parent
+        self.events = parent.events
+        self.main_win = child
         self.title = "Lightning Pass"
 
     def invalid_username_box(self, widget):
@@ -91,9 +92,9 @@ class MessageBoxes(QWidget):
     def message_box_event(self, btn):
         """Handler for clicks on message box window"""
         if re.findall("Yes", btn.text()):
-            self.login_event()
+            self.events.login_event()
         if re.findall("Cancel", btn.text()):
-            self.register_event()
+            self.events.register_event()
 
     def show_message_box(self, title, text, icon, successful_registration=False):
         """Show message box with information about registration process"""

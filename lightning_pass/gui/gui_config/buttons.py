@@ -1,83 +1,80 @@
-import pathlib
-
-from PyQt5.QtWidgets import QWidget
+from pathlib import Path
 
 
-class Buttons(QWidget):
-    def __init__(self, parent):
+class Buttons:
+    def __init__(self, parent, *args, **kwargs):
         """Buttons constructor"""
-        super().__init__(parent)
-        self.main_win = parent.main_win
-        self.setup_buttons(self.main_win)
-        self.setup_menu_bar()
+        super().__init__(*args, **kwargs)
+        self.main_win = parent
+        self.ui = parent.ui
 
     def setup_buttons(self):
         """Connect all buttons."""
-        self.parent.home_login_btn.clicked.connect(self.main_win.login_event)
-        self.main_win.home_register_btn.clicked.connect(self.main_win.register_event)
-        self.main_win.home_generate_password_btn.clicked.connect(
-            self.main_win.generate_pass_event
+        self.ui.home_login_btn.clicked.connect(self.main_win.events.login_event)
+        self.ui.home_register_btn.clicked.connect(self.main_win.events.register_event)
+        self.ui.home_generate_password_btn.clicked.connect(
+            self.main_win.events.generate_pass_event
         )
 
-        self.main_win.log_main_btn.clicked.connect(self.main_win.home_event)
-        self.main_win.log_forgot_pass_btn.clicked.connect(
-            self.main_win.forgot_password_event
+        self.ui.log_main_btn.clicked.connect(self.main_win.events.home_event)
+        self.ui.log_forgot_pass_btn.clicked.connect(
+            self.main_win.events.forgot_password_event
         )
-        self.main_win.log_login_btn_2.clicked.connect(self.main_win.login_user_event)
+        self.ui.log_login_btn_2.clicked.connect(self.main_win.events.login_user_event)
 
-        self.main_win.reg_main_btn.clicked.connect(self.main_win.home_event)
-        self.main_win.reg_register_btn.clicked.connect(
-            self.main_win.register_user_event
-        )
-
-        self.main_win.forgot_pass_main_menu_btn.clicked.connect(
-            self.main_win.home_event
+        self.ui.reg_main_btn.clicked.connect(self.main_win.events.home_event)
+        self.ui.reg_register_btn.clicked.connect(
+            self.main_win.events.register_user_event
         )
 
-        self.main_win.generate_pass_generate_btn.clicked.connect(
-            self.main_win.generate_pass_phase2_event
-        )
-        self.main_win.generate_pass_main_menu_btn.clicked.connect(
-            self.main_win.home_event
-        )
-        self.main_win.generate_pass_p2_main_btn.clicked.connect(
-            self.main_win.home_event
-        )
-        self.main_win.generate_pass_p2_copy_btn.clicked.connect(
-            self.main_win.copy_password_event
+        self.ui.forgot_pass_main_menu_btn.clicked.connect(
+            self.main_win.events.home_event
         )
 
-        self.main_win.account_main_menu_btn.clicked.connect(self.main_win.home_event)
-        self.main_win.account_change_pfp_btn.clicked.connect(
-            self.main_win.change_pfp_event
+        self.ui.generate_pass_generate_btn.clicked.connect(
+            self.main_win.events.generate_pass_phase2_event
         )
-        self.main_win.account_logout_btn.clicked.connect(self.main_win.logout_event)
-        self.main_win.account_change_pass_btn.clicked.connect(
-            self.main_win.change_pass_event
+        self.ui.generate_pass_main_menu_btn.clicked.connect(
+            self.main_win.events.home_event
         )
-        self.main_win.account_edit_details_btn.clicked.connect(
-            self.main_win.edit_details_event
+        self.ui.generate_pass_p2_main_btn.clicked.connect(
+            self.main_win.events.home_event
+        )
+        self.ui.generate_pass_p2_copy_btn.clicked.connect(
+            self.main_win.events.copy_password_event
+        )
+
+        self.ui.account_main_menu_btn.clicked.connect(self.main_win.events.home_event)
+        self.ui.account_change_pfp_btn.clicked.connect(
+            self.main_win.events.change_pfp_event
+        )
+        self.ui.account_logout_btn.clicked.connect(self.main_win.events.logout_event)
+        self.ui.account_change_pass_btn.clicked.connect(
+            self.main_win.events.change_pass_event
+        )
+        self.ui.account_edit_details_btn.clicked.connect(
+            self.main_win.events.edit_details_event
         )
 
     def setup_menu_bar(self):
         """Connect all menu bar actions."""
-        self.main_win.action_main_menu.triggered.connect(self.main_win.home_event)
-        self.main_win.action_light.triggered.connect(
-            lambda: self.main_win.toggle_stylesheet_light(
-                f"{pathlib.Path(__file__).parent}\\static\\light.qss"
+        self.ui.action_main_menu.triggered.connect(self.main_win.events.home_event)
+        self.ui.action_light.triggered.connect(
+            lambda: self.main_win.events.toggle_stylesheet_light(
+                f"{Path(__file__).parent}\\static\\light.qss"
             )
         )
-        self.main_win.action_dark.triggered.connect(
-            lambda: self.main_win.toggle_stylesheet_dark(
-                f"{pathlib.Path(__file__).parent}\\static\\dark.qss"
+        self.ui.action_dark.triggered.connect(
+            lambda: self.main_win.events.toggle_stylesheet_dark(
+                f"{Path(__file__).parent}\\static\\dark.qss"
             )
         )
-        self.main_win.action_generate.triggered.connect(
-            self.main_win.generate_pass_event
+        self.ui.action_generate.triggered.connect(
+            self.main_win.events.generate_pass_event
         )
-        self.main_win.action_login.triggered.connect(self.main_win.login_event)
-        self.main_win.action_register.triggered.connect(self.main_win.register_event)
-        self.main_win.action_account.triggered.connect(self.main_win.account_event)
-        self.main_win.action_forgot_password.triggered.connect(
-            self.main_win.forgot_password_event
+        self.ui.action_login.triggered.connect(self.main_win.events.login_event)
+        self.ui.action_register.triggered.connect(self.main_win.events.register_event)
+        self.ui.action_account.triggered.connect(self.main_win.events.account_event)
+        self.ui.action_forgot_password.triggered.connect(
+            self.main_win.events.forgot_password_event
         )

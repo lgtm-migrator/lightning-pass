@@ -1,7 +1,11 @@
 import sys
 
-from lightning_pass import create_app
+from PyQt5.QtWidgets import QApplication
+
+from lightning_pass.gui.gui2 import LightningPassWindow
 
 if __name__ == "__main__":
-    app = create_app()
+    app = QApplication(sys.argv)
+    window = LightningPassWindow()
+    window.show()
     sys.exit(app.exec_())
