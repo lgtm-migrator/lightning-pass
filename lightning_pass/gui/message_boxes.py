@@ -18,7 +18,7 @@ class MessageBoxes(QWidget):
     def invalid_username_box(self, parent: str) -> None:
         """Show invalid username message box.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -32,7 +32,7 @@ class MessageBoxes(QWidget):
     def invalid_password_box(self, parent: str) -> None:
         """Show invalid password message box.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -51,7 +51,7 @@ contain atleast one special character.
     def invalid_email_box(self, parent: str) -> None:
         """Show invalid email message box.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -63,7 +63,7 @@ contain atleast one special character.
     def invalid_login_box(self, parent: str) -> None:
         """Show invalid login message box.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
 
@@ -92,7 +92,7 @@ contain atleast one special character.
     def username_already_exists_box(self, parent: str) -> None:
         """Show username already exists message box.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -104,7 +104,7 @@ contain atleast one special character.
     def email_already_exists_box(self, parent: str) -> None:
         """Show email already exists message box.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -116,7 +116,7 @@ contain atleast one special character.
     def passwords_do_not_match_box(self, parent: str) -> None:
         """Show passwords do not match message box.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -128,7 +128,7 @@ contain atleast one special character.
     def account_creation_box(self, parent: str) -> None:
         """Show successful account creatio message box.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
 
@@ -157,7 +157,7 @@ contain atleast one special character.
     def no_case_type_box(self, parent: str) -> None:
         """Show message box indicating that password can't be generated with current case type option.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -169,7 +169,7 @@ contain atleast one special character.
     def login_required_box(self, parent: str) -> None:
         """Show message box indicating that password can't be generated with current case type option.
 
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -182,7 +182,7 @@ contain atleast one special character.
         """Show message box indicating that password can't be generated with current case type option.
 
         :param str detail: specifies which detail was updated
-        :param str parent: specifies which window insantiated current box
+        :param str parent: specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
