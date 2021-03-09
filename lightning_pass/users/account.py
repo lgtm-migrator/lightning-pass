@@ -35,7 +35,7 @@ class Account:
     @classmethod
     def register(
         cls, username: str, password: str, confirm_password: str, email: str
-    ) -> object:
+    ) -> "Account":
         """Secondary class constructor for register.
 
         :param str username: user's username
@@ -68,7 +68,7 @@ class Account:
         return cls(get_user_id(value=username, column="username"))
 
     @classmethod
-    def login(cls, username: str, password: str) -> object:
+    def login(cls, username: str, password: str) -> "Account":
         """Secondary class constructor for login.
         Updates last_login_date if log in is successful.
 

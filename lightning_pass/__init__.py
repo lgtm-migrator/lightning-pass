@@ -1,11 +1,12 @@
 import os
-from pathlib import Path
+import pathlib
+from typing import Tuple
 
 import mysql.connector as mysql
 from dotenv import load_dotenv
 
 
-def _copy(self, target):
+def _copy(self: pathlib.Path, target: pathlib.Path) -> None:
     """Monkey Patch copy functionality into pathlib.Path object."""
     import shutil
 
@@ -13,11 +14,11 @@ def _copy(self, target):
     shutil.copy(str(self), str(target))  # str() only there for Python --version < 3.6
 
 
-Path.copy = _copy  # type: ignore
+pathlib.Path.copy = _copy  # type: ignore
 
 
-def connect_to_database():
-    """Initialize database connection.
+def connect_to_database() -> Tuple["MySQLCursor", "MySQLConnection"]:
+    """Initialize database connection. Create table if not exists.
 
     :returns cursor, connection
     :rtype tuple

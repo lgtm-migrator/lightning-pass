@@ -46,10 +46,9 @@ class Events:
                 self.ui.log_password_line_edit.text(),
             )
         except AccountDoesNotExist:
-            del self.ui.current_user
             MessageBoxes.invalid_login_box(self.ui.message_boxes, "Login")
         else:
-            self.ui.account_event()
+            self.account_event()
 
     def register_event(self) -> None:
         """Switch to register widget and reset previous values."""
@@ -144,14 +143,14 @@ class Events:
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
         fname, _ = QFileDialog.getOpenFileName(
-            self.ui,
+            self.parent,
             "Lightning Pass - Open your new profile picture",
             "c:\\",
             "Image files (*.jpg *.png)",
         )
         if fname:
             self.ui.current_user.profile_picture = save_picture(pathlib.Path(fname))
-            self.ui.account_event()
+            self.account_event()
 
     def logout_event(self) -> None:
         """Logout current user."""
