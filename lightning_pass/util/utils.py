@@ -1,3 +1,4 @@
+"""This module holds various functions used throughout the whole project."""
 import pathlib
 import re
 import secrets
@@ -52,12 +53,13 @@ def check_username(username: str) -> None:
 
     if not len(row) <= 0:
         raise UsernameAlreadyExists
-    elif len(username) < 5:
+    if len(username) < 5:
         raise InvalidUsername
 
 
 def check_password(password: str, confirm_password: str) -> None:
-    """Check whether a password matches a required pattern and if it is the same as confirm_password.
+    """Check whether a password matches a required pattern
+    and if it is the same as confirm_password.
 
     :param str password:
     :param str confirm_password:
@@ -73,7 +75,7 @@ def check_password(password: str, confirm_password: str) -> None:
         <= 0  # Negative check for special characters
     ):
         raise InvalidPassword
-    elif not compare_digest(password, confirm_password):
+    if not compare_digest(password, confirm_password):
         raise PasswordsDoNotMatch
 
 
@@ -105,7 +107,7 @@ def check_email(email: str) -> None:
 
     if not len(row) <= 0:
         raise EmailAlreadyExists
-    elif not re.search(REGEX_EMAIL, email):
+    if not re.search(REGEX_EMAIL, email):
         raise InvalidEmail
 
 
@@ -134,7 +136,7 @@ def save_picture(picture_path: pathlib.Path) -> str:
 def get_profile_picture_path(profile_picture: str) -> pathlib.Path:
     """Return the absolute path of a given profile picture from the profile pictures folder.
 
-    :param str profile_picture: Filename of a registered users profile picture collected from the database.
+    :param str profile_picture: filename of the registered users profile picture
 
     :returns path to the profile picture.
     :rtype pathlib.Path

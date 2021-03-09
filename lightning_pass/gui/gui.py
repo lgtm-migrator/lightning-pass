@@ -1,3 +1,4 @@
+"""Holds main GUI class."""
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
 
@@ -8,6 +9,8 @@ from .static.qt_designer.output.main import Ui_lightning_pass
 
 
 class LightningPassWindow(QMainWindow):
+    """Main Window."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -28,7 +31,8 @@ class LightningPassWindow(QMainWindow):
 
         self.general_setup()
 
-    def __repr__(self):
+    def __repr__(self) -> str:
+        """Provide information about this class."""
         return "Lightning Pass :)"
 
     def show(self):

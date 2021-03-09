@@ -1,6 +1,5 @@
 import pytest
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QPushButton
 from pytestqt.qtbot import QtBot
 
 from lightning_pass.gui.gui import LightningPassWindow
@@ -37,13 +36,13 @@ def app(qtbot: QtBot) -> LightningPassWindow:
     ],
 )
 def test_buttons(
-    app: LightningPassWindow, qtbot: QtBot, widget: QPushButton, index: int
+    app: LightningPassWindow, qtbot: QtBot, widget: str, index: int
 ) -> None:
-    """Test if each button correctly switches to correct stackedWidget.
+    """Test if each button correctly switches to correct stacked_widget index.
 
     :param LightningPassWindow app: main window instance
     :param QtBot qtbot: QtBot instance
-    :param QPushButton widget: QPushButton instance
+    :param str widget: QPushButton pointer
     :param int index: stacked_widget expected index,
         index 0: app.ui.home
         index 1: app.ui.login
@@ -56,4 +55,20 @@ def test_buttons(
     """
     widget = getattr(app.ui, widget)
     qtbot.mouseClick(widget, QtCore.Qt.LeftButton)
+    assert app.ui.stacked_widget.currentIndex() == index
+
+
+@pytest.mark.parametrize(
+    "menu_bar_action, index",
+    [
+        ("action_main_menu", 0),
+        ("action_generate", 4),
+        ("action_login", 1),
+        ("action_register", 2),
+        ("action_forgot_password", 3),
+    ],
+)
+def test_menu_bar(app, menu_bar_action, index):
+    action = getattr(app.ui, menu_bar_action)
+    action.trigger()
     assert app.ui.stacked_widget.currentIndex() == index

@@ -8,23 +8,43 @@ stages:
     - Static Analysis
     - Test
 
-shed:
+black:
     stage: Static Analysis
     script:
-        - shed --refactor
+        - black --check .
     tags:
         - ci
 
 flake8:
     stage: Static Analysis
     script:
-        - flake8 --ignore=E501,W391,W503
+        - flake8 --ignore=E501,W391,W503,D100,D104
+    tags:
+        - ci
+
+pydocstyle:
+    stage: Static Analysis
+    script:
+        - pydocstyle
+    tags:
+        - ci
+
+pylama:
+    stage: Static Analysis
+    script:
+        - pylama -i W391,E501
+    tags:
+        - ci
+
+pylint:
+    stage: Static Analysis
+    script:
+        - pylint --disable=W0201,I1101,E0611,C0301 lightning_pass --ignore main.py
     tags:
         - ci
 
 mypy:
     stage: Static Analysis
-    allow_failure: true
     script:
         - mypy lightning_pass --ignore-missing-imports
     tags:

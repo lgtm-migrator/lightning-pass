@@ -1,3 +1,6 @@
+"""This module holds all custom exceptions used throughout the project."""
+
+
 class InvalidUsername(AttributeError):
     """Raised when a username doesn't meet a required username pattern."""
 

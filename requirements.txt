@@ -12,6 +12,10 @@ python-dotenv~=0.15.0
 black
 shed
 flake8
+flake8_docstrings
+pydocstyle
+pylama
+pylint
 mypy
 
 pytest~=6.2.2
