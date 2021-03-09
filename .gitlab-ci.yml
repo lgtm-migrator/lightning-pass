@@ -1,6 +1,23 @@
 image: python:latest
 
 before_script:
+    - apt-get update
+    - apt-get install -y build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev libffi-dev
+    - version=3.9.1
+    - wget -O /tmp/Python-$version.tar.xz https://www.python.org/ftp/python/$version/Python-$version.tar.xz
+    - cd /tmp
+    - tar xf Python-$version.tar.xz
+    - cd Python-$version
+    - ./configure --enable-optimizations
+    - make altinstall
+    - apt -y autoremove
+    - ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
+    - echo "alias python=/usr/local/bin/python3.9" >> ~/.bashrc
+    - echo "alias python3=/usr/local/bin/python3.9" >> ~/.bashrc
+    - source ~/.bashrc
+    - cd ..
+    - . ~/.bashrc
+
     - python3 -V
     - python3 -m pip install -r requirements.txt
 
