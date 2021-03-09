@@ -58,8 +58,7 @@ def check_username(username: str) -> None:
 
 
 def check_password(password: str, confirm_password: str) -> None:
-    """Check whether a password matches a required pattern
-    and if it is the same as confirm_password.
+    """Check whether a password matches a required pattern and if it is the same as confirm_password.
 
     :param str password:
     :param str confirm_password:
