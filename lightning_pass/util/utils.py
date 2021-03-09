@@ -113,6 +113,7 @@ def check_email(email: str) -> None:
 
 def save_picture(picture_path: pathlib.Path) -> str:
     """Save picture into profile pictures folder with a token_hex filename.
+
     Uses the monkey patched copy function of pathlib.Path object to copy the profile picture.
 
     :param pathlib.Path picture_path:
