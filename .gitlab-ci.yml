@@ -2,7 +2,6 @@ image: python:latest
 
 before_script:
     - echo "pi ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
-
     - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
     - python3 get-pip.py
     - sudo apt-get update python3-pip python3-setuptools python3-psutil python3-bottle python3-requests -y
