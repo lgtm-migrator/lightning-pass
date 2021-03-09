@@ -1,0 +1,8 @@
+# Project configuration files
+/.idea/
+
+# Enviroment
+/.env
+
+# Useless profile pictures
+/lightning_pass/users/profile_pictures/
