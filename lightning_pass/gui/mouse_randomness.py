@@ -26,7 +26,7 @@ class MouseTracker(QtCore.QObject):
         return self._widget
 
     def eventFilter(self, o: QLabel, e: QtCore.QEvent.MouseMove) -> object:
-        """Event filter
+        """Event filter.
 
         :param QLabel o: label object
         :param MouseMove e: mouse move event
