@@ -1,8 +1,8 @@
 image: python:latest
 
 before_script:
-    - python3 -V
-    - python3 -m pip install -r requirements.txt
+    - python -V
+    - python -m pip install -r requirements.txt
 
 stages:
     - Static Analysis
