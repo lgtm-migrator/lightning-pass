@@ -1,8 +1,8 @@
 image: python:latest
 
 before_script:
-    - curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
-    - python3 get-pip.py
+    - curl https://bootstrap.pypa.io/get-pip.py | python3
+    - apt-get update && apt-get upgrade python3-pip
     - apt-get update python3-pip python3-setuptools python3-psutil python3-bottle python3-requests -y
     - apt install python-dev -y
     - python3 -V
