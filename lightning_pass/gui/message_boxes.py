@@ -43,8 +43,7 @@ class MessageBoxes(QWidget):
         box.setInformativeText(
             """Password must be at least 8 characters long,
 contain atleast 1 capital letter,
-contain atleast one special character.
-"""
+contain atleast one special character."""
         )
         box.exec_()
 
