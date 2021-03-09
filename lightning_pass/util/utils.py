@@ -19,7 +19,7 @@ from .exceptions import (
 REGEX_EMAIL = r"^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
 
 
-def get_user_id(value, column):
+def get_user_id(value: str, column: str) -> int or bool:
     """Gets user id from any user detail and its column.
 
     :param str value: any user value stored in the database.
@@ -36,7 +36,7 @@ def get_user_id(value, column):
         return False
 
 
-def check_username(username):
+def check_username(username: str) -> None:
     """Check whether a username already exists in a database and if it matches a required pattern.
 
     :param str username: Account username
@@ -56,7 +56,7 @@ def check_username(username):
         raise InvalidUsername
 
 
-def check_password(password, confirm_password):
+def check_password(password: str, confirm_password: str) -> None:
     """Check whether a password matches a required pattern and if it is the same as confirm_password.
 
     :param str password:
@@ -77,19 +77,19 @@ def check_password(password, confirm_password):
         raise PasswordsDoNotMatch
 
 
-def hash_password(password):
+def hash_password(password: str) -> bytes:
     """Hash password by bcrypt with "utf-8" encoding and gensalt().
 
     :param str password: password to an user account.
 
     :returns: hashed password by bcrypt.
-    :rtype byte
+    :rtype bytes
 
     """
     return hashpw(password.encode("utf-8"), gensalt())
 
 
-def check_email(email):
+def check_email(email: str) -> None:
     """Check whether an email already exists and if it matches a correct email pattern.
 
     :param str email: user's email
@@ -109,7 +109,7 @@ def check_email(email):
         raise InvalidEmail
 
 
-def save_picture(picture_path):
+def save_picture(picture_path: pathlib.Path) -> str:
     """Save picture into profile pictures folder with a token_hex filename.
     Uses the monkey patched copy function of pathlib.Path object to copy the profile picture.
 
@@ -124,14 +124,14 @@ def save_picture(picture_path):
     picture_filename = random_hex + f_ext
 
     absolute_path = pathlib.Path().absolute()
-    save_path = f"lightning_pass/gui/static/profile_pictures/{picture_filename}"
+    save_path = f"lightning_pass/users/profile_pictures/{picture_filename}"
     final_path = pathlib.Path.joinpath(absolute_path, save_path)
 
     pathlib.Path.copy(picture_path, final_path)
     return picture_filename
 
 
-def profile_picture_path(profile_picture):
+def get_profile_picture_path(profile_picture: str) -> pathlib.Path:
     """Return the absolute path of a given profile picture from the profile pictures folder.
 
     :param str profile_picture: Filename of a registered users profile picture collected from the database.
@@ -141,5 +141,5 @@ def profile_picture_path(profile_picture):
 
     """
     absolute_path = pathlib.Path().absolute()
-    picture_path = f"lightning_pass/gui/static/profile_pictures/{profile_picture}"
+    picture_path = f"lightning_pass/users/profile_pictures/{profile_picture}"
     return pathlib.Path.joinpath(absolute_path, picture_path)

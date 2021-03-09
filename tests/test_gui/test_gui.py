@@ -3,11 +3,19 @@ from PyQt5 import QtCore
 from PyQt5.QtWidgets import QPushButton
 from pytestqt.qtbot import QtBot
 
-from lightning_pass.gui.gui2 import LightningPassWindow
+from lightning_pass.gui.gui import LightningPassWindow
 
 
 @pytest.fixture
-def app(qtbot):
+def app(qtbot: QtBot) -> LightningPassWindow:
+    """Fixture for GUI tests.
+
+    :param QtBot: clicks on buttons
+
+    :returns test_app: app instance
+    :rtype LightningPassWindow
+
+    """
     test_app = LightningPassWindow()
     qtbot.addWidget(test_app)
     return test_app

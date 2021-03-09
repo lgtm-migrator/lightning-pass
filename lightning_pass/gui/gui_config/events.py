@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QFileDialog
 from qdarkstyle import load_stylesheet
 
 from lightning_pass.gui.message_boxes import MessageBoxes
-from lightning_pass.gui.mouse_randomness import Collector, MouseTracker
+from lightning_pass.gui.mouse_randomness import Collector, Generator, MouseTracker
 from lightning_pass.users.account import Account
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
@@ -21,7 +21,7 @@ from lightning_pass.util.utils import save_picture
 
 
 class Events:
-    def __init__(self, parent, *args, **kwargs) -> None:
+    def __init__(self, parent, *args: object, **kwargs: object) -> None:
         """Buttons constructor"""
         super().__init__(*args, **kwargs)
         self.parent = parent
@@ -96,6 +96,22 @@ class Events:
         self.ui.generate_pass_lower_check.setChecked(True)
         self.ui.generate_pass_upper_check.setChecked(True)
         self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass)
+
+    def get_generator(self) -> Generator:
+        """Get Generator from current password params.
+
+        :returns: Generator object
+        :rtype: Generator
+
+        """
+        return Generator(
+            self.parent.collector.randomness_lst,
+            self.ui.generate_pass_spin_box.value(),
+            True if self.ui.generate_pass_numbers_check.isChecked() else False,
+            True if self.ui.generate_pass_symbols_check.isChecked() else False,
+            True if self.ui.generate_pass_lower_check.isChecked() else False,
+            True if self.ui.generate_pass_upper_check.isChecked() else False,
+        )
 
     def generate_pass_phase2_event(self) -> None:
         """Switch to second password generation widget and reset previous values."""
@@ -188,10 +204,14 @@ class Events:
                     self.ui.message_boxes, "email", "Account"
                 )
 
-    def toggle_stylesheet_light(self, *args):
+    def toggle_stylesheet_light(self, *args: object) -> None:
         """Change stylesheet to light mode."""
+        if args:
+            ...
         self.main_win.setStyleSheet("")
 
-    def toggle_stylesheet_dark(self, *args):
+    def toggle_stylesheet_dark(self, *args: object) -> None:
         """Change stylesheet to dark mode."""
+        if args:
+            ...
         self.main_win.setStyleSheet(load_stylesheet(qt_api="pyqt5"))

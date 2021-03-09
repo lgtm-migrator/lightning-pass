@@ -4,6 +4,8 @@ from typing import Tuple
 
 import mysql.connector as mysql
 from dotenv import load_dotenv
+from mysql.connector.connection import MySQLConnection
+from mysql.connector.cursor import MySQLCursor
 
 
 def _copy(self: pathlib.Path, target: pathlib.Path) -> None:
@@ -17,7 +19,7 @@ def _copy(self: pathlib.Path, target: pathlib.Path) -> None:
 pathlib.Path.copy = _copy  # type: ignore
 
 
-def connect_to_database() -> Tuple["MySQLCursor", "MySQLConnection"]:
+def connect_to_database() -> Tuple[MySQLCursor, MySQLConnection]:
     """Initialize database connection. Create table if not exists.
 
     :returns cursor, connection

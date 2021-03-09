@@ -2,13 +2,15 @@ from pathlib import Path
 
 
 class Buttons:
+    """This class is used to setup buttons on the LightningPassWindow"""
+
     def __init__(self, parent, *args, **kwargs):
         """Buttons constructor"""
         super().__init__(*args, **kwargs)
         self.main_win = parent
         self.ui = parent.ui
 
-    def setup_buttons(self):
+    def setup_buttons(self) -> None:
         """Connect all buttons."""
         self.ui.home_login_btn.clicked.connect(self.main_win.events.login_event)
         self.ui.home_register_btn.clicked.connect(self.main_win.events.register_event)
@@ -56,7 +58,7 @@ class Buttons:
             self.main_win.events.edit_details_event
         )
 
-    def setup_menu_bar(self):
+    def setup_menu_bar(self) -> None:
         """Connect all menu bar actions."""
         self.ui.action_main_menu.triggered.connect(self.main_win.events.home_event)
         self.ui.action_light.triggered.connect(

@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from bcrypt import checkpw
 
@@ -8,9 +8,9 @@ from lightning_pass.util.utils import (
     check_email,
     check_password,
     check_username,
+    get_profile_picture_path,
     get_user_id,
     hash_password,
-    profile_picture_path,
 )
 
 
@@ -43,15 +43,16 @@ class Account:
         :param str confirm_password: user's confirmed password
         :param str email: user's email
 
+        :returns: Account object instantiated with current user id
+        :rtype Account
+
+
         :raises UsernameAlreadyExists: If username is already registered in the database.
         :raises InvalidUsername: If username doesn't match the required pattern.
         :raises PasswordDoNotMatch: If password and confirm_password are not the same.
         :raises InvalidPassword: If password doesn't match the required pattern.
         :raises EmailAlreadyExists: If email is already registered in the database.
         :raises InvalidEmail: If email doesn't match the email pattern.
-
-        :returns account: Account object instantiated with current user id
-        :rtype Account
 
         """
         check_username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
@@ -75,11 +76,11 @@ class Account:
         :param str username: user's username
         :param str password: user's password
 
-        :raises AccountDoesNotExist: If username wasn't found in the database.
-        :raises AccountDoesNotExist: If password doesn't match with the hashed password in the database.
-
         :returns account: Account object instantiated with current user id
         :rtype Account
+
+        :raises AccountDoesNotExist: If username wasn't found in the database.
+        :raises AccountDoesNotExist: If password doesn't match with the hashed password in the database.
 
         """
         sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
@@ -137,7 +138,7 @@ class Account:
             f"SELECT password FROM lightning_pass.credentials WHERE id = {self.user_id}"
         )
         self.cursor.execute(sql)
-        password = self.cursor.fetchone()[0]
+        password, _ = self.cursor.fetchone()
         return password
 
     @property
@@ -197,11 +198,11 @@ class Account:
         :rtype str
 
         """
-        path = str(profile_picture_path(self.profile_picture))
+        path = str(get_profile_picture_path(self.profile_picture))
         return path
 
     @property
-    def last_login_date(self) -> datetime:
+    def last_login_date(self) -> datetime.datetime:
         """Last login date property.
 
         :returns last_login_date: last time the current account was accessed
@@ -220,7 +221,7 @@ class Account:
         self.connection.commit()
 
     @property
-    def register_date(self) -> None:
+    def register_date(self) -> datetime.datetime:
         """Last login date property.
 
         :returns register_date: register date of current user
