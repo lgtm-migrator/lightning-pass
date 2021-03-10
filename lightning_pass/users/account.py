@@ -1,4 +1,6 @@
-import datetime
+from __future__ import annotations
+
+from datetime import datetime
 
 from bcrypt import checkpw
 
@@ -32,7 +34,7 @@ class Account:
     @classmethod
     def register(
         cls, username: str, password: bytes, confirm_password: str, email: str
-    ) -> "Account":
+    ) -> Account:
         """Secondary class constructor for register.
 
         :param str username: User's username
@@ -63,7 +65,7 @@ class Account:
         return cls(get_user_id(value=username, column="username"))
 
     @classmethod
-    def login(cls, username: str, password: str) -> "Account":
+    def login(cls, username: str, password: str) -> Account:
         """Secondary class constructor for login.
         Updates last_login_date if log in is successful.
 
@@ -204,7 +206,7 @@ class Account:
         return path
 
     @property
-    def last_login_date(self) -> datetime.datetime:
+    def last_login_date(self) -> datetime:
         """Last login date property.
 
         :returns: last time the current account was accessed
@@ -219,11 +221,14 @@ class Account:
     def update_last_login_date(self) -> None:
         """Set last login date."""
         with database_manager() as db:
-            sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = {self.user_id}"
+            sql = (
+                f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP()"
+                f"WHERE id = {self.user_id}"
+            )
             db.execute(sql)
 
     @property
-    def register_date(self) -> datetime.datetime:
+    def register_date(self) -> datetime:
         """Last login date property.
 
         :returns: register date of current user

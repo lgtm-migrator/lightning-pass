@@ -1,4 +1,4 @@
-from typing import List, Tuple, Union
+from __future__ import annotations
 
 from passgen import passgen
 from PyQt5 import QtCore
@@ -16,7 +16,7 @@ class MouseTracker(QtCore.QObject):
 
     positionChanged = QtCore.pyqtSignal(QtCore.QPoint)
 
-    def __init__(self, widget: "QLabel") -> None:
+    def __init__(self, widget: QLabel) -> None:
         """Class contructor."""
         super().__init__(widget)
         self._widget = widget
@@ -24,10 +24,10 @@ class MouseTracker(QtCore.QObject):
         self.widget.installEventFilter(self)
 
     @property
-    def widget(self) -> "QLabel":
+    def widget(self) -> QLabel:
         return self._widget
 
-    def eventFilter(self, o: "QLabel", e: "QtCore.QEvent.MouseMove") -> object:
+    def eventFilter(self, o: QLabel, e: QtCore.QEvent.MouseMove) -> object:
         """Event filter.
 
         :param QLabel o: Label object
@@ -41,7 +41,7 @@ class MouseTracker(QtCore.QObject):
         return super().eventFilter(o, e)
 
     @staticmethod
-    def setup_tracker(label: "QLabel", on_change) -> None:
+    def setup_tracker(label: QLabel, on_change) -> None:
         """Setup a mouse tracker over a specified label."""
         tracker = MouseTracker(label)
         tracker.positionChanged.connect(on_change)
@@ -61,7 +61,7 @@ class Collector:
     def __iter__(self):
         yield from self.randomness_lst
 
-    def collect_position(self, pos: "QtCore.QPoint") -> Union[str, bool]:
+    def collect_position(self, pos: QtCore.QPoint) -> str | bool:
         """Collect mouse position.
 
         :param QPoint pos: Current cursor position
@@ -94,7 +94,7 @@ class PwdGenerator:
 
     def __init__(
         self,
-        randomness_lst: List[Tuple[int, int]],
+        randomness_lst: list[tuple[int, int]],
         length: int,
         numbers: bool,
         symbols: bool,

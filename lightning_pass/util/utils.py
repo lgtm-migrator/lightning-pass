@@ -1,9 +1,9 @@
 """This module holds various utility functions used throughout the whole project."""
 import os
-import pathlib
 import re
 import secrets
 from contextlib import contextmanager
+from pathlib import Path
 from secrets import compare_digest
 from typing import Union
 
@@ -11,6 +11,7 @@ from bcrypt import gensalt, hashpw
 from dotenv import load_dotenv
 from mysql import connector
 from mysql.connector import MySQLConnection
+from mysql.connector.connection import MySQLCursor
 
 from .exceptions import (
     EmailAlreadyExists,
@@ -25,7 +26,7 @@ REGEX_EMAIL = r"^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
 
 
 @contextmanager
-def database_manager() -> "connector.connection.MySQLCursor":
+def database_manager() -> MySQLCursor:
     """Manage database __enter__ and __exit__ easily.
 
     :returns: database connection cursor
@@ -33,7 +34,7 @@ def database_manager() -> "connector.connection.MySQLCursor":
     """
     load_dotenv()
     try:
-        con: "MySQLConnection" = connector.connect(
+        con: MySQLConnection = connector.connect(
             host=os.getenv("LOGINSDB_HOST"),
             user=os.getenv("LOGINSDB_USER"),
             password=os.getenv("LOGINSDB_PASS"),
@@ -234,7 +235,7 @@ class ProfilePicture:
     """This class holds various utils connected to any username."""
 
     @staticmethod
-    def save_picture(picture_path: "pathlib.Path") -> str:
+    def save_picture(picture_path: Path) -> str:
         """Save picture into profile pictures folder with a token_hex filename.
 
         Uses the monkey patched copy function of pathlib.Path object to copy the profile picture.
@@ -248,15 +249,15 @@ class ProfilePicture:
         f_ext = picture_path.suffix
         picture_filename = random_hex + f_ext
 
-        absolute_path = pathlib.Path().absolute()
+        absolute_path = Path().absolute()
         save_path = f"lightning_pass/users/profile_pictures/{picture_filename}"
-        final_path = pathlib.Path.joinpath(absolute_path, save_path)
+        final_path = Path.joinpath(absolute_path, save_path)
 
-        pathlib.Path.copy(picture_path, final_path)
+        Path.copy(picture_path, final_path)
         return picture_filename
 
     @staticmethod
-    def get_profile_picture_path(profile_picture: str) -> "pathlib.Path":
+    def get_profile_picture_path(profile_picture: str) -> Path:
         """Return the absolute path of a given profile picture from the profile pictures folder.
 
         :param str profile_picture: Filename of the registered users' profile picture
@@ -264,6 +265,6 @@ class ProfilePicture:
         :returns: path to the profile picture
 
         """
-        absolute_path = pathlib.Path().absolute()
+        absolute_path = Path().absolute()
         picture_path = f"lightning_pass/users/profile_pictures/{profile_picture}"
-        return pathlib.Path.joinpath(absolute_path, picture_path)
+        return Path.joinpath(absolute_path, picture_path)

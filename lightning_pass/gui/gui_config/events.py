@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pathlib
 
 import clipboard
@@ -97,7 +99,7 @@ class Events:
         self.ui.generate_pass_upper_check.setChecked(True)
         self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass)
 
-    def get_generator(self) -> "PwdGenerator":
+    def get_generator(self) -> PwdGenerator:
         """Get Generator from current password params.
 
         :returns: Generator object

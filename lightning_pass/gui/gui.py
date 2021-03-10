@@ -1,4 +1,6 @@
 """Holds main GUI class"""
+from __future__ import annotations
+
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
 
@@ -55,19 +57,19 @@ class LightningPassWindow(QMainWindow):
         self.move(qr.topLeft())
 
     @QtCore.pyqtSlot(QtCore.QPoint)
-    def on_position_changed(self, pos: "QtCore.QPoint") -> None:
+    def on_position_changed(self, pos: QtCore.QPoint) -> None:
         """Handler for changes in mouse position over connected label.
 
         :param QPoint pos: Mouse position
 
         """
-        # TODO: check generated
         try:
             self.collector.collect_position(pos)
         except StopCollectingPositions:
-            self.ui.generate_pass_p2_final_pass_line.setText(
-                self.events.get_generator().generate_password()
-            )
+            if not self.ui.generate_pass_p2_final_pass_line.text():
+                self.ui.generate_pass_p2_final_pass_line.setText(
+                    self.events.get_generator().generate_password()
+                )
         else:
             self.progress += 0.1
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.progress)

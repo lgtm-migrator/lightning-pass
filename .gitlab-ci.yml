@@ -2,18 +2,6 @@ image: python:latest
 
 before_script:
     - python3 -V
-    - sudo apt-get install -y build-essential tk-dev libncurses5-dev libncursesw5-dev libreadline6-dev libdb5.3-dev libgdbm-dev libsqlite3-dev libssl-dev libbz2-dev libexpat1-dev liblzma-dev zlib1g-dev
-    - wget -O /tmp/Python-3.9.1.tar.xz https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tar.xz
-    - cd /tmp
-    - tar xf Python-3.9.1.tar.xz
-    - cd Python-3.9.1
-    - ./configure --enable-optimizations
-    - sudo make altinstall
-    - sudo apt -y autoremove
-    - cd
-    - sudo rm -rf /tmp/Python-3.9.1
-    - sudo rm /tmp/Python-3.9.1.tar.xz
-    - sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
     - echo "alias python=/usr/local/bin/python3.9" >> ~/.bashrc
     - echo "alias python3=/usr/local/bin/python3.9" >> ~/.bashrc
     - source ~/.bashrc

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pytest
 from PyQt5 import QtCore
 from pytestqt.qtbot import QtBot
@@ -68,7 +70,7 @@ def test_buttons(
         ("action_forgot_password", 3),
     ],
 )
-def test_menu_bar(app, menu_bar_action, index):
+def test_menu_bar(app: LightningPassWindow, menu_bar_action: str, index: int) -> None:
     action = getattr(app.ui, menu_bar_action)
     action.trigger()
     assert app.ui.stacked_widget.currentIndex() == index

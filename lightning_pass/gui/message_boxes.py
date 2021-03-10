@@ -1,4 +1,5 @@
 """This module holds the MessageBoxes class used for showing various message boxes."""
+from __future__ import annotations
 
 import re
 
@@ -67,7 +68,7 @@ contain at least one special character."""
 
         """
 
-        def event_handler(btn: "QPushButton") -> None:
+        def event_handler(btn: QPushButton) -> None:
             """Handler for clicks on message box window
 
             :param btn: Clicked button
@@ -132,7 +133,7 @@ contain at least one special character."""
 
         """
 
-        def event_handler(btn: "QPushButton") -> None:
+        def event_handler(btn: QPushButton) -> None:
             """Handler for clicks on message box window
 
             :param btn: Clicked button
@@ -173,7 +174,7 @@ contain at least one special character."""
 
         """
 
-        def event_handler(btn: "QPushButton") -> None:
+        def event_handler(btn: QPushButton) -> None:
             """Handler for clicks on message box window
 
             :param btn: Clicked button

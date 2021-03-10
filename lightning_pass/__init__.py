@@ -1,10 +1,12 @@
 """init"""
-import pathlib
+from __future__ import annotations
+
+from pathlib import Path
 
 from .util import utils
 
 
-def _copy(self: "pathlib.Path", target: "pathlib.Path") -> None:
+def _copy(self: Path, target: Path) -> None:
     """Monkey Patch copy functionality into pathlib.Path object."""
     import shutil
 
@@ -12,7 +14,7 @@ def _copy(self: "pathlib.Path", target: "pathlib.Path") -> None:
     shutil.copy(str(self), str(target))  # str() only there for Python --version < 3.6
 
 
-pathlib.Path.copy = _copy  # type: ignore
+Path.copy = _copy  # type: ignore
 
 with utils.database_manager() as db:
     sql = """CREATE TABLE if not exists credentials(
