@@ -17,7 +17,7 @@ from lightning_pass.util.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-from lightning_pass.util.utils import hash_password, save_picture
+from lightning_pass.util.utils import Password, ProfilePicture
 
 
 class Events:
@@ -63,7 +63,7 @@ class Events:
         try:
             self.ui.current_user = Account.register(
                 self.ui.reg_username_line.text(),
-                hash_password(self.ui.reg_password_line.text()),
+                Password.hash_password(self.ui.reg_password_line.text()),
                 self.ui.reg_conf_pass_line.text(),
                 self.ui.reg_email_line.text(),
             )
@@ -163,7 +163,9 @@ class Events:
             "Image files (*.jpg *.png)",
         )
         if fname:
-            self.ui.current_user.profile_picture = save_picture(pathlib.Path(fname))
+            self.ui.current_user.profile_picture = ProfilePicture.save_picture(
+                pathlib.Path(fname)
+            )
             self.account_event()
 
     def logout_event(self) -> None:

@@ -4,11 +4,11 @@ from bcrypt import checkpw
 
 from lightning_pass.util.exceptions import AccountDoesNotExist
 from lightning_pass.util.utils import (
-    check_email,
-    check_password,
-    check_username,
+    Email,
+    Password,
+    ProfilePicture,
+    Username,
     database_manager,
-    get_profile_picture_path,
     get_user_id,
 )
 
@@ -50,11 +50,11 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        check_username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
-        check_password(
+        Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        Password(
             password, confirm_password
         )  # Exceptions: PasswordDoNotMatch, InvalidPassword
-        check_email(email)  # Exceptions: EmailAlreadyExists, Invalid email
+        Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
         with database_manager() as db:
             sql = "INSERT INTO lightning_pass.credentials (username, password, email) VALUES (%s, %s, %s)"
             val = [username, password, email]
@@ -122,7 +122,7 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        check_username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
         with database_manager() as db:
             sql = f"UPDATE lightning_pass.credentials SET username = '{value}' WHERE id = {self.user_id}"
             db.execute(sql)
@@ -164,7 +164,7 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        check_email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
+        Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
         with database_manager() as db:
             sql = f"UPDATE lightning_pass.credentials SET email = '{value}' WHERE id = {self.user_id}"
             db.execute(sql)
@@ -200,7 +200,7 @@ class Account:
         :returns: path to user's profile picture
 
         """
-        path = str(get_profile_picture_path(self.profile_picture))
+        path = str(ProfilePicture.get_profile_picture_path(self.profile_picture))
         return path
 
     @property
