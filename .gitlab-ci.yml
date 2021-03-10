@@ -8,7 +8,7 @@ stages:
 build:
     stage: build
     script:
-        - docker build . -t app
+        - docker build . - t app
     tags:
         - ci
 
