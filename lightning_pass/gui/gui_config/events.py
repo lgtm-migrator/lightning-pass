@@ -6,7 +6,7 @@ from PyQt5.QtWidgets import QFileDialog
 from qdarkstyle import load_stylesheet
 
 from lightning_pass.gui.message_boxes import MessageBoxes
-from lightning_pass.gui.mouse_randomness import Collector, Generator, MouseTracker
+from lightning_pass.gui.mouse_randomness import Collector, MouseTracker, PwdGenerator
 from lightning_pass.users.account import Account
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
@@ -97,13 +97,13 @@ class Events:
         self.ui.generate_pass_upper_check.setChecked(True)
         self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass)
 
-    def get_generator(self) -> "Generator":
+    def get_generator(self) -> "PwdGenerator":
         """Get Generator from current password params.
 
         :returns: Generator object
 
         """
-        return Generator(
+        return PwdGenerator(
             self.parent.collector.randomness_lst,
             self.ui.generate_pass_spin_box.value(),
             True if self.ui.generate_pass_numbers_check.isChecked() else False,

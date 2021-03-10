@@ -10,6 +10,7 @@ from typing import Union
 from bcrypt import gensalt, hashpw
 from dotenv import load_dotenv
 from mysql import connector
+from mysql.connector import MySQLConnection
 
 from .exceptions import (
     EmailAlreadyExists,
@@ -32,7 +33,7 @@ def database_manager() -> "connector.connection.MySQLCursor":
     """
     load_dotenv()
     try:
-        con = connector.connect(
+        con: "MySQLConnection" = connector.connect(
             host=os.getenv("LOGINSDB_HOST"),
             user=os.getenv("LOGINSDB_USER"),
             password=os.getenv("LOGINSDB_PASS"),
@@ -69,6 +70,8 @@ def get_user_id(value: str, column: str) -> Union[int, bool]:
 
 class Username:
     """This class holds various utils connected to any username.
+
+    Calling the class performs both pattern and existential checks.
 
     :param str username: Username
 
@@ -113,6 +116,8 @@ class Username:
 
 class Password:
     """This class holds various utils connected to any password(s).
+
+    Calling the class performs both pattern and matching case checks.
 
     :param Union[str, bytes] password: Password
 
@@ -182,6 +187,8 @@ class Password:
 
 class Email:
     """This class holds various utils connected to any username.
+
+    Calling the class performs both pattern and existential checks.
 
     :param str email: Email
 

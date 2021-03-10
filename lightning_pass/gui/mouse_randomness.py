@@ -56,6 +56,9 @@ class Collector:
         """Provide information about this class."""
         return f"Collector({self.randomness_lst})"
 
+    def __iter__(self):
+        yield from self.randomness_lst
+
     def collect_position(self, pos: "QtCore.QPoint") -> Union[str, bool]:
         """Collect mouse position.
 
@@ -72,7 +75,7 @@ class Collector:
             return "Done"
 
 
-class Generator:
+class PwdGenerator:
     """This class holds user's chosen parameters for password generation
     and contains the password generation functionality.
 
@@ -113,7 +116,6 @@ class Generator:
                {self.uppercase})
                """
 
-    @property
     def generate_password(self, case_type: str = "both") -> str:
         """Generate a password by passgen library.
         Password generation is based on the chosen parameters in the GUI.

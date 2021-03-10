@@ -65,7 +65,7 @@ class LightningPassWindow(QMainWindow):
             if not self.password_generated:
                 self.pass_gen = self.events.get_generator()
                 self.ui.generate_pass_p2_final_pass_line.setText(
-                    self.pass_gen.generate_password
+                    self.pass_gen.generate_password()
                 )
             self.password_generated = True
         elif val is True:

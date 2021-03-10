@@ -11,8 +11,8 @@ before_script:
     - sudo make altinstall
     - sudo apt -y autoremove
     - cd
-    - rm -rf /tmp/Python-3.9.1
-    - rm /tmp/Python-3.9.1.tar.xz
+    - sudo rm -rf /tmp/Python-3.9.1
+    - sudo rm /tmp/Python-3.9.1.tar.xz
     - sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
     - echo "alias python=/usr/local/bin/python3.9" >> ~/.bashrc
     - echo "alias python3=/usr/local/bin/python3.9" >> ~/.bashrc
