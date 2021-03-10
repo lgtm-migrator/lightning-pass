@@ -4,7 +4,7 @@ from passgen import passgen
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QLabel
 
-from lightning_pass.util.exceptions import StopCollectingPositions
+from ..util.exceptions import StopCollectingPositions
 
 
 class MouseTracker(QtCore.QObject):

@@ -4,8 +4,8 @@ from datetime import datetime
 
 from bcrypt import checkpw
 
-from lightning_pass.util.exceptions import AccountDoesNotExist
-from lightning_pass.util.utils import (
+from ..util.exceptions import AccountDoesNotExist
+from ..util.utils import (
     Email,
     Password,
     ProfilePicture,

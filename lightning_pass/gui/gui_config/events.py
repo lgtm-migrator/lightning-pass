@@ -7,8 +7,6 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QFileDialog
 from qdarkstyle import load_stylesheet
 
-from lightning_pass.gui.message_boxes import MessageBoxes
-from lightning_pass.gui.mouse_randomness import Collector, MouseTracker, PwdGenerator
 from lightning_pass.users.account import Account
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
@@ -20,6 +18,9 @@ from lightning_pass.util.exceptions import (
     UsernameAlreadyExists,
 )
 from lightning_pass.util.utils import Password, ProfilePicture
+
+from ..message_boxes import MessageBoxes
+from ..mouse_randomness import Collector, MouseTracker, PwdGenerator
 
 
 class Events:
