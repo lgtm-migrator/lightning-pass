@@ -2,6 +2,7 @@
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
 
+from ..util.exceptions import StopCollectingPositions
 from .gui_config import buttons, events
 from .message_boxes import MessageBoxes
 from .mouse_randomness import Collector
@@ -60,14 +61,13 @@ class LightningPassWindow(QMainWindow):
         :param QPoint pos: Mouse position
 
         """
-        val = self.collector.collect_position(pos)
-        if val == "Done":
-            if not self.password_generated:
-                self.pass_gen = self.events.get_generator()
-                self.ui.generate_pass_p2_final_pass_line.setText(
-                    self.pass_gen.generate_password()
-                )
-            self.password_generated = True
-        elif val is True:
-            self.progress += 1
+        # TODO: check generated
+        try:
+            self.collector.collect_position(pos)
+        except StopCollectingPositions:
+            self.ui.generate_pass_p2_final_pass_line.setText(
+                self.events.get_generator().generate_password()
+            )
+        else:
+            self.progress += 0.1
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.progress)

@@ -27,3 +27,7 @@ class PasswordsDoNotMatch(AttributeError):
 
 class AccountDoesNotExist(AttributeError):
     """Raised when user tries to login with incorrect login details."""
+
+
+class StopCollectingPositions(Exception):
+    """Raised when all needed mouse positions are collected."""

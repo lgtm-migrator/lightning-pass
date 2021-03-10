@@ -4,6 +4,8 @@ from passgen import passgen
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QLabel
 
+from lightning_pass.util.exceptions import StopCollectingPositions
+
 
 class MouseTracker(QtCore.QObject):
     """This class contains functionality for setting up a mouse tracker over a chosen label.
@@ -66,13 +68,15 @@ class Collector:
 
         :returns: state of the collector list
 
+        :raises StopCollectingPositions: if 1000 mouse positions have been collected
+
         """
         if len(self.randomness_lst) <= 999:
             self.randomness_lst.append("(%d, %d)" % (pos.x(), pos.y()))
             if len(self.randomness_lst) % 10 == 0:
                 return True
         else:
-            return "Done"
+            raise StopCollectingPositions
 
 
 class PwdGenerator:
