@@ -1,4 +1,4 @@
-"""Holds main GUI class."""
+"""Holds main GUI class"""
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
 
