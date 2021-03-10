@@ -1,12 +1,7 @@
 """init"""
-import os
 import pathlib
-from typing import Tuple
 
-import mysql.connector as mysql
-from dotenv import load_dotenv
-from mysql.connector.connection import MySQLConnection
-from mysql.connector.cursor import MySQLCursor
+from util import utils
 
 
 def _copy(self: pathlib.Path, target: pathlib.Path) -> None:
@@ -19,22 +14,7 @@ def _copy(self: pathlib.Path, target: pathlib.Path) -> None:
 
 pathlib.Path.copy = _copy  # type: ignore
 
-
-def connect_to_database() -> Tuple[MySQLCursor, MySQLConnection]:
-    """Initialize database connection. Create table if not exists.
-
-    :returns cursor, connection
-    :rtype tuple
-
-    """
-    load_dotenv()
-    connection = mysql.connect(
-        host=os.getenv("LOGINSDB_HOST"),
-        user=os.getenv("LOGINSDB_USER"),
-        password=os.getenv("LOGINSDB_PASS"),
-        database=os.getenv("LOGINSDB_DB"),
-    )
-    cursor = connection.cursor()
+with utils.database_manager() as db:
     sql = """CREATE TABLE if not exists credentials(
             `id` int NOT NULL AUTO_INCREMENT,
             `username` varchar(255) NOT NULL,
@@ -50,5 +30,4 @@ def connect_to_database() -> Tuple[MySQLCursor, MySQLConnection]:
              DEFAULT CHARSET = utf8mb4
              COLLATE = utf8mb4_0900_ai_ci
              """
-    cursor.execute(sql)
-    return cursor, connection
+    db.execute(sql)

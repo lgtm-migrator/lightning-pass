@@ -1,12 +1,14 @@
 """This module holds various functions used throughout the whole project."""
+import os
 import pathlib
 import re
 import secrets
+from contextlib import contextmanager
 from secrets import compare_digest
 
 from bcrypt import gensalt, hashpw
-
-import lightning_pass
+from dotenv import load_dotenv
+from mysql import connector
 
 from .exceptions import (
     EmailAlreadyExists,
@@ -20,6 +22,23 @@ from .exceptions import (
 REGEX_EMAIL = r"^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
 
 
+@contextmanager
+def database_manager():
+    load_dotenv()
+    try:
+        con = connector.connect(
+            host=os.getenv("LOGINSDB_HOST"),
+            user=os.getenv("LOGINSDB_USER"),
+            password=os.getenv("LOGINSDB_PASS"),
+            database=os.getenv("LOGINSDB_DB"),
+        )
+        cur = con.cursor()
+        yield cur
+    finally:
+        con.commit()
+        con.close()
+
+
 def get_user_id(value: str, column: str) -> int or bool:
     """Gets user id from any user detail and its column.
 
@@ -28,11 +47,11 @@ def get_user_id(value: str, column: str) -> int or bool:
 
     :returns User id on success, False upon failure
     """
-    cursor, _ = lightning_pass.connect_to_database()
-    sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
-    cursor.execute(sql)
+    with database_manager() as db:
+        sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
+        result = db.execute(sql)
     try:
-        return cursor.fetchone()[0]
+        return result.fetchone()[0]
     except TypeError:
         return False
 
@@ -46,10 +65,10 @@ def check_username(username: str) -> None:
     :raises InvalidUsername: If the username doesn't match the required pattern.
 
     """
-    cursor, _ = lightning_pass.connect_to_database()
-    sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
-    cursor.execute(sql)
-    row = cursor.fetchall()
+    with database_manager() as db:
+        sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
+        result = db.execute(sql)
+    row = result.fetchall()
 
     if not len(row) <= 0:
         raise UsernameAlreadyExists
@@ -99,10 +118,10 @@ def check_email(email: str) -> None:
     :raises InvalidEmail: If the email doesn't match the RegEx email pattern.
 
     """
-    cursor, _ = lightning_pass.connect_to_database()
-    sql = f"SELECT 1 FROM lightning_pass.credentials WHERE email = '{email}'"
-    cursor.execute(sql)
-    row = cursor.fetchall()
+    with database_manager() as db:
+        sql = f"SELECT 1 FROM lightning_pass.credentials WHERE email = '{email}'"
+        result = db.execute(sql)
+    row = result.fetchall()
 
     if not len(row) <= 0:
         raise EmailAlreadyExists
