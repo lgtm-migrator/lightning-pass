@@ -103,7 +103,7 @@ class Events:
     def get_generator(self) -> PwdGenerator:
         """Get Generator from current password params.
 
-        :returns: Generator object
+        :returns: PwdGenerator object
 
         """
         return PwdGenerator(
