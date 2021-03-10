@@ -5,6 +5,7 @@ import re
 import secrets
 from contextlib import contextmanager
 from secrets import compare_digest
+from typing import Union
 
 from bcrypt import gensalt, hashpw
 from dotenv import load_dotenv
@@ -23,7 +24,12 @@ REGEX_EMAIL = r"^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
 
 
 @contextmanager
-def database_manager():
+def database_manager() -> "connector.connection.MySQLCursor":
+    """Manage database __enter__ and __exit__ easily.
+
+    :returns: database connection cursor
+
+    """
     load_dotenv()
     try:
         con = connector.connect(
@@ -35,21 +41,26 @@ def database_manager():
         cur = con.cursor()
         yield cur
     finally:
-        con.commit()
+        try:
+            con.commit()
+        except connector.errors.InternalError:
+            pass
         con.close()
 
 
-def get_user_id(value: str, column: str) -> int or bool:
+def get_user_id(value: str, column: str) -> Union[int, bool]:
     """Gets user id from any user detail and its column.
 
-    :param str value: any user value stored in the database.
-    :param str column: database column of the user value.
+    :param str value: Any user value stored in the database
+    :param str column: Database column of the given user value
 
-    :returns User id on success, False upon failure
+    :returns: user id on success, False upon failure
+
     """
     with database_manager() as db:
         sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
         result = db.execute(sql)
+
     try:
         return result.fetchone()[0]
     except TypeError:
@@ -61,49 +72,51 @@ def check_username(username: str) -> None:
 
     :param str username: Account username
 
-    :raises UsernameAlreadyExists: If the username already exists in the database.
-    :raises InvalidUsername: If the username doesn't match the required pattern.
+    :raises UsernameAlreadyExists: if the username already exists in the database.
+    :raises InvalidUsername: if the username doesn't match the required pattern.
 
     """
     with database_manager() as db:
         sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
         result = db.execute(sql)
-    row = result.fetchall()
 
-    if not len(row) <= 0:
+    try:
+        result.fetchall()
+    except AttributeError:  # Means username has not yet been taken (cur is empty).
+        if len(username) < 5:
+            raise InvalidUsername
+    else:
         raise UsernameAlreadyExists
-    if len(username) < 5:
-        raise InvalidUsername
 
 
-def check_password(password: str, confirm_password: str) -> None:
+def check_password(password: Union[str, bytes], confirm_password: str) -> None:
     """Check whether a password matches a required pattern and if it is the same as confirm_password.
 
-    :param str password:
-    :param str confirm_password:
+    :param str password: First password
+    :param Union[str, bytes] confirm_password: Confirmation password
 
-    :raises InvalidPassword: If the password doesn't match the required pattern.
-    :raises PasswordsDoNotMatch: If password and confirm password don't match.
+    :raises InvalidPassword: if the password doesn't match the required pattern.
+    :raises PasswordsDoNotMatch: if password and confirm password don't match.
 
     """
     if (
         len(password) < 8
-        or len(re.findall(r"[A-Z]", password)) <= 0
-        or len(password) - len(re.findall(r"[A-Za-z0-9]", password))
+        or len(re.findall(r"[A-Z]", str(password)))
+        <= 0  # If password in bytes, turn into str.
+        or len(password) - len(re.findall(r"[A-Za-z0-9]", str(password)))
         <= 0  # Negative check for special characters
     ):
         raise InvalidPassword
-    if not compare_digest(password, confirm_password):
+    if not compare_digest(password, confirm_password.encode("utf-8")):
         raise PasswordsDoNotMatch
 
 
 def hash_password(password: str) -> bytes:
     """Hash password by bcrypt with "utf-8" encoding and gensalt().
 
-    :param str password: password to an user account.
+    :param str password: Password to user account.
 
     :returns: hashed password by bcrypt.
-    :rtype bytes
 
     """
     return hashpw(password.encode("utf-8"), gensalt())
@@ -112,10 +125,10 @@ def hash_password(password: str) -> bytes:
 def check_email(email: str) -> None:
     """Check whether an email already exists and if it matches a correct email pattern.
 
-    :param str email: user's email
+    :param str email: User's email
 
-    :raises EmailAlreadyExists: If the email already exists in the database.
-    :raises InvalidEmail: If the email doesn't match the RegEx email pattern.
+    :raises EmailAlreadyExists: if the email already exists in the database.
+    :raises InvalidEmail: if the email doesn't match the RegEx email pattern.
 
     """
     with database_manager() as db:
@@ -129,15 +142,14 @@ def check_email(email: str) -> None:
         raise InvalidEmail
 
 
-def save_picture(picture_path: pathlib.Path) -> str:
+def save_picture(picture_path: "pathlib.Path") -> str:
     """Save picture into profile pictures folder with a token_hex filename.
 
     Uses the monkey patched copy function of pathlib.Path object to copy the profile picture.
 
-    :param pathlib.Path picture_path:
+    :param pathlib.Path picture_path: Path to selected profile picture
 
-    :returns the filename of the saved picture
-    :rtype str
+    :returns: the filename of the saved picture
 
     """
     random_hex = secrets.token_hex(8)
@@ -152,13 +164,12 @@ def save_picture(picture_path: pathlib.Path) -> str:
     return picture_filename
 
 
-def get_profile_picture_path(profile_picture: str) -> pathlib.Path:
+def get_profile_picture_path(profile_picture: str) -> "pathlib.Path":
     """Return the absolute path of a given profile picture from the profile pictures folder.
 
-    :param str profile_picture: filename of the registered users profile picture
+    :param str profile_picture: Filename of the registered users' profile picture
 
-    :returns path to the profile picture.
-    :rtype pathlib.Path
+    :returns: path to the profile picture
 
     """
     absolute_path = pathlib.Path().absolute()

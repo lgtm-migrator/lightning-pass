@@ -18,7 +18,7 @@ class MessageBoxes(QWidget):
     def invalid_username_box(self, parent: str) -> None:
         """Show invalid username message box.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -32,7 +32,7 @@ class MessageBoxes(QWidget):
     def invalid_password_box(self, parent: str) -> None:
         """Show invalid password message box.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -50,7 +50,7 @@ contain atleast one special character."""
     def invalid_email_box(self, parent: str) -> None:
         """Show invalid email message box.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -62,14 +62,14 @@ contain atleast one special character."""
     def invalid_login_box(self, parent: str) -> None:
         """Show invalid login message box.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
 
-        def event_handler(btn: QPushButton) -> None:
+        def event_handler(btn: "QPushButton") -> None:
             """Handler for clicks on message box window
 
-            :param btn: clicked button
+            :param btn: Clicked button
 
             """
             if re.findall("Yes", btn.text()):
@@ -91,7 +91,7 @@ contain atleast one special character."""
     def username_already_exists_box(self, parent: str) -> None:
         """Show username already exists message box.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -103,7 +103,7 @@ contain atleast one special character."""
     def email_already_exists_box(self, parent: str) -> None:
         """Show email already exists message box.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -115,7 +115,7 @@ contain atleast one special character."""
     def passwords_do_not_match_box(self, parent: str) -> None:
         """Show passwords do not match message box.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -127,14 +127,14 @@ contain atleast one special character."""
     def account_creation_box(self, parent: str) -> None:
         """Show successful account creatio message box.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
 
-        def event_handler(btn: QPushButton) -> None:
+        def event_handler(btn: "QPushButton") -> None:
             """Handler for clicks on message box window
 
-            :param btn: clicked button
+            :param btn: Clicked button
 
             """
             if re.findall("Yes", btn.text()):
@@ -156,7 +156,7 @@ contain atleast one special character."""
     def no_case_type_box(self, parent: str) -> None:
         """Show message box indicating that password can't be generated with current case type option.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
@@ -168,20 +168,35 @@ contain atleast one special character."""
     def login_required_box(self, parent: str) -> None:
         """Show message box indicating that password can't be generated with current case type option.
 
-        :param str parent: specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box
 
         """
+
+        def event_handler(btn: "QPushButton") -> None:
+            """Handler for clicks on message box window
+
+            :param btn: Clicked button
+
+            """
+            if re.findall("Yes", btn.text()):
+                self.events.login_event()
+
         box = QMessageBox(self.main_win)
         box.setWindowTitle(f"{self.title} - {parent}")
         box.setText("Please log in to access that page.")
         box.setIcon(QMessageBox.Warning)
+
+        box.setInformativeText("Would you like to move to the login page?")
+        box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        box.setDefaultButton(QMessageBox.No)
+        box.buttonClicked.connect(event_handler)
         box.exec_()
 
     def details_updated_box(self, detail: str, parent: str) -> None:
         """Show message box indicating that password can't be generated with current case type option.
 
-        :param str detail: specifies which detail was updated
-        :param str parent: specifies which window instantiated current box
+        :param str detail: Specifies which detail was updated
+        :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)

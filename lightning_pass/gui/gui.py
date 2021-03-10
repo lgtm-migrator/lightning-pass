@@ -54,8 +54,12 @@ class LightningPassWindow(QMainWindow):
         self.move(qr.topLeft())
 
     @QtCore.pyqtSlot(QtCore.QPoint)
-    def on_position_changed(self, pos):
-        """Handler for changes in mouse position over connected label."""
+    def on_position_changed(self, pos: "QtCore.QPoint") -> None:
+        """Handler for changes in mouse position over connected label.
+
+        :param QPoint pos: Mouse position
+
+        """
         val = self.collector.collect_position(pos)
         if val == "Done":
             if not self.password_generated:

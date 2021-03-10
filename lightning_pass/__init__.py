@@ -1,10 +1,10 @@
 """init"""
 import pathlib
 
-from util import utils
+from .util import utils
 
 
-def _copy(self: pathlib.Path, target: pathlib.Path) -> None:
+def _copy(self: "pathlib.Path", target: "pathlib.Path") -> None:
     """Monkey Patch copy functionality into pathlib.Path object."""
     import shutil
 

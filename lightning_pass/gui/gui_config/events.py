@@ -17,7 +17,7 @@ from lightning_pass.util.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-from lightning_pass.util.utils import save_picture
+from lightning_pass.util.utils import hash_password, save_picture
 
 
 class Events:
@@ -63,7 +63,7 @@ class Events:
         try:
             self.ui.current_user = Account.register(
                 self.ui.reg_username_line.text(),
-                self.ui.reg_password_line.text(),
+                hash_password(self.ui.reg_password_line.text()),
                 self.ui.reg_conf_pass_line.text(),
                 self.ui.reg_email_line.text(),
             )
@@ -97,11 +97,10 @@ class Events:
         self.ui.generate_pass_upper_check.setChecked(True)
         self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass)
 
-    def get_generator(self) -> Generator:
+    def get_generator(self) -> "Generator":
         """Get Generator from current password params.
 
         :returns: Generator object
-        :rtype: Generator
 
         """
         return Generator(
@@ -143,7 +142,6 @@ class Events:
                 raise AttributeError
         except AttributeError:
             MessageBoxes.login_required_box(self.ui.message_boxes, "Account")
-            self.login_event()
         else:
             self.ui.current_user = Account(self.ui.current_user.user_id)
             self.ui.account_username_line.setText(self.ui.current_user.username)
