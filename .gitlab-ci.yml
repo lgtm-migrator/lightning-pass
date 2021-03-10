@@ -1,10 +1,8 @@
 image: python:latest
 
 before_script:
-    - curl https://bootstrap.pypa.io/get-pip.py | python3
     - python3 -V
     - sudo apt-get install python-dev portaudio19-dev libzbar-dev libzbar0 -y
-    - sudo apt install -y python python-pip libffi-dev python-backports.ssl-match-hostname clang
     - python3 -m pip install -r requirements.txt
 
 stages:
