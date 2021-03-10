@@ -1,54 +1,53 @@
 image: python:latest
 
+before_script:
+    - curl https://bootstrap.pypa.io/get-pip.py | python3
+    - python3 -V
+    - sudo apt-get install python-dev
+    - python3 -m pip install -r requirements.txt
+
 stages:
     - build
-    - static Analysis
+    - static analysis
     - test
 
-build:
-    stage: build
-    script:
-        - docker build . - t app
-    tags:
-        - ci
-
 black:
-    stage: static Analysis
+    stage: static analysis
     script:
         - black --check .
     tags:
         - ci
 
 flake8:
-    stage: static Analysis
+    stage: static analysis
     script:
         - flake8 --ignore=E501,W391,W503,D100,D104
     tags:
         - ci
 
 pydocstyle:
-    stage: static Analysis
+    stage: static analysis
     script:
         - pydocstyle
     tags:
         - ci
 
 pylama:
-    stage: static Analysis
+    stage: static analysis
     script:
         - pylama -i W391,E501
     tags:
         - ci
 
 pylint:
-    stage: static Analysis
+    stage: static analysis
     script:
         - pylint --disable=W0201,I1101,E0611,C0301 lightning_pass --ignore main.py
     tags:
         - ci
 
 mypy:
-    stage: static Analysis
+    stage: static analysis
     script:
         - mypy lightning_pass --ignore-missing-imports
     tags:
