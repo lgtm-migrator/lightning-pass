@@ -7,53 +7,61 @@ before_script:
     - python3 -m pip install -r requirements.txt
 
 stages:
-    - Static Analysis
-    - Test
+    - build
+    - static Analysis
+    - test
+
+build:
+    stage: build
+    script:
+        - docker build . -t app
+    tags:
+        - ci
 
 black:
-    stage: Static Analysis
+    stage: static Analysis
     script:
         - black --check .
     tags:
         - ci
 
 flake8:
-    stage: Static Analysis
+    stage: static Analysis
     script:
         - flake8 --ignore=E501,W391,W503,D100,D104
     tags:
         - ci
 
 pydocstyle:
-    stage: Static Analysis
+    stage: static Analysis
     script:
         - pydocstyle
     tags:
         - ci
 
 pylama:
-    stage: Static Analysis
+    stage: static Analysis
     script:
         - pylama -i W391,E501
     tags:
         - ci
 
 pylint:
-    stage: Static Analysis
+    stage: static Analysis
     script:
         - pylint --disable=W0201,I1101,E0611,C0301 lightning_pass --ignore main.py
     tags:
         - ci
 
 mypy:
-    stage: Static Analysis
+    stage: static Analysis
     script:
         - mypy lightning_pass --ignore-missing-imports
     tags:
         - ci
 
 pytest:
-    stage: Test
+    stage: test
     script:
         - pytest -s --no-qt-log
     tags:

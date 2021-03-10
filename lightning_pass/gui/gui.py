@@ -39,7 +39,7 @@ class LightningPassWindow(QMainWindow):
         """Show main window."""
         self.main_win.show()
 
-    def general_setup(self):
+    def general_setup(self) -> None:
         self.progress = 0
         self.password_generated = False
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
