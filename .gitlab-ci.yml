@@ -7,7 +7,7 @@ before_script:
     - cd /tmp
     - tar xf Python-3.9.1.tar.xz
     - cd Python-3.9.1
-    - ./configure-3.9.1
+    - ./configure --enable-optimizations
     - sudo make altinstall
     - sudo apt -y autoremove
     - cd
