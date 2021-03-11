@@ -27,7 +27,10 @@ REGEX_EMAIL = r"^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
 
 @contextmanager
 def database_manager() -> MySQLCursor:
-    """Manage database __enter__ and __exit__ easily.
+    """Manage database queries easily with context manager.
+
+    Automatically yields the database connection on __enter__
+    and closes the connection on __exit__.
 
     :returns: database connection cursor
 
@@ -89,12 +92,20 @@ class Username:
     def check_username_pattern(username: str) -> None:
         """Check whether a given username matches a required pattern.
 
+        Username pattern: 1) must be at least 5 characters long
+                          2) mustn't contain special characters
+
         :param str username: Username to check
 
         :raises InvalidUsername: if the username doesn't match the required pattern.
 
         """
-        if len(username) < 5:
+        if (
+            # length
+            len(username) < 5
+            # special char
+            or not len(username) - len(re.findall(r"[A-Za-z0-9]", username)) <= 0
+        ):
             raise InvalidUsername
 
     @staticmethod
@@ -152,9 +163,13 @@ class Password:
         """
         password = str(password)  # if password in bytes, turn into str
         if (
+            # length
             len(password) < 8
+            # capital letters
             or len(re.findall(r"[A-Z]", password)) <= 0
+            # numbers
             or len(re.findall(r"[0-9]", password)) <= 0
+            # special chars
             or len(password) - len(re.findall(r"[A-Za-z0-9]", password)) <= 0
         ):
             raise InvalidPassword
@@ -187,7 +202,7 @@ class Password:
 
 
 class Email:
-    """This class holds various utils connected to any username.
+    """This class holds various utils connected to any email.
 
     Calling the class performs both pattern and existential checks.
 
@@ -232,15 +247,15 @@ class Email:
 
 
 class ProfilePicture:
-    """This class holds various utils connected to any username."""
+    """This class holds various utils connected to any profile picture."""
 
     @staticmethod
     def save_picture(picture_path: Path) -> str:
         """Save picture into profile pictures folder with a token_hex filename.
 
-        Uses the monkey patched copy function of pathlib.Path object to copy the profile picture.
+        Uses the monkey patched copy function of Path object to copy the profile picture.
 
-        :param pathlib.Path picture_path: Path to selected profile picture
+        :param Path picture_path: Path to selected profile picture
 
         :returns: the filename of the saved picture
 

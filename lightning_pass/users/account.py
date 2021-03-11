@@ -15,7 +15,6 @@ from ..util.utils import (
 )
 
 
-# noinspection SqlInjection
 class Account:
     """The class hold information about currently logged in user.
 
@@ -58,7 +57,10 @@ class Account:
         )  # Exceptions: PasswordDoNotMatch, InvalidPassword
         Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
         with database_manager() as db:
-            sql = "INSERT INTO lightning_pass.credentials (username, password, email) VALUES (%s, %s, %s)"
+            sql = (
+                "INSERT INTO lightning_pass.credentials (username, password, email)"
+                "     VALUES (%s, %s, %s)"
+            )
             val = [username, password, email]
             db.execute(sql, val)
 
@@ -79,7 +81,12 @@ class Account:
 
         """
         with database_manager() as db:
-            sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
+            sql = (
+                "SELECT 1"
+                "  FROM lightning_pass.credentials"
+                " WHERE username = %s" % username
+            )
+
             result = db.execute(sql)
 
         try:
@@ -90,7 +97,9 @@ class Account:
         user_id = get_user_id(value=username, column="username")
         with database_manager() as db:
             sql = (
-                f"SELECT password FROM lightning_pass.credentials WHERE id = {user_id}"
+                "SELECT password"
+                "  FROM lightning_pass.credentials"
+                " WHERE id = %d" % user_id
             )
             result = db.execute(sql)
 
@@ -109,7 +118,11 @@ class Account:
 
         """
         with database_manager() as db:
-            sql = f"SELECT username FROM lightning_pass.credentials WHERE id = {self.user_id}"
+            sql = (
+                "SELECT username"
+                "  FROM lightning_pass.credentials"
+                " WHERE id = %d" % self.user_id
+            )
             result = db.execute(sql)
 
         return result.fetchone()[0]
@@ -126,7 +139,12 @@ class Account:
         """
         Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
         with database_manager() as db:
-            sql = f"UPDATE lightning_pass.credentials SET username = '{value}' WHERE id = {self.user_id}"
+            sql = (
+                "UPDATE lightning_pass.credentials"
+                "   SET username = %s"
+                " WHERE id = %d" % value,
+                self.user_id,
+            )
             db.execute(sql)
 
     @property
@@ -137,7 +155,11 @@ class Account:
 
         """
         with database_manager() as db:
-            sql = f"SELECT password FROM lightning_pass.credentials WHERE id = {self.user_id}"
+            sql = (
+                "SELECT password"
+                "  FROM lightning_pass.credentials"
+                " WHERE id = %d" % self.user_id
+            )
             result = db.execute(sql)
         password = result.fetchone()[0]
 
@@ -151,7 +173,11 @@ class Account:
 
         """
         with database_manager() as db:
-            sql = f"SELECT email FROM lightning_pass.credentials WHERE id = {self.user_id}"
+            sql = (
+                "SELECT email"
+                "  FROM lightning_pass.credentials"
+                " WHERE id = %d" % self.user_id
+            )
             result = db.execute(sql)
 
         return result.fetchone()[0]
@@ -168,7 +194,11 @@ class Account:
         """
         Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
         with database_manager() as db:
-            sql = f"UPDATE lightning_pass.credentials SET email = '{value}' WHERE id = {self.user_id}"
+            sql = (
+                "UPDATE lightning_pass.credentials"
+                "   SET email = '{value}'"
+                " WHERE id = %d" % self.user_id
+            )
             db.execute(sql)
 
     @property
@@ -179,7 +209,11 @@ class Account:
 
         """
         with database_manager() as db:
-            sql = f"SELECT profile_picture FROM lightning_pass.credentials WHERE id = {self.user_id}"
+            sql = (
+                "SELECT profile_picture"
+                "  FROM lightning_pass.credentials"
+                " WHERE id = %d" % self.user_id
+            )
             result = db.execute(sql)
 
         return result.fetchone()[0]
@@ -192,7 +226,12 @@ class Account:
 
         """
         with database_manager() as db:
-            sql = f"UPDATE lightning_pass.credentials SET profile_picture = '{filename}' WHERE id = {self.user_id}"
+            sql = (
+                "UPDATE lightning_pass.credentials"
+                "   SET profile_picture = %s"
+                " WHERE id = %d" % filename,
+                self.user_id,
+            )
             db.execute(sql)
 
     @property
@@ -213,7 +252,11 @@ class Account:
 
         """
         with database_manager() as db:
-            sql = f"SELECT last_login_date FROM lightning_pass.credentials WHERE id = {self.user_id}"
+            sql = (
+                "SELECT last_login_date"
+                "  FROM lightning_pass.credentials"
+                " WHERE id = %d" % self.user_id
+            )
             result = db.execute(sql)
 
         return result.fetchone()[0]
@@ -222,8 +265,9 @@ class Account:
         """Set last login date."""
         with database_manager() as db:
             sql = (
-                f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP()"
-                f"WHERE id = {self.user_id}"
+                "UPDATE lightning_pass.credentials"
+                "   SET last_login_date = CURRENT_TIMESTAMP()"
+                " WHERE id = %d" % self.user_id
             )
             db.execute(sql)
 
@@ -235,7 +279,11 @@ class Account:
 
         """
         with database_manager() as db:
-            sql = f"SELECT register_date FROM lightning_pass.credentials WHERE id = {self.user_id}"
+            sql = (
+                "SELECT register_date"
+                "  FROM lightning_pass.credentials"
+                " WHERE id = %d" % self.user_id
+            )
             result = db.execute(sql)
 
         return result.fetchone()[0]
