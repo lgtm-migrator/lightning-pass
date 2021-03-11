@@ -8,6 +8,7 @@ from PyQt5 import QtGui
 from PyQt5.QtWidgets import QFileDialog
 from qdarkstyle import load_stylesheet
 
+from lightning_pass.gui.gui import LightningPassWindow
 from lightning_pass.users.account import Account
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
@@ -27,7 +28,12 @@ from ..mouse_randomness import Collector, MouseTracker, PwdGenerator
 class Events:
     """Used to provide utilities to connections to the events funcs."""
 
-    def __init__(self, parent, *args: object, **kwargs: object) -> None:
+    def __init__(
+        self,
+        parent: LightningPassWindow,
+        *args: object,
+        **kwargs: object,
+    ) -> None:
         """Buttons constructor."""
         super().__init__(*args, **kwargs)
         self.parent = parent
@@ -112,16 +118,17 @@ class Events:
         return PwdGenerator(
             self.parent.collector.randomness_lst,
             self.ui.generate_pass_spin_box.value(),
-            True if self.ui.generate_pass_numbers_check.isChecked() else False,
-            True if self.ui.generate_pass_symbols_check.isChecked() else False,
-            True if self.ui.generate_pass_lower_check.isChecked() else False,
-            True if self.ui.generate_pass_upper_check.isChecked() else False,
+            bool(self.ui.generate_pass_numbers_check.isChecked()),
+            bool(self.ui.generate_pass_symbols_check.isChecked()),
+            bool(self.ui.generate_pass_lower_check.isChecked()),
+            bool(self.ui.generate_pass_upper_check.isChecked()),
         )
 
     def generate_pass_phase2_event(self) -> None:
         """Switch to second password generation widget and reset previous values."""
         MouseTracker.setup_tracker(
-            self.ui.generate_pass_p2_tracking_lbl, self.parent.on_position_changed
+            self.ui.generate_pass_p2_tracking_lbl,
+            self.parent.on_position_changed,
         )
         self.ui.progress = 0
         self.ui.generate_pass_p2_prgrs_bar.setValue(self.ui.progress)
@@ -142,7 +149,10 @@ class Events:
 
     def account_event(self) -> None:
         """Switch to account widget and reset previous values.
-        Raises log in required error if an user tries to access the page without being logged in."""
+
+        Raises log in required error if an user tries to access the page without being logged in.
+
+        """
         try:
             if self.ui.current_user.user_id is None:
                 raise AttributeError
@@ -153,10 +163,10 @@ class Events:
             self.ui.account_username_line.setText(self.ui.current_user.username)
             self.ui.account_email_line.setText(self.ui.current_user.email)
             self.ui.account_last_log_date.setText(
-                f"Last login was {self.ui.current_user.last_login_date}."
+                f"Last login was {self.ui.current_user.last_login_date}.",
             )
             self.ui.account_pfp_pixmap_lbl.setPixmap(
-                QtGui.QPixmap(self.ui.current_user.profile_picture_path)
+                QtGui.QPixmap(self.ui.current_user.profile_picture_path),
             )
             self.ui.stacked_widget.setCurrentWidget(self.ui.account)
 
@@ -170,7 +180,7 @@ class Events:
         )
         if fname:
             self.ui.current_user.profile_picture = ProfilePicture.save_picture(
-                pathlib.Path(fname)
+                pathlib.Path(fname),
             )
             self.account_event()
 
@@ -192,11 +202,14 @@ class Events:
                 MessageBoxes.invalid_username_box(self.ui.message_boxes, "Account")
             except UsernameAlreadyExists:
                 MessageBoxes.username_already_exists_box(
-                    self.ui.message_boxes, "Account"
+                    self.ui.message_boxes,
+                    "Account",
                 )
             else:
                 MessageBoxes.details_updated_box(
-                    self.ui.message_boxes, "username", "Account"
+                    self.ui.message_boxes,
+                    "username",
+                    "Account",
                 )
         if self.ui.current_user.email != self.ui.account_email_line.text():
             try:
@@ -207,7 +220,9 @@ class Events:
                 MessageBoxes.email_already_exists_box(self.ui.message_boxes, "Account")
             else:
                 MessageBoxes.details_updated_box(
-                    self.ui.message_boxes, "email", "Account"
+                    self.ui.message_boxes,
+                    "email",
+                    "Account",
                 )
 
     def toggle_stylesheet_light(self, *args: object) -> None:

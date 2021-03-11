@@ -12,7 +12,7 @@ class Account:
     """This class holds information about the currently logged in user."""
 
     def __init__(self, user_id: int = None) -> None:
-        """Main contructor.
+        """Construct the class.
 
         :param int user_id: User's id, defaults to None
 
@@ -25,7 +25,11 @@ class Account:
 
     @classmethod
     def register(
-        cls, username: str, password: bytes, confirm_password: str, email: str
+        cls,
+        username: str,
+        password: bytes,
+        confirm_password: str,
+        email: str,
     ) -> Account:
         """Secondary constructor for register.
 
@@ -46,7 +50,8 @@ class Account:
         """
         utl.Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
         utl.Password(
-            password, confirm_password
+            password,
+            confirm_password,
         )  # Exceptions: PasswordDoNotMatch, InvalidPassword
         utl.Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
         with utl.database_manager() as db:
@@ -54,14 +59,15 @@ class Account:
                 "INSERT INTO lightning_pass.credentials (username, password, email)"
                 "     VALUES (%s, %s, %s)"
             )
-            val = [username, password, email]
-            db.execute(sql, val)
+            values = [username, password, email]
+            db.execute(sql, values)
 
         return cls(utl.get_user_item(username, "username", "id"))
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
         """Secondary constructor for login.
+
         Updates last_login_date if log in is successful.
 
         :param str username: User's username
@@ -79,10 +85,9 @@ class Account:
 
         if not utl.Password.authenticate_password(password, stored_password):
             raise AccountDoesNotExist
-        else:
-            account = cls(utl.get_user_item(username, "username", "id"))
-            account.update_last_login_date()
-            return account
+        account = cls(utl.get_user_item(username, "username", "id"))
+        account.update_last_login_date()
+        return account
 
     def get_value(self, result_column: str) -> str | datetime:
         """Simplify getting user values.

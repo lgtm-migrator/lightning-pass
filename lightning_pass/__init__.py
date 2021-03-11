@@ -19,7 +19,7 @@ def _copy(self: Path, target: Path) -> None:
 Path.copy = _copy  # type: ignore
 
 with util.database_manager() as db:
-    sql = """CREATE TABLE if not exists credentials(
+    SQL = """CREATE TABLE if not exists credentials(
             `id` int NOT NULL AUTO_INCREMENT,
             `username` varchar(255) NOT NULL,
             `password` varchar(255) NOT NULL,
@@ -34,4 +34,4 @@ with util.database_manager() as db:
              DEFAULT CHARSET = utf8mb4
              COLLATE = utf8mb4_0900_ai_ci
              """
-    db.execute(sql)
+    db.execute(SQL)

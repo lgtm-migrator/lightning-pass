@@ -1,16 +1,15 @@
 """Module containing various utility functions used throughout the whole project."""
+import contextlib
 import os
 import re
 import secrets
-from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
-from secrets import compare_digest
 from typing import Union
 
-from bcrypt import checkpw, gensalt, hashpw
-from dotenv import load_dotenv
-from mysql import connector
+import bcrypt
+import dotenv
+import mysql
 from mysql.connector import MySQLConnection
 from mysql.connector.connection import MySQLCursor
 
@@ -27,19 +26,19 @@ from .exceptions import (
 REGEX_EMAIL = r"^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
 
 
-@contextmanager
+@contextlib.contextmanager
 def database_manager() -> MySQLCursor:
     """Manage database queries easily with context manager.
 
     Automatically yields the database connection on __enter__
     and closes the connection on __exit__.
 
-    :returns: database connection cursor
+    :Yields: database connection cursor
 
     """
-    load_dotenv()
+    dotenv.load_dotenv()
     try:
-        con: MySQLConnection = connector.connect(
+        con: MySQLConnection = mysql.connector.connect(
             host=os.getenv("LOGINSDB_HOST"),
             user=os.getenv("LOGINSDB_USER"),
             password=os.getenv("LOGINSDB_PASS"),
@@ -48,15 +47,13 @@ def database_manager() -> MySQLCursor:
         cur: MySQLCursor = con.cursor()
         yield cur
     finally:
-        try:
+        with contextlib.suppress(mysql.connector.InternalError):
             con.commit()
-        except connector.errors.InternalError:
-            pass
         con.close()
 
 
 def _get_user_id(value: str, column: str) -> Union[int, bool]:
-    """Gets user id from any user detail and its column.
+    """Get user id from any user detail and its column.
 
     :param str value: Any user value stored in the database
     :param str column: Database column of the given user value
@@ -75,12 +72,14 @@ def _get_user_id(value: str, column: str) -> Union[int, bool]:
 
     try:
         return result.fetchone()[0]
-    except TypeError:
-        raise AccountDoesNotExist
+    except TypeError as e:
+        raise AccountDoesNotExist(e) from e
 
 
 def get_user_item(
-    user_identifier: Union[int, str], identifier_column: str, result_column: str
+    user_identifier: Union[int, str],
+    identifier_column: str,
+    result_column: str,
 ) -> Union[int, str, datetime]:
     """Get any user value from any other user value detail and its column.
 
@@ -94,7 +93,8 @@ def get_user_item(
 
     """
     user_id = _get_user_id(
-        user_identifier, identifier_column
+        user_identifier,
+        identifier_column,
     )  # Exception: AccountDoesNotExist
     if result_column == "id":
         return user_id
@@ -107,17 +107,30 @@ def get_user_item(
                 user_id,
             )
             result = db.execute(sql)
-            return result.fetchone()[0]
+    return result.fetchone()[0]
 
 
-def set_user_item(user_identifier, identifier_column, result, result_clumn):
-    if not identifier_column == "id":
+def set_user_item(
+    user_identifier: Union[int, str, datetime],
+    identifier_column: str,
+    result: Union[int, str, datetime],
+    result_column: str,
+) -> None:
+    """Set new user item.
+
+    :param user_identifier: Defines a value connected to the user
+    :param identifier_column: Defines the location of the value
+    :param result: item to insert
+    :param result_column: Column should result be inserted
+
+    """
+    if identifier_column != "id":
         user_identifier = _get_user_id(identifier_column, user_identifier)
     with database_manager() as db:
         sql = (
             "UPDATE lightning_pass.credentials"
             "   SET %s = %s"
-            " WHERE id = %d" % result_clumn,
+            " WHERE id = %d" % result_column,
             result,
             user_identifier,
         )
@@ -132,7 +145,7 @@ class Username:
     """
 
     def __init__(self, username: str) -> None:
-        """Main constructor.
+        """Construct the class.
 
         :param str username: Username
 
@@ -167,7 +180,7 @@ class Username:
             # length
             len(username) < 5
             # special char
-            or not len(username) - len(re.findall(r"[A-Za-z0-9]", username)) <= 0
+            or len(username) - len(re.findall(r"[A-Za-z0-9]", username)) > 0
         ):
             raise InvalidUsername
 
@@ -181,10 +194,8 @@ class Username:
             1) True means that we're checking if username exists.
             2) False means that we're checking if username doesn't exist.
 
-        :raises UsernameAlreadyExists: if positive search was True and
-        the username already exists in the database.
-        :raises AccountDoesNotExist: if positive search was False and
-        the username was not found.
+        :raises UsernameAlreadyExists: if positive search was True and the username already exists in the database.
+        :raises AccountDoesNotExist: if positive search was False and the username was not found.
 
         """
         with database_manager() as db:
@@ -210,9 +221,11 @@ class Password:
     """
 
     def __init__(
-        self, password: Union[str, bytes], confirm_password: Union[str, bytes]
+        self,
+        password: Union[str, bytes],
+        confirm_password: Union[str, bytes],
     ) -> None:
-        """Main constructor.
+        """Construct the class.
 
         :param Union[str, bytes] password: First password
         :param Union[str, bytes] confirm_password: Second password
@@ -270,7 +283,8 @@ class Password:
 
     @staticmethod
     def check_password_match(
-        password: Union[str, bytes], confirm_password: Union[str, bytes]
+        password: Union[str, bytes],
+        confirm_password: Union[str, bytes],
     ) -> None:
         """Check whether two passwords match.
 
@@ -282,7 +296,7 @@ class Password:
         """
         # If password bytes, turn into str
         password, confirm_password = (str(x) for x in (password, confirm_password))
-        if not compare_digest(password, confirm_password):
+        if not secrets.compare_digest(password, confirm_password):
             raise PasswordsDoNotMatch
 
     @staticmethod
@@ -294,11 +308,22 @@ class Password:
         :returns: hashed password by bcrypt
 
         """
-        return hashpw(password.encode("utf-8"), gensalt())
+        return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
     @staticmethod
-    def authenticate_password(password: str, current_password: str) -> None:
-        if not checkpw(password.encode("utf-8"), current_password.encode("utf-8")):
+    def authenticate_password(
+        password: Union[str, bytes],
+        current_password: Union[str, bytes],
+    ) -> None:
+        """Check if passwords match.
+
+        :param Union[str, bytes] password: Entered password.
+        :param Union[str, bytes] current_password: Password stored in the database.
+        """
+        if not bcrypt.checkpw(
+            password.encode("utf-8"),
+            current_password.encode("utf-8"),
+        ):
             raise AccountDoesNotExist
 
 
@@ -310,7 +335,7 @@ class Email:
     """
 
     def __init__(self, email: str) -> None:
-        """Main constructor.
+        """Construct the class.
 
         :param str email: Email to construct the class
 

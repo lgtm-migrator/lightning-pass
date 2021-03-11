@@ -8,13 +8,13 @@ from pytestqt.qtbot import QtBot
 from lightning_pass.gui.gui import LightningPassWindow
 
 
-@pytest.fixture
+@pytest.fixture()
 def app(qtbot: QtBot) -> LightningPassWindow:
     """Fixture for GUI tests.
 
     :param QtBot qtbot: Click on buttons like a human
 
-    :returns test_app: app instance with QtBot widget
+    :returns: app instance with QtBot widget
 
     """
     test_app = LightningPassWindow()
@@ -38,7 +38,10 @@ def app(qtbot: QtBot) -> LightningPassWindow:
     ],
 )
 def test_buttons(
-    app: LightningPassWindow, qtbot: QtBot, widget: str, index: int
+    app: LightningPassWindow,
+    qtbot: QtBot,
+    widget: str,
+    index: int,
 ) -> None:
     """Test if each button correctly switches to correct stacked_widget index.
 
@@ -60,7 +63,9 @@ def test_buttons(
 
     """
     widget = getattr(app.ui, widget)
-    qtbot.mouseClick(widget, QtCore.Qt.LeftButton)
+
+    qtbot.mouseClick(widget, QtCore.Qt.LeftButton)  # act
+
     assert app.ui.stacked_widget.currentIndex() == index
 
 
@@ -94,5 +99,7 @@ def test_menu_bar(app: LightningPassWindow, menu_bar_action: str, index: int) ->
 
     """
     action = getattr(app.ui, menu_bar_action)
-    action.trigger()
+
+    action.trigger()  # act
+
     assert app.ui.stacked_widget.currentIndex() == index

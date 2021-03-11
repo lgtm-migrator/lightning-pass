@@ -1,8 +1,11 @@
 """Module containing classes used for operations with mouse randomness generation."""
 from __future__ import annotations
 
+from typing import Generator
+
 from passgen import passgen
 from PyQt5 import QtCore
+from PyQt5.QtCore import QEvent, pyqtBoundSignal
 from PyQt5.QtWidgets import QLabel
 
 from ..util.exceptions import StopCollectingPositions
@@ -15,7 +18,7 @@ class MouseTracker(QtCore.QObject):
 
     """
 
-    positionChanged = QtCore.pyqtSignal(QtCore.QPoint)
+    position_changed = QtCore.pyqtSignal(QtCore.QPoint)
 
     def __init__(self, widget: QLabel) -> None:
         """Class contructor."""
@@ -26,43 +29,53 @@ class MouseTracker(QtCore.QObject):
 
     @property
     def widget(self) -> QLabel:
+        """Widget property.
+
+        :return: Own widget
+
+        """
         return self._widget
 
-    def eventFilter(self, o: QLabel, e: QtCore.QEvent.MouseMove) -> object:
+    def event_filter(self, event: QEvent, move: QtCore.QEvent.MouseMove) -> object:
         """Event filter.
 
-        :param QLabel o: Label object
-        :param MouseMove e: Mouse move event
+        :param QLabel event: Label object
+        :param MouseMove move: Mouse move event
 
         :returns: eventFilter of super class
 
         """
-        if o is self.widget and e.type() == QtCore.QEvent.MouseMove:
-            self.positionChanged.emit(e.pos())
-        return super().eventFilter(o, e)
+        if move is self.widget and event.type() == QtCore.QEvent.MouseMove:
+            self.position_changed.emit(event.pos())
+        return super().eventFilter(move, event)
 
     @staticmethod
-    def setup_tracker(label: QLabel, on_change) -> None:
-        """Setup a mouse tracker over a specified label."""
+    def setup_tracker(label: QLabel, on_change: pyqtBoundSignal) -> None:
+        """Set up a mouse tracker over a specified label."""
         tracker = MouseTracker(label)
-        tracker.positionChanged.connect(on_change)
+        tracker.position_changed.connect(on_change)
 
 
 class Collector:
     """This class contains functionality for recording current mouse position."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Class contructor."""
-        self.randomness_lst = []  # List[Tuple[int, int]]
+        self.randomness_lst: List[int, int] = []
 
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"Collector({self.randomness_lst})"
 
-    def __iter__(self):
+    def __iter__(self) -> Generator:
+        """Iterate over the class.
+
+        - yield item from randomness_lst
+
+        """
         yield from self.randomness_lst
 
-    def collect_position(self, pos: QtCore.QPoint) -> str | bool:
+    def collect_position(self, pos: QtCore.QPoint) -> bool:
         """Collect mouse position.
 
         :param QPoint pos: Current cursor position
@@ -72,17 +85,15 @@ class Collector:
         :raises StopCollectingPositions: if 1000 mouse positions have been collected
 
         """
-        if len(self.randomness_lst) <= 999:
-            self.randomness_lst.append("(%d, %d)" % (pos.x(), pos.y()))
-            if len(self.randomness_lst) % 10 == 0:
-                return True
-        else:
+        if len(self.randomness_lst) > 999:
             raise StopCollectingPositions
+        self.randomness_lst.append("(%d, %d)" % (pos.x(), pos.y()))
+        if len(self.randomness_lst) % 10 == 0:
+            return True
 
 
 class PwdGenerator:
-    """This class holds user's chosen parameters for password generation
-    and contains the password generation functionality.
+    """Holds user's chosen parameters for password generation and contains the password generation functionality.
 
     :param List[Tuple[int, int]] randomness_lst: Information about mouse positions
     :param int length: Password length
@@ -123,6 +134,7 @@ class PwdGenerator:
 
     def generate_password(self, case_type: str = "both") -> str:
         """Generate a password by passgen library.
+
         Password generation is based on the chosen parameters in the GUI.
 
         :param str case_type: "both" as a default case
@@ -137,10 +149,9 @@ class PwdGenerator:
         elif self.uppercase is False:
             case_type = "lower"
 
-        password = passgen(
+        return passgen(
             length=self.length,
             punctuation=self.symbols,
             digits=self.numbers,
             case=case_type,
         )
-        return password

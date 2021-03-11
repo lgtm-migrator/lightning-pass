@@ -6,9 +6,13 @@ import pytest
 from lightning_pass.util.util import Password
 
 
-@pytest.fixture
+@pytest.fixture()
 def password_cls() -> Password:
-    """Return Password object."""
+    """Return Password object.
+
+    :returns: empty Password class
+
+    """
     return Password(..., ...)
 
 
@@ -35,4 +39,4 @@ def test_check_password_match(
     Fails if func raises an exception.
 
     """
-    password_cls.check_password_match(password, confirm_password)
+    password_cls.check_password_match(password, confirm_password)  # act

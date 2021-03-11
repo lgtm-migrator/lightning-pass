@@ -3,13 +3,15 @@ from __future__ import annotations
 
 import re
 
-from PyQt5.QtWidgets import QMessageBox, QPushButton, QWidget
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, QWidget
+
+from lightning_pass.gui.gui import LightningPassWindow
 
 
 class MessageBoxes(QWidget):
     """This class holds the functionality to show various message boxes."""
 
-    def __init__(self, child, parent):
+    def __init__(self, child: QMainWindow, parent: LightningPassWindow) -> None:
         """Class constructor."""
         super().__init__(parent)
         self.events = parent.events
@@ -45,7 +47,7 @@ class MessageBoxes(QWidget):
             """Password must be at least 8 characters long,
 contain at least 1 capital letter,
 contain at least 1 number
-contain at least one special character."""
+contain at least one special character.""",
         )
         box.exec_()
 
@@ -69,7 +71,7 @@ contain at least one special character."""
         """
 
         def event_handler(btn: QPushButton) -> None:
-            """Handler for clicks on message box window
+            """Handle clicks on message box window.
 
             :param btn: Clicked button
 
@@ -134,7 +136,7 @@ contain at least one special character."""
         """
 
         def event_handler(btn: QPushButton) -> None:
-            """Handler for clicks on message box window
+            """Handle clicks on message box window.
 
             :param btn: Clicked button
 
@@ -175,7 +177,7 @@ contain at least one special character."""
         """
 
         def event_handler(btn: QPushButton) -> None:
-            """Handler for clicks on message box window
+            """Handle clicks on message box window.
 
             :param btn: Clicked button
 
