@@ -3,17 +3,19 @@ import os
 import re
 import secrets
 from contextlib import contextmanager
+from datetime import datetime
 from pathlib import Path
 from secrets import compare_digest
 from typing import Union
 
-from bcrypt import gensalt, hashpw
+from bcrypt import checkpw, gensalt, hashpw
 from dotenv import load_dotenv
 from mysql import connector
 from mysql.connector import MySQLConnection
 from mysql.connector.connection import MySQLCursor
 
 from .exceptions import (
+    AccountDoesNotExist,
     EmailAlreadyExists,
     InvalidEmail,
     InvalidPassword,
@@ -53,13 +55,15 @@ def database_manager() -> MySQLCursor:
         con.close()
 
 
-def get_user_id(value: str, column: str) -> Union[int, bool]:
+def _get_user_id(value: str, column: str) -> Union[int, bool]:
     """Gets user id from any user detail and its column.
 
     :param str value: Any user value stored in the database
     :param str column: Database column of the given user value
 
     :returns: user id on success, False upon failure
+
+    :raises AccountDoesNotExist: if no result was found
 
     """
     with database_manager() as db:
@@ -72,7 +76,52 @@ def get_user_id(value: str, column: str) -> Union[int, bool]:
     try:
         return result.fetchone()[0]
     except TypeError:
-        return False
+        raise AccountDoesNotExist
+
+
+def get_user_item(
+    user_identifier: Union[int, str], identifier_column: str, result_column: str
+) -> Union[int, str, datetime]:
+    """Get any user value from any other user value detail and its column.
+
+    :param str user_identifier: Any user value stored in the database
+    :param str identifier_column: Database column of the given user value
+    :param str result_column: Column of the wanted value
+
+    :returns: user id on success, False upon failure
+
+    :raises AccountDoesNotExist: if no result was found
+
+    """
+    user_id = _get_user_id(
+        user_identifier, identifier_column
+    )  # Exception: AccountDoesNotExist
+    if result_column == "id":
+        return user_id
+    if user_id:
+        with database_manager() as db:
+            sql = (
+                "SELECT %s"
+                "  FROM lightning_pass.credentials"
+                " WHERE id = %d" % result_column,
+                user_id,
+            )
+            result = db.execute(sql)
+            return result.fetchone()[0]
+
+
+def set_user_item(user_identifier, identifier_column, result, result_clumn):
+    if not identifier_column == "id":
+        user_identifier = _get_user_id(identifier_column, user_identifier)
+    with database_manager() as db:
+        sql = (
+            "UPDATE lightning_pass.credentials"
+            "   SET %s = %s"
+            " WHERE id = %d" % result_clumn,
+            result,
+            user_identifier,
+        )
+        db.execute(sql)
 
 
 class Username:
@@ -123,12 +172,19 @@ class Username:
             raise InvalidUsername
 
     @staticmethod
-    def check_username_existence(username: str) -> None:
+    def check_username_existence(username: str, exists: bool = True) -> None:
         """Check whether a username already exists in a database and if it matches a required pattern.
 
         :param str username: Username to check
+        :param bool exists:
+            Search type, defaults to True
+            1) True means that we're checking if username exists.
+            2) False means that we're checking if username doesn't exist.
 
-        :raises UsernameAlreadyExists: if the username already exists in the database.
+        :raises UsernameAlreadyExists: if positive search was True and
+        the username already exists in the database.
+        :raises AccountDoesNotExist: if positive search was False and
+        the username was not found.
 
         """
         with database_manager() as db:
@@ -140,7 +196,9 @@ class Username:
             result = db.execute(sql)
         row = result.fetchone()
 
-        if not len(row) <= 0:
+        if exists and len(row) <= 0:
+            raise AccountDoesNotExist
+        if not exists and len(row) > 0:
             raise UsernameAlreadyExists
 
 
@@ -237,6 +295,11 @@ class Password:
 
         """
         return hashpw(password.encode("utf-8"), gensalt())
+
+    @staticmethod
+    def authenticate_password(password: str, current_password: str) -> None:
+        if not checkpw(password.encode("utf-8"), current_password.encode("utf-8")):
+            raise AccountDoesNotExist
 
 
 class Email:

@@ -25,7 +25,7 @@ from ..mouse_randomness import Collector, MouseTracker, PwdGenerator
 
 
 class Events:
-    """Used to provide utilities to """
+    """Used to provide utilities to connections to the events funcs."""
 
     def __init__(self, parent, *args: object, **kwargs: object) -> None:
         """Buttons constructor."""
