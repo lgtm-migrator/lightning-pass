@@ -1,9 +1,11 @@
-"""init"""
+"""Package containing the whole project."""
 from __future__ import annotations
 
 from pathlib import Path
 
 from .util import util
+
+__all__ = ["gui", "users", "util"]
 
 
 def _copy(self: Path, target: Path) -> None:

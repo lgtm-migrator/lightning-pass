@@ -1,4 +1,4 @@
-"""This module holds the MessageBoxes class used for showing various message boxes."""
+"""Module containing the MessageBoxes class used for showing various message boxes."""
 from __future__ import annotations
 
 import re

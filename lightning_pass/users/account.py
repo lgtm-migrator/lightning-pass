@@ -1,3 +1,4 @@
+"""Module containing the Account class and other functions related to accounts."""
 from __future__ import annotations
 
 from datetime import datetime
@@ -10,14 +11,14 @@ from ..util.exceptions import AccountDoesNotExist
 
 
 class Account:
-    """This class holds information about currently logged in user.
-
-    :param int user_id: User's id
-
-    """
+    """This class holds information about the currently logged in user."""
 
     def __init__(self, user_id: int = None) -> None:
-        """Class contructor."""
+        """Main contructor.
+
+        :param int user_id: User's id, defaults to None
+
+        """
         self.user_id = int(user_id) if user_id else None
 
     def __repr__(self) -> str:
@@ -28,7 +29,7 @@ class Account:
     def register(
         cls, username: str, password: bytes, confirm_password: str, email: str
     ) -> Account:
-        """Secondary class constructor for register.
+        """Secondary constructor for register.
 
         :param str username: User's username
         :param bytes password: User's password
@@ -62,7 +63,7 @@ class Account:
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
-        """Secondary class constructor for login.
+        """Secondary constructor for login.
         Updates last_login_date if log in is successful.
 
         :param str username: User's username

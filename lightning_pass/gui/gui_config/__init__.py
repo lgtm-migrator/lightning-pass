@@ -1,8 +1,2 @@
-"""Scripts to setup the GUI elements.
-
-Modules:
-    buttons - connect various events to each button on the GUI
-    events - handlers for various actions
-
-"""
+"""Subpackage containing modules to setup the GUI elements."""
 __all__ = ["buttons", "events"]

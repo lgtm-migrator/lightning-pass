@@ -1,4 +1,4 @@
-"""This module holds all custom exceptions used throughout the project."""
+"""Module containing all custom exceptions used throughout the project."""
 
 
 class InvalidUsername(AttributeError):

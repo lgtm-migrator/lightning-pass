@@ -1,3 +1,4 @@
+"""Test module for the gui package."""
 from __future__ import annotations
 
 import pytest
@@ -11,10 +12,9 @@ from lightning_pass.gui.gui import LightningPassWindow
 def app(qtbot: QtBot) -> LightningPassWindow:
     """Fixture for GUI tests.
 
-    :param QtBot: clicks on buttons
+    :param QtBot qtbot: Click on buttons like a human
 
-    :returns test_app: app instance
-    :rtype LightningPassWindow
+    :returns test_app: app instance with QtBot widget
 
     """
     test_app = LightningPassWindow()
@@ -42,17 +42,21 @@ def test_buttons(
 ) -> None:
     """Test if each button correctly switches to correct stacked_widget index.
 
-    :param LightningPassWindow app: main window instance
+    :param LightningPassWindow app: Main window instance
     :param QtBot qtbot: QtBot instance
     :param str widget: QPushButton pointer
-    :param int index: stacked_widget expected index,
-        index 0: app.ui.home
-        index 1: app.ui.login
-        index 2: app.ui.register_2
-        index 3: app.ui.forgot_password
-        index 4: app.ui.generate_password
-        index 5: app.ui.generate_pass_phase2
-        index 6: app.ui.account
+    :param int index: stacked_widget expected index
+
+    Index description:
+        1) index 0: app.ui.home
+        2) index 1: app.ui.login
+        3) index 2: app.ui.register_2
+        4) index 3: app.ui.forgot_password
+        5) index 4: app.ui.generate_password
+        6) index 5: app.ui.generate_pass_phase2
+        7) index 6: app.ui.account
+
+    Fails if stacked_widget didn't change index.
 
     """
     widget = getattr(app.ui, widget)
@@ -71,6 +75,24 @@ def test_buttons(
     ],
 )
 def test_menu_bar(app: LightningPassWindow, menu_bar_action: str, index: int) -> None:
+    """Test if each menu bar action correctly switches to correct stacked_widget index.
+
+    :param LightningPassWindow app: Main window instance
+    :param str menu_bar_action: QPushButton pointer
+    :param int index: stacked_widget expected index
+
+    Index description:
+        1) index 0: app.ui.home
+        2) index 1: app.ui.login
+        3) index 2: app.ui.register_2
+        4) index 3: app.ui.forgot_password
+        5) index 4: app.ui.generate_password
+        6) index 5: app.ui.generate_pass_phase2
+        7) index 6: app.ui.account
+
+    Fails if stacked_widget didn't change index.
+
+    """
     action = getattr(app.ui, menu_bar_action)
     action.trigger()
     assert app.ui.stacked_widget.currentIndex() == index

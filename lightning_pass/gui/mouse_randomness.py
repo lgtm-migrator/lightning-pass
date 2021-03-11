@@ -1,3 +1,4 @@
+"""Module containing classes used for operations with mouse randomness generation."""
 from __future__ import annotations
 
 from passgen import passgen

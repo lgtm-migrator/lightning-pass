@@ -1,3 +1,4 @@
+"""Module containing the Events class used for event handling."""
 from __future__ import annotations
 
 import pathlib
@@ -24,8 +25,10 @@ from ..mouse_randomness import Collector, MouseTracker, PwdGenerator
 
 
 class Events:
+    """Used to provide utilities to """
+
     def __init__(self, parent, *args: object, **kwargs: object) -> None:
-        """Buttons constructor"""
+        """Buttons constructor."""
         super().__init__(*args, **kwargs)
         self.parent = parent
         self.main_win = parent.main_win

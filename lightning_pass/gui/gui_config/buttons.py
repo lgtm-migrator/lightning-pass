@@ -1,11 +1,26 @@
+"""Module containing the Buttons class.
+
+Used for connecting each button on the GUI to various events or lambdas.
+
+"""
+from __future__ import annotations
+
 from pathlib import Path
+
+from lightning_pass.gui.gui import LightningPassWindow
 
 
 class Buttons:
     """This class is used to setup buttons on the LightningPassWindow"""
 
-    def __init__(self, parent, *args, **kwargs):
-        """Buttons constructor"""
+    def __init__(
+        self, parent: LightningPassWindow, *args: object, **kwargs: object
+    ) -> None:
+        """Buttons constructor.
+
+        :param LightningPassWindow parent: Main GUI window
+
+        """
         super().__init__(*args, **kwargs)
         self.main_win = parent
         self.ui = parent.ui
@@ -63,12 +78,12 @@ class Buttons:
         self.ui.action_main_menu.triggered.connect(self.main_win.events.home_event)
         self.ui.action_light.triggered.connect(
             lambda: self.main_win.events.toggle_stylesheet_light(
-                f"{Path(__file__).parent}\\static\\light.qss"
+                f"{Path(__file__).parent}/static/light.qss"
             )
         )
         self.ui.action_dark.triggered.connect(
             lambda: self.main_win.events.toggle_stylesheet_dark(
-                f"{Path(__file__).parent}\\static\\dark.qss"
+                f"{Path(__file__).parent}/static/dark.qss"
             )
         )
         self.ui.action_generate.triggered.connect(

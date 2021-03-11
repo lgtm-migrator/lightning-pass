@@ -1,4 +1,4 @@
-"""This module holds various utility functions used throughout the whole project."""
+"""Module containing various utility functions used throughout the whole project."""
 import os
 import re
 import secrets
@@ -43,7 +43,7 @@ def database_manager() -> MySQLCursor:
             password=os.getenv("LOGINSDB_PASS"),
             database=os.getenv("LOGINSDB_DB"),
         )
-        cur = con.cursor()
+        cur: MySQLCursor = con.cursor()
         yield cur
     finally:
         try:
@@ -63,7 +63,10 @@ def get_user_id(value: str, column: str) -> Union[int, bool]:
 
     """
     with database_manager() as db:
-        sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
+        sql = (
+            "SELECT id" "  FROM lightning_pass.credentials" " WHERE %s = %s" % column,
+            value,
+        )
         result = db.execute(sql)
 
     try:
@@ -77,14 +80,24 @@ class Username:
 
     Calling the class performs both pattern and existential checks.
 
-    :param str username: Username
-
     """
 
     def __init__(self, username: str) -> None:
-        self.name = username
+        """Main constructor.
 
-    def __call__(self, username: str) -> None:
+        :param str username: Username
+
+        """
+        self._username = username
+
+    def __call__(self, username: str = None) -> None:
+        """Perform both pattern and existence checks.
+
+        :param str username: Username to check, defaults to None
+
+        """
+        if not username:
+            username = self._username
         self.check_username_pattern(username)
         self.check_username_existence(username)
 
@@ -92,8 +105,9 @@ class Username:
     def check_username_pattern(username: str) -> None:
         """Check whether a given username matches a required pattern.
 
-        Username pattern: 1) must be at least 5 characters long
-                          2) mustn't contain special characters
+        Username pattern:
+            1) must be at least 5 characters long
+            2) mustn't contain special characters
 
         :param str username: Username to check
 
@@ -118,9 +132,13 @@ class Username:
 
         """
         with database_manager() as db:
-            sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
+            sql = (
+                "SELECT 1"
+                "  FROM lightning_pass.credentials"
+                " WHERE username = %s" % username
+            )
             result = db.execute(sql)
-        row = result.fetchall()
+        row = result.fetchone()
 
         if not len(row) <= 0:
             raise UsernameAlreadyExists
@@ -131,19 +149,35 @@ class Password:
 
     Calling the class performs both pattern and matching case checks.
 
-    :param Union[str, bytes] password: Password
-
     """
 
     def __init__(
         self, password: Union[str, bytes], confirm_password: Union[str, bytes]
     ) -> None:
-        self._pass = password
-        self.conf_pass = confirm_password
+        """Main constructor.
+
+        :param Union[str, bytes] password: First password
+        :param Union[str, bytes] confirm_password: Second password
+
+        """
+        self._password = str(password)
+        self.confirm_password = str(confirm_password)
 
     def __call__(
-        self, password: Union[str, bytes], confirm_password: Union[str, bytes]
+        self,
+        password: Union[str, bytes] = None,
+        confirm_password: Union[str, bytes] = None,
     ) -> None:
+        """Perform both pattern and match checks.
+
+        :param Union[str, bytes] password: First password, defaults to None
+        :param Union[str, bytes] confirm_password: Second password, defaults to None
+
+        """
+        if not password:
+            password = self._password
+        if not confirm_password:
+            confirm_password = self.confirm_password
         self.check_password_pattern(password)
         self.check_password_match(password, confirm_password)
 
@@ -151,17 +185,19 @@ class Password:
     def check_password_pattern(password: Union[str, bytes]) -> None:
         """Check whether password matches a required pattern.
 
-        Password pattern: 1) must be at least 8 characters long
-                          2) must contain at least 1 capital letter
-                          3) must contain at least 1 number
-                          4) must contain at least 1 special character
+        Password pattern:
+            1) must be at least 8 characters long
+            2) must contain at least 1 capital letter
+            3) must contain at least 1 number
+            4) must contain at least 1 special character
 
         :param Union[str, bytes] password: Password to check
 
         :raises InvalidPassword: if the password doesn't match the required pattern.
 
         """
-        password = str(password)  # if password in bytes, turn into str
+        # if password in bytes, turn into str
+        password = str(password)
         if (
             # length
             len(password) < 8
@@ -180,13 +216,15 @@ class Password:
     ) -> None:
         """Check whether two passwords match.
 
-        :param str password: First password
+        :param  Union[str, bytes] password: First password
         :param Union[str, bytes] confirm_password: Confirmation password
 
         :raises PasswordsDoNotMatch: if password and confirm password don't match.
 
         """
-        if not compare_digest(password, confirm_password.encode("utf-8")):
+        # If password bytes, turn into str
+        password, confirm_password = (str(x) for x in (password, confirm_password))
+        if not compare_digest(password, confirm_password):
             raise PasswordsDoNotMatch
 
     @staticmethod
@@ -206,14 +244,24 @@ class Email:
 
     Calling the class performs both pattern and existential checks.
 
-    :param str email: Email
-
     """
 
     def __init__(self, email: str) -> None:
+        """Main constructor.
+
+        :param str email: Email to construct the class
+
+        """
         self._email = email
 
-    def __call__(self, email: str) -> None:
+    def __call__(self, email: str = None) -> None:
+        """Perform both pattern and existence checks.
+
+        :param str email: First password, defaults to None
+
+        """
+        if not email:
+            email = self._email
         self.check_email_pattern(email)
         self.check_email_existence(email)
 
@@ -221,9 +269,12 @@ class Email:
     def check_email_pattern(email: str) -> None:
         """Check whether given email matches email pattern.
 
+        Email pattern: defined by REGEX_EMAIL constant
+
         :param str email: Email to check
 
         :raises InvalidEmail: if the email doesn't match the RegEx email pattern.
+
         """
         if not re.search(REGEX_EMAIL, email):
             raise InvalidEmail
@@ -238,7 +289,11 @@ class Email:
 
         """
         with database_manager() as db:
-            sql = f"SELECT 1 FROM lightning_pass.credentials WHERE email = '{email}'"
+            sql = (
+                "SELECT 1"
+                "  FROM lightning_pass.credentials"
+                " WHERE email = %s" % email
+            )
             result = db.execute(sql)
         row = result.fetchall()
 
