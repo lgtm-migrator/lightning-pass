@@ -17,7 +17,7 @@ from lightning_pass.util.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-from lightning_pass.util.utils import Password, ProfilePicture
+from lightning_pass.util.util import Password, ProfilePicture
 
 from ..message_boxes import MessageBoxes
 from ..mouse_randomness import Collector, MouseTracker, PwdGenerator

@@ -4,19 +4,13 @@ from datetime import datetime
 
 from bcrypt import checkpw
 
+import lightning_pass.util.util as utl
+
 from ..util.exceptions import AccountDoesNotExist
-from ..util.utils import (
-    Email,
-    Password,
-    ProfilePicture,
-    Username,
-    database_manager,
-    get_user_id,
-)
 
 
 class Account:
-    """The class hold information about currently logged in user.
+    """This class holds information about currently logged in user.
 
     :param int user_id: User's id
 
@@ -51,12 +45,12 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
-        Password(
+        utl.Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        utl.Password(
             password, confirm_password
         )  # Exceptions: PasswordDoNotMatch, InvalidPassword
-        Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
-        with database_manager() as db:
+        utl.Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
+        with utl.database_manager() as db:
             sql = (
                 "INSERT INTO lightning_pass.credentials (username, password, email)"
                 "     VALUES (%s, %s, %s)"
@@ -64,7 +58,7 @@ class Account:
             val = [username, password, email]
             db.execute(sql, val)
 
-        return cls(get_user_id(value=username, column="username"))
+        return cls(utl.get_user_id(value=username, column="username"))
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
@@ -80,7 +74,7 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "SELECT 1"
                 "  FROM lightning_pass.credentials"
@@ -94,8 +88,8 @@ class Account:
         except AttributeError:
             raise AccountDoesNotExist
 
-        user_id = get_user_id(value=username, column="username")
-        with database_manager() as db:
+        user_id = utl.get_user_id(value=username, column="username")
+        with utl.database_manager() as db:
             sql = (
                 "SELECT password"
                 "  FROM lightning_pass.credentials"
@@ -117,7 +111,7 @@ class Account:
         :returns: user's username in database
 
         """
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "SELECT username"
                 "  FROM lightning_pass.credentials"
@@ -137,8 +131,8 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
-        with database_manager() as db:
+        utl.Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        with utl.database_manager() as db:
             sql = (
                 "UPDATE lightning_pass.credentials"
                 "   SET username = %s"
@@ -154,7 +148,7 @@ class Account:
         :returns: user's password in database
 
         """
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "SELECT password"
                 "  FROM lightning_pass.credentials"
@@ -172,7 +166,7 @@ class Account:
         :returns: user's email in database
 
         """
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "SELECT email"
                 "  FROM lightning_pass.credentials"
@@ -192,8 +186,8 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
-        with database_manager() as db:
+        utl.Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
+        with utl.database_manager() as db:
             sql = (
                 "UPDATE lightning_pass.credentials"
                 "   SET email = '{value}'"
@@ -208,7 +202,7 @@ class Account:
         :returns: user's profile picture in database
 
         """
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "SELECT profile_picture"
                 "  FROM lightning_pass.credentials"
@@ -225,7 +219,7 @@ class Account:
         :param str filename: Filename of the new profile picture
 
         """
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "UPDATE lightning_pass.credentials"
                 "   SET profile_picture = %s"
@@ -241,7 +235,7 @@ class Account:
         :returns: path to user's profile picture
 
         """
-        path = str(ProfilePicture.get_profile_picture_path(self.profile_picture))
+        path = str(utl.ProfilePicture.get_profile_picture_path(self.profile_picture))
         return path
 
     @property
@@ -251,7 +245,7 @@ class Account:
         :returns: last time the current account was accessed
 
         """
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "SELECT last_login_date"
                 "  FROM lightning_pass.credentials"
@@ -263,7 +257,7 @@ class Account:
 
     def update_last_login_date(self) -> None:
         """Set last login date."""
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "UPDATE lightning_pass.credentials"
                 "   SET last_login_date = CURRENT_TIMESTAMP()"
@@ -278,7 +272,7 @@ class Account:
         :returns: register date of current user
 
         """
-        with database_manager() as db:
+        with utl.database_manager() as db:
             sql = (
                 "SELECT register_date"
                 "  FROM lightning_pass.credentials"

@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .util import utils
+from .util import util
 
 
 def _copy(self: Path, target: Path) -> None:
@@ -16,7 +16,7 @@ def _copy(self: Path, target: Path) -> None:
 
 Path.copy = _copy  # type: ignore
 
-with utils.database_manager() as db:
+with util.database_manager() as db:
     sql = """CREATE TABLE if not exists credentials(
             `id` int NOT NULL AUTO_INCREMENT,
             `username` varchar(255) NOT NULL,

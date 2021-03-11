@@ -1,4 +1,4 @@
-"""Holds main GUI class"""
+"""Holds main GUI class."""
 from __future__ import annotations
 
 from PyQt5 import QtCore
