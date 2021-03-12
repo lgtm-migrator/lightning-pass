@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import functools
 import pathlib
+from typing import Callable
 
 import clipboard
 from PyQt5 import QtGui
@@ -24,13 +25,27 @@ from lightning_pass.util.exceptions import (
 from lightning_pass.util.util import Password, ProfilePicture
 
 
-def login_required(func):
+def login_required(func: Callable) -> Callable:
+    """Decorator to ensure that a user has to be logged in to access a specific event.
+
+    :param func: Function to decorate
+
+    :return: the decorated function
+
+    """
+
     @functools.wraps(func)
-    def wrapper(self):
+    def wrapper(self: Events, *args, **kwargs) -> Callable | None:
+        """
+
+        :param self: Class instance to give access to its attributes
+
+        :return: executed function
+        """
         if not hasattr(self, "current_user"):
             msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "account")
         else:
-            return func(self)
+            return func(self, args, kwargs)
 
     return wrapper
 

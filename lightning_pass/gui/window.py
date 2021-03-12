@@ -1,8 +1,11 @@
 """Module containing the main GUI class."""
 from __future__ import annotations
 
+import sys
+
+import PyQt5.QtWidgets as QtWidgets
 from PyQt5 import QtCore
-from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
+from PyQt5.QtGui import QIcon
 
 from lightning_pass.gui.gui_config import buttons, events
 from lightning_pass.gui.message_boxes import MessageBoxes
@@ -11,7 +14,26 @@ from lightning_pass.gui.static.qt_designer.output.main import Ui_lightning_pass
 from lightning_pass.util.exceptions import StopCollectingPositions
 
 
-class LightningPassWindow(QMainWindow):
+def main() -> None:
+    """Show main window with everything set up."""
+    app = QtWidgets.QApplication(sys.argv)
+    main_window = LightningPassWindow()
+
+    # Tray icon setup
+    tray_icon = QtWidgets.QSystemTrayIcon(QIcon("tray_icon.png"), app)
+    tray_icon.setToolTip("Lightning Pass")
+    tray_icon.show()
+    # Inherit main window to follow current style sheet
+    menu = QtWidgets.QMenu(main_window.main_win)
+    quit_action = menu.addAction("Exit Lightning Pass")
+    quit_action.triggered.connect(quit)
+    tray_icon.setContextMenu(menu)
+
+    main_window.show()
+    app.exec_()
+
+
+class LightningPassWindow(QtWidgets.QMainWindow):
     """Main Window."""
 
     def __init__(self, *args: iter, **kwargs: iter) -> None:
@@ -23,7 +45,7 @@ class LightningPassWindow(QMainWindow):
         """
         super().__init__(*args, **kwargs)
 
-        self.main_win = QMainWindow()
+        self.main_win = QtWidgets.QMainWindow()
 
         self.ui = Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
@@ -59,7 +81,7 @@ class LightningPassWindow(QMainWindow):
     def center(self) -> None:
         """Center main window."""
         qr = self.frameGeometry()
-        cp = QDesktopWidget().availableGeometry().center()
+        cp = QtWidgets.QDesktopWidget().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
