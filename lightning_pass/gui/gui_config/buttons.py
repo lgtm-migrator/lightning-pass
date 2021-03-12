@@ -5,7 +5,7 @@ Used for connecting each button on the GUI to various events or lambdas.
 """
 from __future__ import annotations
 
-from pathlib import Path
+import pathlib
 
 from PyQt5.QtWidgets import QMainWindow
 
@@ -81,12 +81,12 @@ class Buttons:
         self.ui.action_main_menu.triggered.connect(self.main_win.events.home_event)
         self.ui.action_light.triggered.connect(
             lambda: self.main_win.events.toggle_stylesheet_light(
-                f"{Path(__file__).parent}/static/light.qss",
+                f"{pathlib.Path(__file__).parent}/static/light.qss",
             ),
         )
         self.ui.action_dark.triggered.connect(
             lambda: self.main_win.events.toggle_stylesheet_dark(
-                f"{Path(__file__).parent}/static/dark.qss",
+                f"{pathlib.Path(__file__).parent}/static/dark.qss",
             ),
         )
         self.ui.action_generate.triggered.connect(

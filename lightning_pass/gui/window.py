@@ -1,29 +1,36 @@
 """Module containing the main GUI class."""
 from __future__ import annotations
 
+import pathlib
 import sys
 
 import PyQt5.QtWidgets as QtWidgets
-from PyQt5 import QtCore
-from PyQt5.QtGui import QIcon
+from PyQt5 import QtCore, QtGui
+from qdarkstyle import load_stylesheet
 
 from lightning_pass.gui.gui_config import buttons, events
 from lightning_pass.gui.message_boxes import MessageBoxes
 from lightning_pass.gui.mouse_randomness import Collector
-from lightning_pass.gui.static.qt_designer.output.main import Ui_lightning_pass
+from lightning_pass.gui.static.qt_designer.output import main, splash_screen
 from lightning_pass.util.exceptions import StopCollectingPositions
 
 
-def main() -> None:
+def run() -> None:
     """Show main window with everything set up."""
+    SplashScreen()
     app = QtWidgets.QApplication(sys.argv)
     main_window = LightningPassWindow()
 
-    # Tray icon setup
-    tray_icon = QtWidgets.QSystemTrayIcon(QIcon("tray_icon.png"), app)
+    # tray icon setup
+    tray_icon = QtWidgets.QSystemTrayIcon(
+        QtGui.QIcon(
+            str(pathlib.Path(__file__).parent.parent / "gui/static/tray_icon.png")
+        ),
+        app,
+    )
     tray_icon.setToolTip("Lightning Pass")
     tray_icon.show()
-    # Inherit main window to follow current style sheet
+    # inherit main window to follow current style sheet
     menu = QtWidgets.QMenu(main_window.main_win)
     quit_action = menu.addAction("Exit Lightning Pass")
     quit_action.triggered.connect(quit)
@@ -31,6 +38,39 @@ def main() -> None:
 
     main_window.show()
     app.exec_()
+
+
+class SplashScreen(QtWidgets.QWidget):
+    """Splash Screen."""
+
+    def __init__(self):
+        app = QtWidgets.QApplication(sys.argv)
+
+        super().__init__()
+
+        self.widget = QtWidgets.QWidget()
+        self.widget.setStyleSheet(load_stylesheet(qt_api="pyqt5"))
+        self.widget.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+
+        self.ui = splash_screen.Ui_loading_widget()
+        self.ui.setupUi(self.widget)
+
+        self.widget.show()
+
+        self.timer = QtCore.QTimer(self)
+        self.timer.timeout.connect(self.increase)
+        self.progress = 0
+        self.timer.start(30)
+
+        app.exec_()
+
+    def increase(self):
+        self.ui.loading_progress_bar.setValue(self.progress)
+        if self.progress > 100:
+            self.timer.stop()
+            self.widget.close()
+        print(self.progress)
+        self.progress += 1
 
 
 class LightningPassWindow(QtWidgets.QMainWindow):
@@ -47,7 +87,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
         self.main_win = QtWidgets.QMainWindow()
 
-        self.ui = Ui_lightning_pass()
+        self.ui = main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
         self.events = events.Events(self)
@@ -74,8 +114,8 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         """Move function __init__ function call into a function for simplicity."""
         self.progress: float = 0
         self.password_generated = False
-        self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.events.toggle_stylesheet_dark()  # Dark mode is the default theme.
+        self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
 
     def center(self) -> None:
@@ -100,5 +140,5 @@ class LightningPassWindow(QtWidgets.QMainWindow):
                     self.events.get_generator().generate_password(),
                 )
         else:
-            self.progress += 0.1
+            self.progress += 1
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.progress)

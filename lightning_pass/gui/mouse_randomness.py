@@ -87,8 +87,6 @@ class Collector:
         if len(self.randomness_lst) > 999:
             raise StopCollectingPositions
         self.randomness_lst.append("(%d, %d)" % (pos.x(), pos.y()))
-        if len(self.randomness_lst) % 10 == 0:
-            return True
 
 
 class PwdGenerator:
