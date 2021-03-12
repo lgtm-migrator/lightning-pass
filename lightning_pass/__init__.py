@@ -16,6 +16,7 @@ def _copy(self: Path, target: Path) -> None:
     shutil.copy(str(self), str(target))  # str() only there for Python --version < 3.6
 
 
+# noinspection PyTypeHints
 Path.copy = _copy  # type: ignore
 
 with util.database_manager() as db:

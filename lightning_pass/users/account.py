@@ -1,10 +1,19 @@
 """Module containing the Account class and other functions related to accounts."""
 from __future__ import annotations
 
+import functools
 from datetime import datetime
 
-import lightning_pass.util as util
 from lightning_pass.util.exceptions import AccountDoesNotExist
+from lightning_pass.util.util import (
+    Email,
+    Password,
+    ProfilePicture,
+    Username,
+    database_manager,
+    get_user_item,
+    set_user_item,
+)
 
 
 class Account:
@@ -30,7 +39,7 @@ class Account:
         confirm_password: str,
         email: str,
     ) -> Account:
-        """Secondary constructor for register.
+        """Secondary constructor for registering.
 
         :param str username: User's username
         :param bytes password: User's password
@@ -47,25 +56,25 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        util.Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
-        util.Password(
+        Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        Password(
             password,
             confirm_password,
         )  # Exceptions: PasswordDoNotMatch, InvalidPassword
-        util.Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
-        with util.database_manager() as db:
+        Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
+        with database_manager() as db:
             sql = (
                 "INSERT INTO lightning_pass.credentials (username, password, email)"
                 "     VALUES (%s, %s, %s)"
             )
-            values = [username, password, email]
+            values = (username, password, email)
             db.execute(sql, values)
 
-        return cls(util.get_user_item(username, "username", "id"))
+        return cls(get_user_item(username, "username", "id"))
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
-        """Secondary constructor for login.
+        """Secondary constructor for login in.
 
         Updates last_login_date if log in is successful.
 
@@ -78,13 +87,13 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        util.Username.check_username_existence(username, exists=False)
+        Username.check_username_existence(username, exists=False)
 
-        stored_password = util.get_user_item(username, "username", "password")
+        stored_password = get_user_item(username, "username", "password")
 
-        if not util.Password.authenticate_password(password, stored_password):
+        if not Password.authenticate_password(password, stored_password):
             raise AccountDoesNotExist
-        account = cls(util.get_user_item(username, "username", "id"))
+        account = cls(get_user_item(username, "username", "id"))
         account.update_last_login_date()
         return account
 
@@ -96,7 +105,7 @@ class Account:
         :returns: the result value
 
         """
-        return util.get_user_item(self.user_id, "id", result_column)
+        return get_user_item(self.user_id, "id", result_column)
 
     def set_value(self, result: str | datetime, result_column: str) -> None:
         """Simplify setting user values.
@@ -105,7 +114,7 @@ class Account:
         :param str result_column: Column where to insert the value
 
         """
-        util.set_user_item(self.user_id, "id", result, result_column)
+        set_user_item(self.user_id, "id", result, result_column)
 
     @property
     def username(self) -> str:
@@ -126,7 +135,7 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        util.Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
         self.set_value(value, "username")
 
     @property
@@ -157,7 +166,7 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        util.Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
+        Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
         self.set_value(value, "email")
 
     @property
@@ -185,7 +194,7 @@ class Account:
         :returns: path to user's profile picture
 
         """
-        return str(util.ProfilePicture.get_profile_picture_path(self.profile_picture))
+        return str(ProfilePicture.get_profile_picture_path(self.profile_picture))
 
     @property
     def last_login_date(self) -> datetime:
@@ -200,7 +209,7 @@ class Account:
         """Set last login date."""
         self.set_value(datetime.now(), "last_login_date")
 
-    @property
+    @functools.cached_property
     def register_date(self) -> datetime:
         """Last login date property.
 

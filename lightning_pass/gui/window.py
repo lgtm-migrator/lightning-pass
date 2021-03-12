@@ -4,12 +4,11 @@ from __future__ import annotations
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
 
+from lightning_pass.gui.gui_config import buttons, events
+from lightning_pass.gui.message_boxes import MessageBoxes
+from lightning_pass.gui.mouse_randomness import Collector
+from lightning_pass.gui.static.qt_designer.output.main import Ui_lightning_pass
 from lightning_pass.util.exceptions import StopCollectingPositions
-
-from .gui_config import buttons, events
-from .message_boxes import MessageBoxes
-from .mouse_randomness import Collector
-from .static.qt_designer.output.main import Ui_lightning_pass
 
 
 class LightningPassWindow(QMainWindow):
@@ -43,7 +42,7 @@ class LightningPassWindow(QMainWindow):
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return "Lightning Pass :)"
+        return "LightningPassWindow()"
 
     def show(self) -> None:
         """Show main window."""
