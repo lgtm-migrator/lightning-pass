@@ -1,14 +1,12 @@
 """Module containing classes used for operations with mouse randomness generation."""
 from __future__ import annotations
 
-from typing import Generator
-
 from passgen import passgen
 from PyQt5 import QtCore
 from PyQt5.QtCore import QEvent, pyqtBoundSignal
 from PyQt5.QtWidgets import QLabel
 
-from ..util.exceptions import StopCollectingPositions
+from lightning_pass.util.exceptions import StopCollectingPositions
 
 
 class MouseTracker(QtCore.QObject):
@@ -61,19 +59,20 @@ class Collector:
 
     def __init__(self) -> None:
         """Class contructor."""
-        self.randomness_lst: List[int, int] = []
+        self.randomness_lst: list[tuple[int, int]] = []
 
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"Collector({self.randomness_lst})"
 
-    def __iter__(self) -> Generator:
+    @property
+    def __iter__(self) -> tuple[int, int]:
         """Iterate over the class.
 
         - yield item from randomness_lst
 
         """
-        yield from self.randomness_lst
+        yield from self.randomness_lst  # python:S5886
 
     def collect_position(self, pos: QtCore.QPoint) -> bool:
         """Collect mouse position.

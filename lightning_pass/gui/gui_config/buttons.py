@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from lightning_pass.gui.gui import LightningPassWindow
+from PyQt5.QtWidgets import QMainWindow
 
 
 class Buttons:
@@ -15,13 +15,13 @@ class Buttons:
 
     def __init__(
         self,
-        parent: LightningPassWindow,
+        parent: QMainWindow,
         *args: object,
         **kwargs: object,
     ) -> None:
         """Buttons constructor.
 
-        :param LightningPassWindow parent: Main GUI window
+        :param QMainWindow parent: Main GUI window
 
         """
         super().__init__(*args, **kwargs)

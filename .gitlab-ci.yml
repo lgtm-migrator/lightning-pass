@@ -1,24 +1,7 @@
 image: python:latest
 
 before_script:
-    - python3 -V
-    - wget -O /tmp/Python-3.9.1.tar.xz https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tar.xz
-    - cd /tmp
-    - tar xf Python-3.9.1.tar.xz
-    - cd Python-3.9.1
-    - ./configure --enable-optimizations
-    - sudo make altinstall
-    - sudo apt -y autoremove
-    - cd
-    - sudo rm -rf /tmp/Python-3.9.1
-    - sudo rm /tmp/Python-3.9.1.tar.xz
-    - echo "alias python=/usr/local/bin/python3.9" >> ~/.bashrc
-    - echo "alias python3=/usr/local/bin/python3.9" >> ~/.bashrc
-    - source ~/.bashrc
-    - cd ..
-    - . ~/.bashrc
-    - cd
-    - python3 -V
+    - python3 --version
     - python3 -m pip install -r requirements.txt
 
 stages:

@@ -4,7 +4,8 @@ from __future__ import annotations
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import QDesktopWidget, QMainWindow
 
-from ..util.exceptions import StopCollectingPositions
+from lightning_pass.util.exceptions import StopCollectingPositions
+
 from .gui_config import buttons, events
 from .message_boxes import MessageBoxes
 from .mouse_randomness import Collector

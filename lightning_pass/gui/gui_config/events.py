@@ -1,15 +1,17 @@
 """Module containing the Events class used for event handling."""
 from __future__ import annotations
 
+import functools
 import pathlib
 
 import clipboard
 from PyQt5 import QtGui
-from PyQt5.QtWidgets import QFileDialog
+from PyQt5.QtWidgets import QFileDialog, QMainWindow
 from qdarkstyle import load_stylesheet
 
-from lightning_pass.gui.gui import LightningPassWindow
-from lightning_pass.users.account import Account
+import lightning_pass.gui.message_boxes as msg_box
+import lightning_pass.gui.mouse_randomness as mouse_rnd
+import lightning_pass.users.account as acc
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
     EmailAlreadyExists,
@@ -21,8 +23,16 @@ from lightning_pass.util.exceptions import (
 )
 from lightning_pass.util.util import Password, ProfilePicture
 
-from ..message_boxes import MessageBoxes
-from ..mouse_randomness import Collector, MouseTracker, PwdGenerator
+
+def login_required(func):
+    @functools.wraps(func)
+    def wrapper(self):
+        if not hasattr(self, "current_user"):
+            msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "account")
+        else:
+            return func(self)
+
+    return wrapper
 
 
 class Events:
@@ -30,7 +40,7 @@ class Events:
 
     def __init__(
         self,
-        parent: LightningPassWindow,
+        parent: QMainWindow,
         *args: object,
         **kwargs: object,
     ) -> None:
@@ -53,12 +63,12 @@ class Events:
     def login_user_event(self) -> None:
         """Try to login a user. If successful, show the account widget."""
         try:
-            self.ui.current_user = Account.login(
+            self.current_user = acc.Account.login(
                 self.ui.log_username_line_edit.text(),
                 self.ui.log_password_line_edit.text(),
             )
         except AccountDoesNotExist:
-            MessageBoxes.invalid_login_box(self.ui.message_boxes, "Login")
+            msg_box.MessageBoxes.invalid_login_box(self.ui.message_boxes, "Login")
         else:
             self.account_event()
 
@@ -73,26 +83,32 @@ class Events:
     def register_user_event(self) -> None:
         """Try to register a user. If successful, show login widget."""
         try:
-            self.ui.current_user = Account.register(
+            self.current_user = acc.Account.register(
                 self.ui.reg_username_line.text(),
                 Password.hash_password(self.ui.reg_password_line.text()),
                 self.ui.reg_conf_pass_line.text(),
                 self.ui.reg_email_line.text(),
             )
         except InvalidUsername:
-            MessageBoxes.invalid_username_box(self.ui.message_boxes, "Register")
+            msg_box.MessageBoxes.invalid_username_box(self.ui.message_boxes, "Register")
         except InvalidPassword:
-            MessageBoxes.invalid_password_box(self.ui.message_boxes, "Register")
+            msg_box.MessageBoxes.invalid_password_box(self.ui.message_boxes, "Register")
         except InvalidEmail:
-            MessageBoxes.invalid_email_box(self.ui.message_boxes, "Register")
+            msg_box.MessageBoxes.invalid_email_box(self.ui.message_boxes, "Register")
         except UsernameAlreadyExists:
-            MessageBoxes.username_already_exists_box(self.ui.message_boxes, "Register")
+            msg_box.MessageBoxes.username_already_exists_box(
+                self.ui.message_boxes, "Register"
+            )
         except EmailAlreadyExists:
-            MessageBoxes.email_already_exists_box(self.ui.message_boxes, "Register")
+            msg_box.MessageBoxes.email_already_exists_box(
+                self.ui.message_boxes, "Register"
+            )
         except PasswordsDoNotMatch:
-            MessageBoxes.passwords_do_not_match_box(self.ui.message_boxes, "Register")
+            msg_box.MessageBoxes.passwords_do_not_match_box(
+                self.ui.message_boxes, "Register"
+            )
         else:
-            MessageBoxes.account_creation_box(self.ui.message_boxes, "Register")
+            msg_box.MessageBoxes.account_creation_box(self.ui.message_boxes, "Register")
 
     def forgot_password_event(self) -> None:
         """Switch to forgot password widget and reset previous email."""
@@ -101,7 +117,7 @@ class Events:
 
     def generate_pass_event(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
-        self.ui.collector = Collector()
+        self.ui.collector = mouse_rnd.Collector()
         self.ui.generate_pass_spin_box.setValue(16)
         self.ui.generate_pass_numbers_check.setChecked(True)
         self.ui.generate_pass_symbols_check.setChecked(True)
@@ -109,13 +125,13 @@ class Events:
         self.ui.generate_pass_upper_check.setChecked(True)
         self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass)
 
-    def get_generator(self) -> PwdGenerator:
+    def get_generator(self) -> mouse_rnd.PwdGenerator:
         """Get Generator from current password params.
 
         :returns: PwdGenerator object
 
         """
-        return PwdGenerator(
+        return mouse_rnd.PwdGenerator(
             self.parent.collector.randomness_lst,
             self.ui.generate_pass_spin_box.value(),
             bool(self.ui.generate_pass_numbers_check.isChecked()),
@@ -126,7 +142,7 @@ class Events:
 
     def generate_pass_phase2_event(self) -> None:
         """Switch to second password generation widget and reset previous values."""
-        MouseTracker.setup_tracker(
+        mouse_rnd.MouseTracker.setup_tracker(
             self.ui.generate_pass_p2_tracking_lbl,
             self.parent.on_position_changed,
         )
@@ -138,7 +154,7 @@ class Events:
             not self.ui.generate_pass_lower_check.isChecked()
             and not self.ui.generate_pass_upper_check.isChecked()
         ):
-            MessageBoxes.no_case_type_box(self.ui.message_boxes, "Generator")
+            msg_box.MessageBoxes.no_case_type_box(self.ui.message_boxes, "Generator")
         else:
             self.ui.password_generated = False
             self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass_phase2)
@@ -147,29 +163,25 @@ class Events:
         """Copy generated password into clipboard."""
         clipboard.copy(self.ui.generate_pass_p2_final_pass_line.text())
 
+    @login_required
     def account_event(self) -> None:
         """Switch to account widget and reset previous values.
 
         Raises log in required error if an user tries to access the page without being logged in.
 
         """
-        try:
-            if self.ui.current_user.user_id is None:
-                raise AttributeError
-        except AttributeError:
-            MessageBoxes.login_required_box(self.ui.message_boxes, "Account")
-        else:
-            self.ui.current_user = Account(self.ui.current_user.user_id)
-            self.ui.account_username_line.setText(self.ui.current_user.username)
-            self.ui.account_email_line.setText(self.ui.current_user.email)
-            self.ui.account_last_log_date.setText(
-                f"Last login was {self.ui.current_user.last_login_date}.",
-            )
-            self.ui.account_pfp_pixmap_lbl.setPixmap(
-                QtGui.QPixmap(self.ui.current_user.profile_picture_path),
-            )
-            self.ui.stacked_widget.setCurrentWidget(self.ui.account)
+        self.current_user = acc.Account(self.current_user.user_id)
+        self.ui.account_username_line.setText(self.current_user.username)
+        self.ui.account_email_line.setText(self.current_user.email)
+        self.ui.account_last_log_date.setText(
+            f"Last login was {self.ui.current_user.last_login_date}.",
+        )
+        self.ui.account_pfp_pixmap_lbl.setPixmap(
+            QtGui.QPixmap(self.current_user.profile_picture_path),
+        )
+        self.ui.stacked_widget.setCurrentWidget(self.ui.account)
 
+    @login_required
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
         fname, _ = QFileDialog.getOpenFileName(
@@ -179,47 +191,54 @@ class Events:
             "Image files (*.jpg *.png)",
         )
         if fname:
-            self.ui.current_user.profile_picture = ProfilePicture.save_picture(
+            self.current_user.profile_picture = ProfilePicture.save_picture(
                 pathlib.Path(fname),
             )
             self.account_event()
 
+    @login_required
     def logout_event(self) -> None:
         """Logout current user."""
-        del self.ui.current_user
+        del self.current_user
         self.ui.home_event()
 
+    @login_required
     def change_pass_event(self) -> None:
         """Change password for current user."""
         ...
 
+    @login_required
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
-        if self.ui.current_user.username != self.ui.account_username_line.text():
+        if self.current_user.username != self.ui.account_username_line.text():
             try:
-                self.ui.current_user.username = self.ui.account_username_line.text()
+                self.current_user.username = self.ui.account_username_line.text()
             except InvalidUsername:
-                MessageBoxes.invalid_username_box(self.ui.message_boxes, "Account")
+                msg_box.MessageBoxes.invalid_username_box(
+                    self.ui.message_boxes, "Account"
+                )
             except UsernameAlreadyExists:
-                MessageBoxes.username_already_exists_box(
+                msg_box.MessageBoxes.username_already_exists_box(
                     self.ui.message_boxes,
                     "Account",
                 )
             else:
-                MessageBoxes.details_updated_box(
+                msg_box.MessageBoxes.details_updated_box(
                     self.ui.message_boxes,
                     "username",
                     "Account",
                 )
-        if self.ui.current_user.email != self.ui.account_email_line.text():
+        if self.current_user.email != self.ui.account_email_line.text():
             try:
-                self.ui.current_user.email = self.ui.account_email_line.text()
+                self.current_user.email = self.ui.account_email_line.text()
             except InvalidEmail:
-                MessageBoxes.invalid_email_box(self.ui.message_boxes, "Account")
+                msg_box.MessageBoxes.invalid_email_box(self.ui.message_boxes, "Account")
             except EmailAlreadyExists:
-                MessageBoxes.email_already_exists_box(self.ui.message_boxes, "Account")
+                msg_box.MessageBoxes.email_already_exists_box(
+                    self.ui.message_boxes, "Account"
+                )
             else:
-                MessageBoxes.details_updated_box(
+                msg_box.MessageBoxes.details_updated_box(
                     self.ui.message_boxes,
                     "email",
                     "Account",

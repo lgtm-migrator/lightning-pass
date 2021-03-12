@@ -5,7 +5,7 @@ import pytest
 from PyQt5 import QtCore
 from pytestqt.qtbot import QtBot
 
-from lightning_pass.gui.gui import LightningPassWindow
+from lightning_pass.gui.window import LightningPassWindow
 
 
 @pytest.fixture()

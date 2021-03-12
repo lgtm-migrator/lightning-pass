@@ -3,9 +3,8 @@ from __future__ import annotations
 
 from datetime import datetime
 
-import lightning_pass.util.util as utl
-
-from ..util.exceptions import AccountDoesNotExist
+import lightning_pass.util as util
+from lightning_pass.util.exceptions import AccountDoesNotExist
 
 
 class Account:
@@ -48,13 +47,13 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        utl.Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
-        utl.Password(
+        util.Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        util.Password(
             password,
             confirm_password,
         )  # Exceptions: PasswordDoNotMatch, InvalidPassword
-        utl.Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
-        with utl.database_manager() as db:
+        util.Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
+        with util.database_manager() as db:
             sql = (
                 "INSERT INTO lightning_pass.credentials (username, password, email)"
                 "     VALUES (%s, %s, %s)"
@@ -62,7 +61,7 @@ class Account:
             values = [username, password, email]
             db.execute(sql, values)
 
-        return cls(utl.get_user_item(username, "username", "id"))
+        return cls(util.get_user_item(username, "username", "id"))
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
@@ -79,13 +78,13 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        utl.Username.check_username_existence(username, exists=False)
+        util.Username.check_username_existence(username, exists=False)
 
-        stored_password = utl.get_user_item(username, "username", "password")
+        stored_password = util.get_user_item(username, "username", "password")
 
-        if not utl.Password.authenticate_password(password, stored_password):
+        if not util.Password.authenticate_password(password, stored_password):
             raise AccountDoesNotExist
-        account = cls(utl.get_user_item(username, "username", "id"))
+        account = cls(util.get_user_item(username, "username", "id"))
         account.update_last_login_date()
         return account
 
@@ -97,7 +96,7 @@ class Account:
         :returns: the result value
 
         """
-        return utl.get_user_item(self.user_id, "id", result_column)
+        return util.get_user_item(self.user_id, "id", result_column)
 
     def set_value(self, result: str | datetime, result_column: str) -> None:
         """Simplify setting user values.
@@ -106,7 +105,7 @@ class Account:
         :param str result_column: Column where to insert the value
 
         """
-        utl.set_user_item(self.user_id, "id", result, result_column)
+        util.set_user_item(self.user_id, "id", result, result_column)
 
     @property
     def username(self) -> str:
@@ -127,7 +126,7 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        utl.Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        util.Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
         self.set_value(value, "username")
 
     @property
@@ -158,7 +157,7 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        utl.Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
+        util.Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
         self.set_value(value, "email")
 
     @property
@@ -186,7 +185,7 @@ class Account:
         :returns: path to user's profile picture
 
         """
-        return str(utl.ProfilePicture.get_profile_picture_path(self.profile_picture))
+        return str(util.ProfilePicture.get_profile_picture_path(self.profile_picture))
 
     @property
     def last_login_date(self) -> datetime:
