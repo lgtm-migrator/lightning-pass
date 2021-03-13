@@ -198,19 +198,18 @@ class Username:
         :raises AccountDoesNotExist: if positive search was False and the username was not found.
 
         """
-        with database_manager() as db:
-            sql = (
-                "SELECT 1"
-                "  FROM lightning_pass.credentials"
-                " WHERE username = %s" % username
-            )
-            result = db.execute(sql)
-        row = result.fetchone()
-
-        if exists and len(row) <= 0:
+        if not username:
             raise AccountDoesNotExist
-        if not exists and len(row) > 0:
-            raise UsernameAlreadyExists
+        with database_manager() as db:
+            sql = "SELECT 1 FROM lightning_pass.credentials WHERE username = %s"
+            print(sql)
+            val = (username,)
+            result = db.execute(sql, val)
+        if not contextlib.suppress(result.fetchone()):
+            if exists and len(result) <= 0:
+                raise AccountDoesNotExist
+            if not exists and len(result) > 0:
+                raise UsernameAlreadyExists
 
 
 class Password:

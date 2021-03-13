@@ -69,7 +69,6 @@ class SplashScreen(QtWidgets.QWidget):
         if self.progress > 100:
             self.timer.stop()
             self.widget.close()
-        print(self.progress)
         self.progress += 1
 
 

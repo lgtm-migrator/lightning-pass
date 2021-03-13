@@ -199,17 +199,20 @@ class Events:
     @login_required
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
-        fname, _ = QFileDialog.getOpenFileName(
-            self.parent,
-            "Lightning Pass - Open your new profile picture",
-            "c:\\",
-            "Image files (*.jpg *.png)",
-        )
+        if self.ui.account_pfp_pixmap_lbl.text() == self.current_user.profile_picture:
+            fname, _ = QFileDialog.getOpenFileName(
+                self.parent,
+                "Lightning Pass - Open your new profile picture",
+                "c:\\",
+                "Image files (*.jpg *.png)",
+            )
+        else:
+            fname = self.ui.account_pfp_pixmap_lbl.text()
         if fname:
             self.current_user.profile_picture = ProfilePicture.save_picture(
                 pathlib.Path(fname),
             )
-            self.account_event()
+        self.account_event()
 
     @login_required
     def logout_event(self) -> None:

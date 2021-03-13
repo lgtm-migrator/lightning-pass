@@ -87,7 +87,7 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        Username.check_username_existence(username, exists=False)
+        Username.check_username_existence(username, exists=True)
 
         stored_password = get_user_item(username, "username", "password")
 

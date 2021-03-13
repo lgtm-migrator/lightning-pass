@@ -438,9 +438,7 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_username_lbl, 3, 0, 1, 1)
         self.account_pfp_pixmap_lbl = QtWidgets.QLabel(self.account)
         self.account_pfp_pixmap_lbl.setText("")
-        self.account_pfp_pixmap_lbl.setPixmap(
-            QtGui.QPixmap("C:/Users/Luky/.designer/profile_pictures/default.png")
-        )
+        self.account_pfp_pixmap_lbl.setPixmap(QtGui.QPixmap(""))
         self.account_pfp_pixmap_lbl.setScaledContents(True)
         self.account_pfp_pixmap_lbl.setObjectName("account_pfp_pixmap_lbl")
         self.gridLayout_7.addWidget(self.account_pfp_pixmap_lbl, 0, 3, 2, 2)
