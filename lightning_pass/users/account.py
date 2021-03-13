@@ -209,7 +209,7 @@ class Account:
         """Set last login date."""
         self.set_value(datetime.now(), "last_login_date")
 
-    @functools.cached_property
+    @functools.cached_property  # lru caching the register date to avoid unnecessary database queries
     def register_date(self) -> datetime:
         """Last login date property.
 

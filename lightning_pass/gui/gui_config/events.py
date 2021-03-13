@@ -147,7 +147,6 @@ class Events:
 
         """
         return mouse_rnd.PwdGenerator(
-            self.parent.collector.randomness_lst,
             self.ui.generate_pass_spin_box.value(),
             bool(self.ui.generate_pass_numbers_check.isChecked()),
             bool(self.ui.generate_pass_symbols_check.isChecked()),
@@ -156,22 +155,23 @@ class Events:
         )
 
     def generate_pass_phase2_event(self) -> None:
-        """Switch to second password generation widget and reset previous values."""
-        mouse_rnd.MouseTracker.setup_tracker(
-            self.ui.generate_pass_p2_tracking_lbl,
-            self.parent.on_position_changed,
-        )
-        self.ui.progress = 0
-        self.ui.generate_pass_p2_prgrs_bar.setValue(self.ui.progress)
-        self.ui.generate_pass_p2_final_pass_line.setText("")
-        self.ui.password_generated = False
+        """Switch to the second password generation widget and reset previous values.
+
+        If no password options were checked, shows message box letting the user know about it.
+
+        """
         if (
-            not self.ui.generate_pass_lower_check.isChecked()
+            not self.ui.generate_pass_numbers_check.isChecked()
+            and not self.ui.generate_pass_symbols_check.isChecked()
+            and not self.ui.generate_pass_lower_check.isChecked()
             and not self.ui.generate_pass_upper_check.isChecked()
         ):
-            msg_box.MessageBoxes.no_case_type_box(self.ui.message_boxes, "Generator")
+            msg_box.MessageBoxes.no_options_generate(self.ui.message_boxes, "Generator")
         else:
-            self.ui.password_generated = False
+            self.parent.collector = mouse_rnd.Collector()
+            self.parent.pass_progress = 0
+            self.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
+            self.ui.generate_pass_p2_final_pass_line.setText("")
             self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass_phase2)
 
     def copy_password_event(self) -> None:

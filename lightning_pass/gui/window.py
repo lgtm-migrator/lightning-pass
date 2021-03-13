@@ -1,16 +1,14 @@
-"""Module containing the main GUI class."""
+"""Module containing the main GUI classes."""
 from __future__ import annotations
 
 import pathlib
 import sys
 
-import PyQt5.QtWidgets as QtWidgets
-from PyQt5 import QtCore, QtGui
-from qdarkstyle import load_stylesheet
+import qdarkstyle
+from PyQt5 import QtCore, QtGui, QtWidgets
 
+from lightning_pass.gui import message_boxes, mouse_randomness
 from lightning_pass.gui.gui_config import buttons, events
-from lightning_pass.gui.message_boxes import MessageBoxes
-from lightning_pass.gui.mouse_randomness import Collector
 from lightning_pass.gui.static.qt_designer.output import main, splash_screen
 from lightning_pass.util.exceptions import StopCollectingPositions
 
@@ -49,7 +47,7 @@ class SplashScreen(QtWidgets.QWidget):
         super().__init__()
 
         self.widget = QtWidgets.QWidget()
-        self.widget.setStyleSheet(load_stylesheet(qt_api="pyqt5"))
+        self.widget.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
         self.widget.setWindowFlag(QtCore.Qt.FramelessWindowHint)
 
         self.ui = splash_screen.Ui_loading_widget()
@@ -95,11 +93,18 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.buttons.setup_buttons()
         self.buttons.setup_menu_bar()
 
-        self.ui.message_boxes = MessageBoxes(child=self.main_win, parent=self)
-
-        self.collector = Collector()
+        self.ui.message_boxes = message_boxes.MessageBoxes(
+            child=self.main_win, parent=self
+        )
 
         self.general_setup()
+
+        self.collector = mouse_randomness.Collector()
+        mouse_randomness.MouseTracker.setup_tracker(
+            self.ui.generate_pass_p2_tracking_lbl,
+            self.on_position_changed,
+        )
+        self.pass_progress = 0
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -111,8 +116,6 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
     def general_setup(self) -> None:
         """Move function __init__ function call into a function for simplicity."""
-        self.progress: float = 0
-        self.password_generated = False
         self.events.toggle_stylesheet_dark()  # Dark mode is the default theme.
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
@@ -135,9 +138,10 @@ class LightningPassWindow(QtWidgets.QMainWindow):
             self.collector.collect_position(pos)
         except StopCollectingPositions:
             if not self.ui.generate_pass_p2_final_pass_line.text():
-                self.ui.generate_pass_p2_final_pass_line.setText(
-                    self.events.get_generator().generate_password(),
-                )
+                gen = self.events.get_generator()
+                for i in self.collector.generator():
+                    gen.get_character(i)
+                self.ui.generate_pass_p2_final_pass_line.setText(gen.get_password())
         else:
-            self.progress += 1
-            self.ui.generate_pass_p2_prgrs_bar.setValue(self.progress)
+            self.pass_progress += 1
+            self.ui.generate_pass_p2_prgrs_bar.setValue(self.pass_progress)

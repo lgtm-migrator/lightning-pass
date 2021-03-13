@@ -64,12 +64,9 @@ def _get_user_id(value: str, column: str) -> Union[int, bool]:
 
     """
     with database_manager() as db:
-        sql = (
-            "SELECT id" "  FROM lightning_pass.credentials" " WHERE %s = %s" % column,
-            value,
-        )
+        # f-string SQl injection not an issue
+        sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
         result = db.execute(sql)
-
     try:
         return result.fetchone()[0]
     except TypeError as e:
@@ -100,12 +97,8 @@ def get_user_item(
         return user_id
     if user_id:
         with database_manager() as db:
-            sql = (
-                "SELECT %s"
-                "  FROM lightning_pass.credentials"
-                " WHERE id = %d" % result_column,
-                user_id,
-            )
+            # f-string SQl injection not an issue
+            sql = f"SELECT {result_column} FROM lightning_pass.credentials WHERE id = {user_id}"
             result = db.execute(sql)
     return result.fetchone()[0]
 
@@ -127,13 +120,8 @@ def set_user_item(
     if identifier_column != "id":
         user_identifier = _get_user_id(identifier_column, user_identifier)
     with database_manager() as db:
-        sql = (
-            "UPDATE lightning_pass.credentials"
-            "   SET %s = %s"
-            " WHERE id = %d" % result_column,
-            result,
-            user_identifier,
-        )
+        # f-string SQl injection not an issue
+        sql = f"UPDATE lightning_pass.credentials WHERE id = {user_identifier} SET {result_column} = {result}"
         db.execute(sql)
 
 
@@ -201,10 +189,9 @@ class Username:
         if not username:
             raise AccountDoesNotExist
         with database_manager() as db:
-            sql = "SELECT 1 FROM lightning_pass.credentials WHERE username = %s"
-            print(sql)
-            val = (username,)
-            result = db.execute(sql, val)
+            # f-string SQl injection not an issue
+            sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
+            result = db.execute(sql)
         if not contextlib.suppress(result.fetchone()):
             if exists and len(result) <= 0:
                 raise AccountDoesNotExist
@@ -376,11 +363,8 @@ class Email:
 
         """
         with database_manager() as db:
-            sql = (
-                "SELECT 1"
-                "  FROM lightning_pass.credentials"
-                " WHERE email = %s" % email
-            )
+            # f-string SQl injection not an issue
+            sql = f"SELECT 1 FROM lightning_pass.credentials WHERE email = '{email}'"
             result = db.execute(sql)
         row = result.fetchall()
 

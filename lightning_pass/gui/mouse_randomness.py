@@ -1,10 +1,11 @@
 """Module containing classes used for operations with mouse randomness generation."""
 from __future__ import annotations
 
-from passgen import passgen
-from PyQt5 import QtCore
-from PyQt5.QtCore import QEvent, pyqtBoundSignal
-from PyQt5.QtWidgets import QLabel
+import random
+import string
+from typing import Generator
+
+from PyQt5 import QtCore, QtWidgets
 
 from lightning_pass.util.exceptions import StopCollectingPositions
 
@@ -18,7 +19,7 @@ class MouseTracker(QtCore.QObject):
 
     position_changed = QtCore.pyqtSignal(QtCore.QPoint)
 
-    def __init__(self, widget: QLabel) -> None:
+    def __init__(self, widget: QtWidgets.QLabel) -> None:
         """Class contructor."""
         super().__init__(widget)
         self._widget = widget
@@ -26,7 +27,7 @@ class MouseTracker(QtCore.QObject):
         self.widget.installEventFilter(self)
 
     @property
-    def widget(self) -> QLabel:
+    def widget(self) -> QtWidgets.QLabel:
         """Widget property.
 
         :return: Own widget
@@ -34,7 +35,9 @@ class MouseTracker(QtCore.QObject):
         """
         return self._widget
 
-    def event_filter(self, event: QEvent, move: QtCore.QEvent.MouseMove) -> object:
+    def eventFilter(  # Non PEP-8 due to PyQt naming
+        self, label: QtWidgets.QLabel, event: QtCore.QEvent.MouseMove
+    ) -> object:
         """Event filter.
 
         :param QLabel event: Label object
@@ -43,12 +46,14 @@ class MouseTracker(QtCore.QObject):
         :returns: eventFilter of super class
 
         """
-        if move is self.widget and event.type() == QtCore.QEvent.MouseMove:
+        if label is self.widget and event.type() == QtCore.QEvent.MouseMove:
             self.position_changed.emit(event.pos())
-        return super().eventFilter(move, event)
+        return super().eventFilter(label, event)
 
     @staticmethod
-    def setup_tracker(label: QLabel, on_change: pyqtBoundSignal) -> None:
+    def setup_tracker(
+        label: QtWidgets.QLabel, on_change: QtCore.pyqtBoundSignal
+    ) -> None:
         """Set up a mouse tracker over a specified label."""
         tracker = MouseTracker(label)
         tracker.position_changed.connect(on_change)
@@ -65,34 +70,25 @@ class Collector:
         """Provide information about this class."""
         return f"Collector({self.randomness_lst})"
 
-    @property
-    def __iter__(self) -> tuple[int, int]:
-        """Iterate over the class.
-
-        - yield item from randomness_lst
-
-        """
-        yield from self.randomness_lst  # python:S5886
-
-    def collect_position(self, pos: QtCore.QPoint) -> bool:
+    def collect_position(self, pos: QtCore.QPoint) -> None:
         """Collect mouse position.
 
         :param QPoint pos: Current cursor position
-
-        :returns: state of the collector list
 
         :raises StopCollectingPositions: if 1000 mouse positions have been collected
 
         """
         if len(self.randomness_lst) > 999:
             raise StopCollectingPositions
-        self.randomness_lst.append("(%d, %d)" % (pos.x(), pos.y()))
+        self.randomness_lst.append((pos.x(), pos.y()))
+
+    def generator(self) -> Generator:
+        yield from self.randomness_lst
 
 
 class PwdGenerator:
     """Holds user's chosen parameters for password generation and contains the password generation functionality.
 
-    :param List[Tuple[int, int]] randomness_lst: Information about mouse positions
     :param int length: Password length
     :param bool numbers: Password option
     :param bool symbols: Password option
@@ -103,7 +99,6 @@ class PwdGenerator:
 
     def __init__(
         self,
-        randomness_lst: list[tuple[int, int]],
         length: int,
         numbers: bool,
         symbols: bool,
@@ -111,44 +106,48 @@ class PwdGenerator:
         uppercase: bool,
     ) -> None:
         """Class contructor."""
-        self.val_lst = randomness_lst
         self.length = length
         self.numbers = numbers
         self.symbols = symbols
         self.lowercase = lowercase
         self.uppercase = uppercase
 
-    def __repr__(self) -> str:
-        """Provide information about this class."""
-        return f"""Generator(
-               {self.val_lst},
-               {self.length},
-               {self.numbers},
-               {self.symbols},
-               {self.lowercase},
-               {self.uppercase})
-               """
+        self.password = ""
 
-    def generate_password(self, case_type: str = "both") -> str:
+    def get_character(self, position: tuple[int, int]) -> None:
+        sd = position[0] + 1j * position[1]
+        random.seed(sd)
+        flt = random.random()
+
+        indx = flt / 0.0106382978723404  # 94 symbols... 0,0106382978723404
+        self.__collect_char(str(string.printable)[int(indx)])
+
+    def __collect_char(self, char: str) -> None:
         """Generate a password by passgen library.
 
         Password generation is based on the chosen parameters in the GUI.
 
-        :param str case_type: "both" as a default case
+        :param str char: character to evaluate and potentially add to current password.
 
         :returns: password generated by passgen
 
         """
-        if self.lowercase and self.uppercase:
-            case_type = "both"
-        elif self.lowercase is False:
-            case_type = "upper"
-        elif self.uppercase is False:
-            case_type = "lower"
+        if not len(self.password) >= self.length:
+            if char.isdigit() and self.numbers:
+                self.password += char
+            elif char.islower() and self.lowercase:
+                self.password += char
+            elif char.isupper() and self.uppercase:
+                self.password += char
+            elif (
+                self.symbols
+            ):  # char is a symbol char, thus only checking symbols eligibility
+                self.password += char
 
-        return passgen(
-            length=self.length,
-            punctuation=self.symbols,
-            digits=self.numbers,
-            case=case_type,
-        )
+    def get_password(self) -> str:
+        """Return generated password.
+
+        :returns: generated password
+
+        """
+        return self.password

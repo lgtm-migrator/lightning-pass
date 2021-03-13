@@ -155,15 +155,15 @@ contain at least one special character.""",
         box.buttonClicked.connect(event_handler)
         box.exec_()
 
-    def no_case_type_box(self, parent: str) -> None:
-        """Show message box indicating that password can't be generated with current case type option.
+    def no_options_generate(self, parent: str) -> None:
+        """Show a message box indicating that password can't be generated with the options.
 
         :param str parent: Specifies which window instantiated current box
 
         """
         box = QMessageBox(self.main_win)
         box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("Passwords can't be generate without any case type.")
+        box.setText("Password can't be generate without a single parameter.")
         box.setIcon(QMessageBox.Warning)
         box.exec_()
 

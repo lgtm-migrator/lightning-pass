@@ -39,7 +39,9 @@ class Ui_lightning_pass:
         font.setPointSize(28)
         self.loading_progress_bar.setFont(font)
         self.loading_progress_bar.setCursor(QtGui.QCursor(QtCore.Qt.WaitCursor))
-        self.loading_progress_bar.setProperty("value", 24)
+        self.loading_progress_bar.setMaximum(3000)
+        self.loading_progress_bar.setProperty("value", 0)
+        self.loading_progress_bar.setTextDirection(QtWidgets.QProgressBar.TopToBottom)
         self.loading_progress_bar.setObjectName("loading_progress_bar")
         self.gridLayout_8.addWidget(self.loading_progress_bar, 1, 0, 1, 1)
         self.stacked_widget.addWidget(self.loading)
@@ -350,6 +352,7 @@ class Ui_lightning_pass:
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
         self.generate_pass_p2_prgrs_bar.setFont(font)
+        self.generate_pass_p2_prgrs_bar.setMaximum(1000)
         self.generate_pass_p2_prgrs_bar.setProperty("value", 0)
         self.generate_pass_p2_prgrs_bar.setTextVisible(True)
         self.generate_pass_p2_prgrs_bar.setObjectName("generate_pass_p2_prgrs_bar")
@@ -438,7 +441,9 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_username_lbl, 3, 0, 1, 1)
         self.account_pfp_pixmap_lbl = QtWidgets.QLabel(self.account)
         self.account_pfp_pixmap_lbl.setText("")
-        self.account_pfp_pixmap_lbl.setPixmap(QtGui.QPixmap(""))
+        self.account_pfp_pixmap_lbl.setPixmap(
+            QtGui.QPixmap("C:/Users/Luky/.designer/profile_pictures/default.png")
+        )
         self.account_pfp_pixmap_lbl.setScaledContents(True)
         self.account_pfp_pixmap_lbl.setObjectName("account_pfp_pixmap_lbl")
         self.gridLayout_7.addWidget(self.account_pfp_pixmap_lbl, 0, 3, 2, 2)
@@ -585,7 +590,7 @@ class Ui_lightning_pass:
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(1)
+        self.stacked_widget.setCurrentIndex(6)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):
