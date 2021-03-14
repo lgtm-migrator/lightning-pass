@@ -21,7 +21,7 @@
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stacked_widget">
       <property name="currentIndex">
-       <number>6</number>
+       <number>7</number>
       </property>
       <widget class="QWidget" name="loading">
        <property name="cursor">
@@ -741,6 +741,12 @@
         </item>
         <item row="0" column="3" rowspan="2" colspan="2">
          <widget class="QLabel" name="account_pfp_pixmap_lbl">
+          <property name="mouseTracking">
+           <bool>true</bool>
+          </property>
+          <property name="acceptDrops">
+           <bool>true</bool>
+          </property>
           <property name="text">
            <string/>
           </property>

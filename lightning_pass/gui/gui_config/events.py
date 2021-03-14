@@ -6,15 +6,15 @@ import pathlib
 from typing import Callable
 
 import clipboard
+import qdarkstyle
 from PyQt5 import QtGui
 from PyQt5.QtWidgets import QFileDialog, QMainWindow
-from qdarkstyle import load_stylesheet
 
 import lightning_pass.gui.message_boxes as msg_box
 import lightning_pass.gui.mouse_randomness as mouse_rnd
 import lightning_pass.users.account as acc
 from lightning_pass.util.exceptions import (
-    AccountDoesNotExist,
+    AccountException,
     EmailAlreadyExists,
     InvalidEmail,
     InvalidPassword,
@@ -22,7 +22,7 @@ from lightning_pass.util.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-from lightning_pass.util.util import Password, ProfilePicture
+from lightning_pass.util.util import ProfilePicture
 
 
 def login_required(func: Callable) -> Callable:
@@ -35,17 +35,18 @@ def login_required(func: Callable) -> Callable:
     """
 
     @functools.wraps(func)
-    def wrapper(self: Events, *args, **kwargs) -> Callable | None:
-        """
+    def wrapper(self: Events) -> Callable | None:
+        """Wrapper, checks the "current_user" attribute.
 
         :param self: Class instance to give access to its attributes
 
         :return: executed function
+
         """
         if not hasattr(self, "current_user"):
             msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "account")
         else:
-            return func(self, args, kwargs)
+            return func(self)
 
     return wrapper
 
@@ -82,7 +83,7 @@ class Events:
                 self.ui.log_username_line_edit.text(),
                 self.ui.log_password_line_edit.text(),
             )
-        except AccountDoesNotExist:
+        except AccountException:
             msg_box.MessageBoxes.invalid_login_box(self.ui.message_boxes, "Login")
         else:
             self.account_event()
@@ -100,7 +101,7 @@ class Events:
         try:
             self.current_user = acc.Account.register(
                 self.ui.reg_username_line.text(),
-                Password.hash_password(self.ui.reg_password_line.text()),
+                self.ui.reg_password_line.text(),
                 self.ui.reg_conf_pass_line.text(),
                 self.ui.reg_email_line.text(),
             )
@@ -189,7 +190,7 @@ class Events:
         self.ui.account_username_line.setText(self.current_user.username)
         self.ui.account_email_line.setText(self.current_user.email)
         self.ui.account_last_log_date.setText(
-            f"Last login was {self.ui.current_user.last_login_date}.",
+            f"Last login was {self.current_user.last_login_date}.",
         )
         self.ui.account_pfp_pixmap_lbl.setPixmap(
             QtGui.QPixmap(self.current_user.profile_picture_path),
@@ -218,7 +219,7 @@ class Events:
     def logout_event(self) -> None:
         """Logout current user."""
         del self.current_user
-        self.ui.home_event()
+        self.home_event()
 
     @login_required
     def change_pass_event(self) -> None:
@@ -272,4 +273,4 @@ class Events:
         """Change stylesheet to dark mode."""
         if args:
             ...
-        self.main_win.setStyleSheet(load_stylesheet(qt_api="pyqt5"))
+        self.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))

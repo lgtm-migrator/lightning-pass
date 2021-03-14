@@ -44,7 +44,7 @@ class MessageBoxes(QWidget):
         box.setInformativeText(
             """Password must be at least 8 characters long,
 contain at least 1 capital letter,
-contain at least 1 number
+contain at least 1 number and
 contain at least one special character.""",
         )
         box.exec_()
@@ -76,8 +76,6 @@ contain at least one special character.""",
             """
             if re.findall("Yes", btn.text()):
                 self.events.forgot_password_event()
-            elif re.findall("No", btn.text()):
-                self.events.login_event()
 
         box = QMessageBox(self.main_win)
         box.setWindowTitle(f"{self.title} - {parent}")

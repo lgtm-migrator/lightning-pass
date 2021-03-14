@@ -440,6 +440,8 @@ class Ui_lightning_pass:
         self.account_username_lbl.setObjectName("account_username_lbl")
         self.gridLayout_7.addWidget(self.account_username_lbl, 3, 0, 1, 1)
         self.account_pfp_pixmap_lbl = QtWidgets.QLabel(self.account)
+        self.account_pfp_pixmap_lbl.setMouseTracking(True)
+        self.account_pfp_pixmap_lbl.setAcceptDrops(True)
         self.account_pfp_pixmap_lbl.setText("")
         self.account_pfp_pixmap_lbl.setPixmap(
             QtGui.QPixmap("C:/Users/Luky/.designer/profile_pictures/default.png")
@@ -590,7 +592,7 @@ class Ui_lightning_pass:
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(6)
+        self.stacked_widget.setCurrentIndex(7)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):

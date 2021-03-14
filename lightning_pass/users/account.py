@@ -19,13 +19,13 @@ from lightning_pass.util.util import (
 class Account:
     """This class holds information about the currently logged in user."""
 
-    def __init__(self, user_id: int = None) -> None:
+    def __init__(self, user_id: int | None = None) -> None:
         """Construct the class.
 
         :param int user_id: User's id, defaults to None
 
         """
-        self.user_id = int(user_id) if user_id else None
+        self.user_id = int(user_id)
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -35,14 +35,14 @@ class Account:
     def register(
         cls,
         username: str,
-        password: bytes,
+        password: str,
         confirm_password: str,
         email: str,
     ) -> Account:
         """Secondary constructor for registering.
 
         :param str username: User's username
-        :param bytes password: User's password
+        :param str password: User's password
         :param str confirm_password: User's confirmed password
         :param str email: User's email
 
@@ -56,25 +56,29 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        Username(username)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        # Exceptions: UsernameAlreadyExists, InvalidUsername
+        Username(username)(exists=False)
+        # Exceptions: PasswordDoNotMatch, InvalidPassword
         Password(
             password,
             confirm_password,
-        )  # Exceptions: PasswordDoNotMatch, InvalidPassword
-        Email(email)  # Exceptions: EmailAlreadyExists, Invalid email
+        )()
+        # Exceptions: EmailAlreadyExists, Invalid email
+        Email(email)()
+        # no exceptions raised -> insert into db
         with database_manager() as db:
             sql = (
                 "INSERT INTO lightning_pass.credentials (username, password, email)"
                 "     VALUES (%s, %s, %s)"
             )
-            values = (username, password, email)
+            values = (username, Password.hash_password(password), email)
             db.execute(sql, values)
 
         return cls(get_user_item(username, "username", "id"))
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
-        """Secondary constructor for login in.
+        """Secondary constructor for log in.
 
         Updates last_login_date if log in is successful.
 
@@ -87,12 +91,12 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
+        # exception for the following checks: AccountDoesNotExist
         Username.check_username_existence(username, exists=True)
-
         stored_password = get_user_item(username, "username", "password")
-
         if not Password.authenticate_password(password, stored_password):
             raise AccountDoesNotExist
+
         account = cls(get_user_item(username, "username", "id"))
         account.update_last_login_date()
         return account
@@ -135,7 +139,8 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        Username(value)  # Exceptions: UsernameAlreadyExists, InvalidUsername
+        # Exceptions: UsernameAlreadyExists, InvalidUsername
+        Username(value)(exists=False)
         self.set_value(value, "username")
 
     @property
@@ -166,7 +171,7 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        Email(value)  # Exceptions: EmailAlreadyExists, InvalidEmail
+        Email(value)()  # Exceptions: EmailAlreadyExists, InvalidEmail
         self.set_value(value, "email")
 
     @property
@@ -207,9 +212,13 @@ class Account:
 
     def update_last_login_date(self) -> None:
         """Set last login date."""
-        self.set_value(datetime.now(), "last_login_date")
+        with database_manager() as db:
+            # f-string SQl injection not an issue
+            sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = {self.user_id}"
+            db.execute(sql)
 
-    @functools.cached_property  # lru caching the register date to avoid unnecessary database queries
+    # lru caching the register date to avoid unnecessary database queries
+    @functools.cached_property
     def register_date(self) -> datetime:
         """Last login date property.
 

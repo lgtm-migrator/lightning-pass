@@ -1,11 +1,12 @@
 """Module containing various utility functions used throughout the whole project."""
+from __future__ import annotations
+
 import contextlib
 import os
 import re
 import secrets
 from datetime import datetime
 from pathlib import Path
-from typing import Union
 
 import bcrypt
 import dotenv
@@ -13,8 +14,8 @@ import mysql
 from mysql.connector import MySQLConnection
 from mysql.connector.connection import MySQLCursor
 
-from .exceptions import (
-    AccountDoesNotExist,
+from lightning_pass.util.exceptions import (
+    AccountException,
     EmailAlreadyExists,
     InvalidEmail,
     InvalidPassword,
@@ -44,40 +45,40 @@ def database_manager() -> MySQLCursor:
             password=os.getenv("LOGINSDB_PASS"),
             database=os.getenv("LOGINSDB_DB"),
         )
-        cur: MySQLCursor = con.cursor()
+        # fix unread results with buffered cursor
+        cur: MySQLCursor = con.cursor(buffered=True)
         yield cur
     finally:
-        with contextlib.suppress(mysql.connector.InternalError):
-            con.commit()
+        con.commit()
         con.close()
 
 
-def _get_user_id(value: str, column: str) -> Union[int, bool]:
+def _get_user_id(column: str, value: str) -> int | bool:
     """Get user id from any user detail and its column.
 
     :param str value: Any user value stored in the database
     :param str column: Database column of the given user value
 
-    :returns: user id on success, False upon failure
+    :returns: user id on success
 
-    :raises AccountDoesNotExist: if no result was found
+    :raises AccountException: if no result was found
 
     """
     with database_manager() as db:
         # f-string SQl injection not an issue
         sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
-        result = db.execute(sql)
-    try:
-        return result.fetchone()[0]
-    except TypeError as e:
-        raise AccountDoesNotExist(e) from e
+        db.execute(sql)
+        result = db.fetchone()[0]
+    if not result:
+        raise AccountException
+    return result
 
 
 def get_user_item(
-    user_identifier: Union[int, str],
+    user_identifier: int | str,
     identifier_column: str,
     result_column: str,
-) -> Union[int, str, datetime]:
+) -> int | str | datetime:
     """Get any user value from any other user value detail and its column.
 
     :param str user_identifier: Any user value stored in the database
@@ -86,27 +87,31 @@ def get_user_item(
 
     :returns: user id on success, False upon failure
 
-    :raises AccountDoesNotExist: if no result was found
+    :raises AccountException: if no result was found
 
     """
+    # Exception: AccountException
     user_id = _get_user_id(
-        user_identifier,
         identifier_column,
-    )  # Exception: AccountDoesNotExist
+        user_identifier,
+    )
     if result_column == "id":
         return user_id
-    if user_id:
-        with database_manager() as db:
-            # f-string SQl injection not an issue
-            sql = f"SELECT {result_column} FROM lightning_pass.credentials WHERE id = {user_id}"
-            result = db.execute(sql)
-    return result.fetchone()[0]
+    with database_manager() as db:
+        # f-string SQl injection not an issue
+        sql = f"SELECT {result_column} FROM lightning_pass.credentials WHERE id = {user_id}"
+        db.execute(sql)
+        result = db.fetchone()
+    try:
+        return result[0]
+    except TypeError as e:
+        raise AccountException from e
 
 
 def set_user_item(
-    user_identifier: Union[int, str, datetime],
+    user_identifier: int | str | datetime,
     identifier_column: str,
-    result: Union[int, str, datetime],
+    result: int | str | datetime,
     result_column: str,
 ) -> None:
     """Set new user item.
@@ -121,7 +126,7 @@ def set_user_item(
         user_identifier = _get_user_id(identifier_column, user_identifier)
     with database_manager() as db:
         # f-string SQl injection not an issue
-        sql = f"UPDATE lightning_pass.credentials WHERE id = {user_identifier} SET {result_column} = {result}"
+        sql = f"UPDATE lightning_pass.credentials SET {result_column} = '{result}' WHERE id = {user_identifier}"
         db.execute(sql)
 
 
@@ -140,19 +145,27 @@ class Username:
         """
         self._username = username
 
-    def __call__(self, username: str = None) -> None:
-        """Perform both pattern and existence checks.
+    def __call__(self, exists: bool, username: str | None = None) -> bool | None:
+        """Perform both pattern and existence checks (+ raise exceptions for flow control).
 
-        :param str username: Username to check, defaults to None
+        :param bool exists: Defines how to approach username existence check
+        :param str username: Username to check, defaults to None and uses class attribute
+
+        :raises AccountException: if there is no username to check
+        :raises InvalidUsername: if pattern check fails
+        :raises UsernameAlreadyExists: if existence check fails
 
         """
-        if not username:
+        if not username and self._username:
             username = self._username
-        self.check_username_pattern(username)
-        self.check_username_existence(username)
+        if not self.check_username_pattern(username):
+            raise InvalidUsername
+        elif not self.check_username_existence(username, exists=exists):
+            raise UsernameAlreadyExists
+        return True
 
     @staticmethod
-    def check_username_pattern(username: str) -> None:
+    def check_username_pattern(username: str) -> bool:
         """Check whether a given username matches a required pattern.
 
         Username pattern:
@@ -161,42 +174,37 @@ class Username:
 
         :param str username: Username to check
 
-        :raises InvalidUsername: if the username doesn't match the required pattern.
+        :returns: True or False depending on the result
 
         """
         if (
+            not username
             # length
-            len(username) < 5
+            or len(username) < 5
             # special char
             or len(username) - len(re.findall(r"[A-Za-z0-9]", username)) > 0
         ):
-            raise InvalidUsername
+            return False
+        return True
 
     @staticmethod
-    def check_username_existence(username: str, exists: bool = True) -> None:
+    def check_username_existence(username: str, exists: bool | None = False) -> bool:
         """Check whether a username already exists in a database and if it matches a required pattern.
 
         :param str username: Username to check
-        :param bool exists:
-            Search type, defaults to True
-            1) True means that we're checking if username exists.
-            2) False means that we're checking if username doesn't exist.
+        :param bool exists: Influences the checking type, default to False
 
-        :raises UsernameAlreadyExists: if positive search was True and the username already exists in the database.
-        :raises AccountDoesNotExist: if positive search was False and the username was not found.
+        :returns: True or False depending on the result
 
         """
-        if not username:
-            raise AccountDoesNotExist
         with database_manager() as db:
             # f-string SQl injection not an issue
-            sql = f"SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}'"
-            result = db.execute(sql)
-        if not contextlib.suppress(result.fetchone()):
-            if exists and len(result) <= 0:
-                raise AccountDoesNotExist
-            if not exists and len(result) > 0:
-                raise UsernameAlreadyExists
+            sql = f"SELECT EXISTS(SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}')"
+            db.execute(sql)
+            result = db.fetchone()[0]
+        if not result and exists or result and not exists:
+            return False
+        return True
 
 
 class Password:
@@ -208,13 +216,13 @@ class Password:
 
     def __init__(
         self,
-        password: Union[str, bytes],
-        confirm_password: Union[str, bytes],
+        password: str | bytes,
+        confirm_password: str | bytes,
     ) -> None:
         """Construct the class.
 
-        :param Union[str, bytes] password: First password
-        :param Union[str, bytes] confirm_password: Second password
+        :param str | bytes password: First password
+        :param str | bytes confirm_password: Second password
 
         """
         self._password = str(password)
@@ -222,24 +230,32 @@ class Password:
 
     def __call__(
         self,
-        password: Union[str, bytes] = None,
-        confirm_password: Union[str, bytes] = None,
-    ) -> None:
-        """Perform both pattern and match checks.
+        password: str | bytes | None = None,
+        confirm_password: str | bytes | None = None,
+    ) -> bool | None:
+        """Perform both pattern and match checks (+ raise exceptions for flow control).
 
-        :param Union[str, bytes] password: First password, defaults to None
-        :param Union[str, bytes] confirm_password: Second password, defaults to None
+        :param str | bytes password: First password, defaults to None
+        :param str | bytes confirm_password: Second password, defaults to None
+
+        :returns: True or False depending on the check results
+
+        :raises: Invalid password: if pattern check fails
+        :raises: PasswordsDoNotMatch: if password do not match (obviously)
 
         """
-        if not password:
+        if not password and self._password:
             password = self._password
-        if not confirm_password:
+        if not confirm_password and self.confirm_password:
             confirm_password = self.confirm_password
-        self.check_password_pattern(password)
-        self.check_password_match(password, confirm_password)
+        if not self.check_password_pattern(password):
+            raise InvalidPassword
+        if not self.check_password_match(password, confirm_password):
+            raise PasswordsDoNotMatch
+        return True
 
     @staticmethod
-    def check_password_pattern(password: Union[str, bytes]) -> None:
+    def check_password_pattern(password: str | bytes) -> bool:
         """Check whether password matches a required pattern.
 
         Password pattern:
@@ -250,7 +266,7 @@ class Password:
 
         :param Union[str, bytes] password: Password to check
 
-        :raises InvalidPassword: if the password doesn't match the required pattern.
+        :returns: True or False depending on the pattern check
 
         """
         # if password in bytes, turn into str
@@ -265,29 +281,31 @@ class Password:
             # special chars
             or len(password) - len(re.findall(r"[A-Za-z0-9]", password)) <= 0
         ):
-            raise InvalidPassword
+            return False
+        return True
 
     @staticmethod
     def check_password_match(
-        password: Union[str, bytes],
-        confirm_password: Union[str, bytes],
-    ) -> None:
+        password: str | bytes,
+        confirm_password: str | bytes,
+    ) -> bool:
         """Check whether two passwords match.
 
         :param  Union[str, bytes] password: First password
         :param Union[str, bytes] confirm_password: Confirmation password
 
-        :raises PasswordsDoNotMatch: if password and confirm password don't match.
+        :returns: True or False depending on the result of the comparison
 
         """
-        # If password bytes, turn into str
+        # If password in bytes, turn into str
         password, confirm_password = (str(x) for x in (password, confirm_password))
         if not secrets.compare_digest(password, confirm_password):
-            raise PasswordsDoNotMatch
+            return False
+        return True
 
     @staticmethod
     def hash_password(password: str) -> bytes:
-        """Hash password by bcrypt with "utf-8" encoding and gensalt().
+        """Hash password by bcrypt with "utf-8" encoding and a salt.
 
         :param str password: Password to hash
 
@@ -298,19 +316,23 @@ class Password:
 
     @staticmethod
     def authenticate_password(
-        password: Union[str, bytes],
-        current_password: Union[str, bytes],
-    ) -> None:
+        password: str | bytes,
+        current_password: str | bytes,
+    ) -> bool:
         """Check if passwords match.
 
         :param Union[str, bytes] password: Entered password.
         :param Union[str, bytes] current_password: Password stored in the database.
+
+        :returns: True or False based on the authentication result
+
         """
         if not bcrypt.checkpw(
             password.encode("utf-8"),
             current_password.encode("utf-8"),
         ):
-            raise AccountDoesNotExist
+            return False
+        return True
 
 
 class Email:
@@ -320,7 +342,7 @@ class Email:
 
     """
 
-    def __init__(self, email: str) -> None:
+    def __init__(self, email: str | None) -> None:
         """Construct the class.
 
         :param str email: Email to construct the class
@@ -328,48 +350,57 @@ class Email:
         """
         self._email = email
 
-    def __call__(self, email: str = None) -> None:
-        """Perform both pattern and existence checks.
+    def __call__(self, email: str | None = None) -> bool:
+        """Perform both pattern and existence checks (+ raise exceptions for flow control).
 
         :param str email: First password, defaults to None
 
+        :returns: True if all checks pass
+
+        :raises InvalidEmail: if email pattern check fails
+        :raises EmailAlreadyExists: if chosen email already exists in the database
+
         """
-        if not email:
+        if not email and self._email:
             email = self._email
-        self.check_email_pattern(email)
-        self.check_email_existence(email)
+        if not self.check_email_pattern(email):
+            raise InvalidEmail
+        if not self.check_email_existence(email):
+            raise EmailAlreadyExists
+        return True
 
     @staticmethod
-    def check_email_pattern(email: str) -> None:
+    def check_email_pattern(email: str) -> bool:
         """Check whether given email matches email pattern.
 
         Email pattern: defined by REGEX_EMAIL constant
 
         :param str email: Email to check
 
-        :raises InvalidEmail: if the email doesn't match the RegEx email pattern.
+        :returns: True or False depending on the pattern check
 
         """
         if not re.search(REGEX_EMAIL, email):
-            raise InvalidEmail
+            return False
+        return True
 
     @staticmethod
-    def check_email_existence(email: str) -> None:
-        """Check whether an email already exists and if it matches a correct email pattern.
+    def check_email_existence(email: str) -> bool:
+        """Check whether an email already exists.
 
         :param str email: Email to check
 
-        :raises EmailAlreadyExists: if the email already exists in the database.
+        :returns: True or False depending on the existence check
 
         """
         with database_manager() as db:
             # f-string SQl injection not an issue
-            sql = f"SELECT 1 FROM lightning_pass.credentials WHERE email = '{email}'"
-            result = db.execute(sql)
-        row = result.fetchall()
-
-        if not len(row) <= 0:
-            raise EmailAlreadyExists
+            sql = f"SELECT EXISTS(SELECT 1 FROM lightning_pass.credentials WHERE email = '{email}')"
+            db.execute(sql)
+            result = db.fetchone()[0]
+        if result:
+            return False
+        return True
 
 
 class ProfilePicture:
