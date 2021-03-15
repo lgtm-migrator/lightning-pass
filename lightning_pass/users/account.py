@@ -57,7 +57,7 @@ class Account:
 
         """
         # Exceptions: UsernameAlreadyExists, InvalidUsername
-        Username(username)(exists=False)
+        Username(username)(should_exist=False)
         # Exceptions: PasswordDoNotMatch, InvalidPassword
         Password(
             password,
@@ -92,7 +92,7 @@ class Account:
 
         """
         # exception for the following checks: AccountDoesNotExist
-        Username.check_username_existence(username, exists=True)
+        Username.check_username_existence(username, should_exist=True)
         stored_password = get_user_item(username, "username", "password")
         if not Password.authenticate_password(password, stored_password):
             raise AccountDoesNotExist
@@ -140,7 +140,7 @@ class Account:
 
         """
         # Exceptions: UsernameAlreadyExists, InvalidUsername
-        Username(value)(exists=False)
+        Username(value)(should_exist=False)
         self.set_value(value, "username")
 
     @property

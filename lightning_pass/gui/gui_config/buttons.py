@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import pathlib
 
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Buttons:
@@ -15,7 +15,7 @@ class Buttons:
 
     def __init__(
         self,
-        parent: QMainWindow,
+        parent: QtWidgets.QMainWindow,
         *args: object,
         **kwargs: object,
     ) -> None:
@@ -27,6 +27,11 @@ class Buttons:
         super().__init__(*args, **kwargs)
         self.main_win = parent
         self.ui = parent.ui
+
+    def setup_all(self):
+        self.setup_buttons()
+        self.setup_menu_bar()
+        self.data_validation()
 
     def setup_buttons(self) -> None:
         """Connect all buttons."""
@@ -98,3 +103,11 @@ class Buttons:
         self.ui.action_forgot_password.triggered.connect(
             self.main_win.events.forgot_password_event,
         )
+
+    def data_validation(self) -> None:
+        """Disable whitespaces in registration input fields."""
+        input_validator = QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+"))
+        self.ui.reg_username_line.setValidator(input_validator)
+        self.ui.reg_password_line.setValidator(input_validator)
+        self.ui.reg_conf_pass_line.setValidator(input_validator)
+        self.ui.reg_email_line.setValidator(input_validator)

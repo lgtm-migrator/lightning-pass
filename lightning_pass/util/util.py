@@ -7,6 +7,7 @@ import re
 import secrets
 from datetime import datetime
 from pathlib import Path
+from typing import Optional, Union
 
 import bcrypt
 import dotenv
@@ -40,20 +41,23 @@ def database_manager() -> MySQLCursor:
     dotenv.load_dotenv()
     try:
         con: MySQLConnection = mysql.connector.connect(
-            host=os.getenv("LOGINSDB_HOST"),
-            user=os.getenv("LOGINSDB_USER"),
-            password=os.getenv("LOGINSDB_PASS"),
-            database=os.getenv("LOGINSDB_DB"),
+            host=os.getenv("DB_HOST"),
+            user=os.getenv("DB_USER"),
+            password=os.getenv("DB_PASS"),
+            database=os.getenv("DB_DB"),
         )
         # fix unread results with buffered cursor
         cur: MySQLCursor = con.cursor(buffered=True)
         yield cur
     finally:
-        con.commit()
+        try:
+            con.commit()
+        except TypeError:
+            raise ConnectionError("Please initialize your database connection")
         con.close()
 
 
-def _get_user_id(column: str, value: str) -> int | bool:
+def _get_user_id(column: str, value: str) -> Union[int, bool]:
     """Get user id from any user detail and its column.
 
     :param str value: Any user value stored in the database
@@ -68,17 +72,17 @@ def _get_user_id(column: str, value: str) -> int | bool:
         # f-string SQl injection not an issue
         sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
         db.execute(sql)
-        result = db.fetchone()[0]
+        result = db.fetchone()
     if not result:
         raise AccountException
-    return result
+    return result[0]
 
 
 def get_user_item(
-    user_identifier: int | str,
+    user_identifier: Union[int, str],
     identifier_column: str,
     result_column: str,
-) -> int | str | datetime:
+) -> Union[int, str, datetime]:
     """Get any user value from any other user value detail and its column.
 
     :param str user_identifier: Any user value stored in the database
@@ -102,6 +106,8 @@ def get_user_item(
         sql = f"SELECT {result_column} FROM lightning_pass.credentials WHERE id = {user_id}"
         db.execute(sql)
         result = db.fetchone()
+    # raising an exception from the type error is more explicit than checking `if result`
+    # (like for example in Username.check_username_existence
     try:
         return result[0]
     except TypeError as e:
@@ -109,9 +115,9 @@ def get_user_item(
 
 
 def set_user_item(
-    user_identifier: int | str | datetime,
+    user_identifier: Union[int, str, datetime],
     identifier_column: str,
-    result: int | str | datetime,
+    result: Union[int, str, datetime],
     result_column: str,
 ) -> None:
     """Set new user item.
@@ -145,7 +151,9 @@ class Username:
         """
         self._username = username
 
-    def __call__(self, exists: bool, username: str | None = None) -> bool | None:
+    def __call__(
+        self, should_exist: bool, username: Optional[str] = None
+    ) -> Optional[bool]:
         """Perform both pattern and existence checks (+ raise exceptions for flow control).
 
         :param bool exists: Defines how to approach username existence check
@@ -160,7 +168,7 @@ class Username:
             username = self._username
         if not self.check_username_pattern(username):
             raise InvalidUsername
-        elif not self.check_username_existence(username, exists=exists):
+        if not self.check_username_existence(username, should_exist=should_exist):
             raise UsernameAlreadyExists
         return True
 
@@ -188,11 +196,13 @@ class Username:
         return True
 
     @staticmethod
-    def check_username_existence(username: str, exists: bool | None = False) -> bool:
+    def check_username_existence(
+        username: str, should_exist: Optional[bool] = False
+    ) -> bool:
         """Check whether a username already exists in a database and if it matches a required pattern.
 
         :param str username: Username to check
-        :param bool exists: Influences the checking type, default to False
+        :param bool should_exist: Influences the checking type, default to False
 
         :returns: True or False depending on the result
 
@@ -202,7 +212,7 @@ class Username:
             sql = f"SELECT EXISTS(SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}')"
             db.execute(sql)
             result = db.fetchone()[0]
-        if not result and exists or result and not exists:
+        if (not result and should_exist) or (result and not should_exist):
             return False
         return True
 
@@ -230,9 +240,9 @@ class Password:
 
     def __call__(
         self,
-        password: str | bytes | None = None,
-        confirm_password: str | bytes | None = None,
-    ) -> bool | None:
+        password: Optional[str | bytes] = None,
+        confirm_password: Optional[str, bytes] = None,
+    ) -> Optional[bool]:
         """Perform both pattern and match checks (+ raise exceptions for flow control).
 
         :param str | bytes password: First password, defaults to None
@@ -316,8 +326,8 @@ class Password:
 
     @staticmethod
     def authenticate_password(
-        password: str | bytes,
-        current_password: str | bytes,
+        password: Union[str, bytes],
+        current_password: Union[str, bytes],
     ) -> bool:
         """Check if passwords match.
 
@@ -342,7 +352,7 @@ class Email:
 
     """
 
-    def __init__(self, email: str | None) -> None:
+    def __init__(self, email: Optional[str]) -> None:
         """Construct the class.
 
         :param str email: Email to construct the class
@@ -350,7 +360,7 @@ class Email:
         """
         self._email = email
 
-    def __call__(self, email: str | None = None) -> bool:
+    def __call__(self, email: Optional[str] = None) -> bool:
         """Perform both pattern and existence checks (+ raise exceptions for flow control).
 
         :param str email: First password, defaults to None

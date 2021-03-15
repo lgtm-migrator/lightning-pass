@@ -20,6 +20,12 @@
    <layout class="QGridLayout" name="gridLayout_9">
     <item row="0" column="0">
      <widget class="QStackedWidget" name="stacked_widget">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="currentIndex">
        <number>7</number>
       </property>
@@ -98,6 +104,12 @@
         </item>
         <item row="0" column="0" colspan="2">
          <widget class="QLabel" name="home_welcome_lbl">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="font">
            <font>
             <family>Segoe Print</family>
@@ -667,85 +679,34 @@
       </widget>
       <widget class="QWidget" name="account">
        <layout class="QGridLayout" name="gridLayout_7">
-        <item row="5" column="0" colspan="2">
-         <widget class="QPushButton" name="account_edit_details_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Edit Details</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="3">
-         <widget class="QLabel" name="account_last_log_date">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Last login date is: </string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="account_email_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Email:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="4">
-         <widget class="QPushButton" name="account_main_menu_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="account_email_line">
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="account_username_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Username:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3" rowspan="2" colspan="2">
+        <item row="0" column="4">
          <widget class="QLabel" name="account_pfp_pixmap_lbl">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>135</width>
+            <height>135</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>135</width>
+            <height>135</height>
+           </size>
+          </property>
           <property name="mouseTracking">
            <bool>true</bool>
           </property>
           <property name="acceptDrops">
            <bool>true</bool>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">border: 2px dashed</string>
           </property>
           <property name="text">
            <string/>
@@ -758,8 +719,14 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="3">
-         <widget class="QPushButton" name="account_logout_btn">
+        <item row="2" column="4" rowspan="3">
+         <widget class="QPushButton" name="pushButton">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -767,19 +734,50 @@
            </font>
           </property>
           <property name="text">
-           <string>Logout</string>
+           <string>Vault U+1F512</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="3" column="0" colspan="2">
+         <widget class="QPushButton" name="account_edit_details_btn">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Edit Details</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="3">
          <widget class="QLineEdit" name="account_username_line">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="readOnly">
            <bool>false</bool>
           </property>
          </widget>
         </item>
-        <item row="0" column="0" rowspan="2" colspan="2">
+        <item row="0" column="0" colspan="4">
          <widget class="QLabel" name="account_lbl">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="font">
            <font>
             <family>Segoe Print</family>
@@ -791,8 +789,96 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
+        <item row="1" column="0">
+         <widget class="QLabel" name="account_username_lbl">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Username:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="4">
+         <widget class="QPushButton" name="account_change_pfp_btn">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Save Picture</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="account_email_lbl">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Email:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <widget class="QLabel" name="account_last_log_date">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Last login date is: 0000-00-00 00:00:00.</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2" colspan="2">
          <widget class="QPushButton" name="account_change_pass_btn">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -804,8 +890,33 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="3" colspan="2">
-         <widget class="QPushButton" name="account_change_pfp_btn">
+        <item row="2" column="1" colspan="3">
+         <widget class="QLineEdit" name="account_email_line">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="readOnly">
+           <bool>false</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QPushButton" name="account_logout_btn">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -813,7 +924,26 @@
            </font>
           </property>
           <property name="text">
-           <string>Change Profile Picture</string>
+           <string>Logout</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="3">
+         <widget class="QPushButton" name="account_main_menu_btn">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Main Menu</string>
           </property>
          </widget>
         </item>

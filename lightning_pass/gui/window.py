@@ -89,12 +89,11 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
         self.events = events.Events(self)
 
-        self.buttons = buttons.Buttons(self)
-        self.buttons.setup_buttons()
-        self.buttons.setup_menu_bar()
+        buttons.Buttons(self).setup_all()
 
         self.ui.message_boxes = message_boxes.MessageBoxes(
-            child=self.main_win, parent=self
+            child=self.main_win,
+            parent=self,
         )
 
         self.general_setup()
@@ -140,7 +139,9 @@ class LightningPassWindow(QtWidgets.QMainWindow):
             if not self.ui.generate_pass_p2_final_pass_line.text():
                 gen = self.events.get_generator()
                 for i in self.collector.generator():
-                    gen.get_character(i)
+                    length_check = gen.get_character(i)
+                    if length_check is False:
+                        break
                 self.ui.generate_pass_p2_final_pass_line.setText(gen.get_password())
         else:
             self.pass_progress += 1

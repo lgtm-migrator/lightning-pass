@@ -40,7 +40,7 @@ def login_required(func: Callable) -> Callable:
 
         :param self: Class instance to give access to its attributes
 
-        :return: executed function
+        :return: executed function or None and shows a message box indicating needed log in
 
         """
         if not hasattr(self, "current_user"):
@@ -200,15 +200,12 @@ class Events:
     @login_required
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
-        if self.ui.account_pfp_pixmap_lbl.text() == self.current_user.profile_picture:
-            fname, _ = QFileDialog.getOpenFileName(
-                self.parent,
-                "Lightning Pass - Open your new profile picture",
-                "c:\\",
-                "Image files (*.jpg *.png)",
-            )
-        else:
-            fname = self.ui.account_pfp_pixmap_lbl.text()
+        fname, _ = QFileDialog.getOpenFileName(
+            self.parent,
+            "Lightning Pass - Open your new profile picture",
+            "c:\\",
+            "Image files (*.jpg *.png)",
+        )
         if fname:
             self.current_user.profile_picture = ProfilePicture.save_picture(
                 pathlib.Path(fname),
