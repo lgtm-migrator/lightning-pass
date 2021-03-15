@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import functools
 import pathlib
-from typing import Callable
+from typing import Callable, Optional
 
 import clipboard
 import qdarkstyle
@@ -35,7 +35,7 @@ def login_required(func: Callable) -> Callable:
     """
 
     @functools.wraps(func)
-    def wrapper(self: Events) -> Callable | None:
+    def wrapper(self: Events) -> Optional[Callable]:
         """Wrapper, checks the "current_user" attribute.
 
         :param self: Class instance to give access to its attributes
@@ -271,3 +271,9 @@ class Events:
         if args:
             ...
         self.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
+
+
+__all__ = [
+    "Events",
+    "login_required",
+]

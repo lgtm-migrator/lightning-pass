@@ -41,7 +41,7 @@ def run() -> None:
 class SplashScreen(QtWidgets.QWidget):
     """Splash Screen."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         app = QtWidgets.QApplication(sys.argv)
 
         super().__init__()
@@ -62,7 +62,8 @@ class SplashScreen(QtWidgets.QWidget):
 
         app.exec_()
 
-    def increase(self):
+    def increase(self) -> None:
+        """Increase loading bar progress by 1 point and close widget if 100% has been reached."""
         self.ui.loading_progress_bar.setValue(self.progress)
         if self.progress > 100:
             self.timer.stop()
@@ -146,3 +147,10 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         else:
             self.pass_progress += 1
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.pass_progress)
+
+
+__all__ = [
+    "LightningPassWindow",
+    "SplashScreen",
+    "run",
+]

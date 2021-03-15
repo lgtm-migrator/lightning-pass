@@ -29,6 +29,7 @@ class Buttons:
         self.ui = parent.ui
 
     def setup_all(self):
+        """Run all 3 funcs to setup everything."""
         self.setup_buttons()
         self.setup_menu_bar()
         self.data_validation()
@@ -111,3 +112,8 @@ class Buttons:
         self.ui.reg_password_line.setValidator(input_validator)
         self.ui.reg_conf_pass_line.setValidator(input_validator)
         self.ui.reg_email_line.setValidator(input_validator)
+
+
+__all__ = [
+    "Buttons",
+]

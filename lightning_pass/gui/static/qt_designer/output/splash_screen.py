@@ -41,3 +41,6 @@ class Ui_loading_widget:
         self.loading_label.setText(
             _translate("loading_widget", "Loading Lightning Pass...")
         )
+
+
+__all__ = ["Ui_loading_widget"]

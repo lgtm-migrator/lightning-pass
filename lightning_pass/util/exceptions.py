@@ -35,3 +35,16 @@ class AccountDoesNotExist(AccountException):
 
 class StopCollectingPositions(AccountException):
     """Raised when all needed mouse positions are collected."""
+
+
+__all__ = [
+    "AccountDoesNotExist",
+    "AccountException",
+    "EmailAlreadyExists",
+    "InvalidEmail",
+    "InvalidPassword",
+    "InvalidUsername",
+    "PasswordsDoNotMatch",
+    "StopCollectingPositions",
+    "UsernameAlreadyExists",
+]

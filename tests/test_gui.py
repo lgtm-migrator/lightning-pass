@@ -25,16 +25,16 @@ def app(qtbot: QtBot) -> LightningPassWindow:
 @pytest.mark.parametrize(
     "widget, index",
     [
-        ("home_login_btn", 1),
-        ("home_register_btn", 2),
-        ("home_generate_password_btn", 4),
-        ("log_main_btn", 0),
-        ("log_forgot_pass_btn", 3),
-        ("reg_main_btn", 0),
-        ("forgot_pass_main_menu_btn", 0),
-        ("generate_pass_main_menu_btn", 0),
-        ("generate_pass_p2_main_btn", 0),
-        ("account_main_menu_btn", 0),
+        ("home_login_btn", 2),
+        ("home_register_btn", 3),
+        ("home_generate_password_btn", 5),
+        ("log_main_btn", 1),
+        ("log_forgot_pass_btn", 4),
+        ("reg_main_btn", 1),
+        ("forgot_pass_main_menu_btn", 1),
+        ("generate_pass_main_menu_btn", 1),
+        ("generate_pass_p2_main_btn", 1),
+        ("account_main_menu_btn", 1),
     ],
 )
 def test_buttons(
@@ -51,13 +51,13 @@ def test_buttons(
     :param int index: stacked_widget expected index
 
     Index description:
-        1) index 0: app.ui.home
-        2) index 1: app.ui.login
-        3) index 2: app.ui.register_2
-        4) index 3: app.ui.forgot_password
-        5) index 4: app.ui.generate_password
-        6) index 5: app.ui.generate_pass_phase2
-        7) index 6: app.ui.account
+        1) index 1: app.ui.home
+        2) index 2: app.ui.login
+        3) index 3: app.ui.register_2
+        4) index 4: app.ui.forgot_password
+        5) index 5: app.ui.generate_password
+        6) index 6: app.ui.generate_pass_phase2
+        7) index 7: app.ui.account
 
     Fails if stacked_widget didn't change index.
 
@@ -72,11 +72,11 @@ def test_buttons(
 @pytest.mark.parametrize(
     "menu_bar_action, index",
     [
-        ("action_main_menu", 0),
-        ("action_generate", 4),
-        ("action_login", 1),
-        ("action_register", 2),
-        ("action_forgot_password", 3),
+        ("action_main_menu", 1),
+        ("action_generate", 5),
+        ("action_login", 2),
+        ("action_register", 3),
+        ("action_forgot_password", 4),
     ],
 )
 def test_menu_bar(app: LightningPassWindow, menu_bar_action: str, index: int) -> None:
@@ -87,13 +87,13 @@ def test_menu_bar(app: LightningPassWindow, menu_bar_action: str, index: int) ->
     :param int index: stacked_widget expected index
 
     Index description:
-        1) index 0: app.ui.home
-        2) index 1: app.ui.login
-        3) index 2: app.ui.register_2
-        4) index 3: app.ui.forgot_password
-        5) index 4: app.ui.generate_password
-        6) index 5: app.ui.generate_pass_phase2
-        7) index 6: app.ui.account
+        1) index 1: app.ui.home
+        2) index 2: app.ui.login
+        3) index 3: app.ui.register_2
+        4) index 4: app.ui.forgot_password
+        5) index 5: app.ui.generate_password
+        6) index 6: app.ui.generate_pass_phase2
+        7) index 7: app.ui.account
 
     Fails if stacked_widget didn't change index.
 
@@ -103,3 +103,6 @@ def test_menu_bar(app: LightningPassWindow, menu_bar_action: str, index: int) ->
     action.trigger()  # act
 
     assert app.ui.stacked_widget.currentIndex() == index
+
+
+__all__ = ["app", "test_buttons", "test_menu_bar"]

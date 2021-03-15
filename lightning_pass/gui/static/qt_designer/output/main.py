@@ -853,3 +853,6 @@ class Ui_lightning_pass:
         self.action_light.setText(_translate("lightning_pass", "light"))
         self.action_dark.setText(_translate("lightning_pass", "dark"))
         self.action_account.setText(_translate("lightning_pass", "account"))
+
+
+__all__ = ["Ui_lightning_pass"]

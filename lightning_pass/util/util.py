@@ -52,8 +52,8 @@ def database_manager() -> MySQLCursor:
     finally:
         try:
             con.commit()
-        except TypeError:
-            raise ConnectionError("Please initialize your database connection")
+        except TypeError as e:
+            raise ConnectionError("Please initialize your database connection") from e
         con.close()
 
 
@@ -156,7 +156,7 @@ class Username:
     ) -> Optional[bool]:
         """Perform both pattern and existence checks (+ raise exceptions for flow control).
 
-        :param bool exists: Defines how to approach username existence check
+        :param bool should_exist: Defines how to approach username existence check
         :param str username: Username to check, defaults to None and uses class attribute
 
         :raises AccountException: if there is no username to check
@@ -226,13 +226,13 @@ class Password:
 
     def __init__(
         self,
-        password: str | bytes,
-        confirm_password: str | bytes,
+        password: Union[str, bytes],
+        confirm_password: Union[str, bytes],
     ) -> None:
         """Construct the class.
 
-        :param str | bytes password: First password
-        :param str | bytes confirm_password: Second password
+        :param Union[str, bytes] password: First password
+        :param Union[str, bytes] confirm_password: Second password
 
         """
         self._password = str(password)
@@ -240,13 +240,13 @@ class Password:
 
     def __call__(
         self,
-        password: Optional[str | bytes] = None,
-        confirm_password: Optional[str, bytes] = None,
+        password: Optional[Union[str, bytes]] = None,
+        confirm_password: Optional[Union[str, bytes]] = None,
     ) -> Optional[bool]:
         """Perform both pattern and match checks (+ raise exceptions for flow control).
 
-        :param str | bytes password: First password, defaults to None
-        :param str | bytes confirm_password: Second password, defaults to None
+        :param Union[str, bytes] password: First password, defaults to None
+        :param Union[str, bytes] confirm_password: Second password, defaults to None
 
         :returns: True or False depending on the check results
 
@@ -265,7 +265,7 @@ class Password:
         return True
 
     @staticmethod
-    def check_password_pattern(password: str | bytes) -> bool:
+    def check_password_pattern(password: Union[str, bytes]) -> bool:
         """Check whether password matches a required pattern.
 
         Password pattern:
@@ -296,8 +296,8 @@ class Password:
 
     @staticmethod
     def check_password_match(
-        password: str | bytes,
-        confirm_password: str | bytes,
+        password: Union[str, bytes],
+        confirm_password: Union[str, bytes],
     ) -> bool:
         """Check whether two passwords match.
 
@@ -450,3 +450,15 @@ class ProfilePicture:
         absolute_path = Path().absolute()
         picture_path = f"lightning_pass/users/profile_pictures/{profile_picture}"
         return Path.joinpath(absolute_path, picture_path)
+
+
+__all__ = [
+    "Email",
+    "Password",
+    "ProfilePicture",
+    "REGEX_EMAIL",
+    "Username",
+    "database_manager",
+    "get_user_item",
+    "set_user_item",
+]

@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
+from typing import Optional, Union
 
 from lightning_pass.util.exceptions import AccountDoesNotExist
 from lightning_pass.util.util import (
@@ -19,7 +20,7 @@ from lightning_pass.util.util import (
 class Account:
     """This class holds information about the currently logged in user."""
 
-    def __init__(self, user_id: int | None = None) -> None:
+    def __init__(self, user_id: Optional[int] = None) -> None:
         """Construct the class.
 
         :param int user_id: User's id, defaults to None
@@ -101,7 +102,7 @@ class Account:
         account.update_last_login_date()
         return account
 
-    def get_value(self, result_column: str) -> str | datetime:
+    def get_value(self, result_column: str) -> Union[str, datetime]:
         """Simplify getting user values.
 
         :param str result_column: Column from which we're collecting the value
@@ -111,7 +112,7 @@ class Account:
         """
         return get_user_item(self.user_id, "id", result_column)
 
-    def set_value(self, result: str | datetime, result_column: str) -> None:
+    def set_value(self, result: Union[str, datetime], result_column: str) -> None:
         """Simplify setting user values.
 
         :param str result: Value which we're inserting
@@ -226,3 +227,6 @@ class Account:
 
         """
         return self.get_value("register_date")
+
+
+__all__ = ["Account"]

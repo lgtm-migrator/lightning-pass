@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import random
 import string
-from typing import Generator
+from typing import Generator, Optional, List, Tuple
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -40,8 +40,8 @@ class MouseTracker(QtCore.QObject):
     ) -> object:
         """Event filter.
 
-        :param QLabel event: Label object
-        :param MouseMove move: Mouse move event
+        :param QLabel label: Label object
+        :param MouseMove event: Mouse move event
 
         :returns: eventFilter of super class
 
@@ -64,7 +64,7 @@ class Collector:
 
     def __init__(self) -> None:
         """Class contructor."""
-        self.randomness_lst: list[tuple[int, int]] = []
+        self.randomness_lst: List[Tuple[int, int]] = []
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -83,6 +83,7 @@ class Collector:
         self.randomness_lst.append((pos.x(), pos.y()))
 
     def generator(self) -> Generator:
+        """Yield mouse movement tuples."""
         yield from self.randomness_lst
 
 
@@ -114,7 +115,8 @@ class PwdGenerator:
 
         self.password = ""
 
-    def get_character(self, position: tuple[int, int]) -> bool | None:
+    def get_character(self, position: tuple[int, int]) -> Optional[bool]:
+        """Get a eligible password character by generating a random seed from the mouse position tuple."""
         sd = position[0] + 1j * position[1]
         random.seed(sd)
         flt = random.random()
@@ -122,8 +124,8 @@ class PwdGenerator:
         indx = flt / (1 / 94)  # 0.0106382978723404  # 94 symbols... 0,0106382978723404
         return self._collect_char(str(string.printable)[int(indx)])
 
-    def _collect_char(self, char: str) -> bool | None:
-        """Generate a password by passgen library.
+    def _collect_char(self, char: str) -> Optional[bool]:
+        """Collect a password character.
 
         Password generation is based on the chosen parameters in the GUI.
 
@@ -154,3 +156,10 @@ class PwdGenerator:
 
         """
         return self.password
+
+
+__all__ = [
+    "Collector",
+    "MouseTracker",
+    "PwdGenerator",
+]

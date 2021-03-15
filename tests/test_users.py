@@ -1,6 +1,8 @@
 """Test module for the users package."""
 from __future__ import annotations
 
+from typing import Union
+
 import pytest
 
 from lightning_pass.util.util import Password
@@ -27,8 +29,8 @@ def password_cls() -> Password:
 )
 def test_check_password_match(
     password_cls: Password,
-    password: str | bytes,
-    confirm_password: str | bytes,
+    password: Union[str, bytes],
+    confirm_password: Union[str, bytes],
 ) -> None:
     """Test check_password_match func of Password.
 
@@ -40,3 +42,9 @@ def test_check_password_match(
 
     """
     password_cls.check_password_match(password, confirm_password)  # act
+
+
+__all__ = [
+    "password_cls",
+    "test_check_password_match",
+]

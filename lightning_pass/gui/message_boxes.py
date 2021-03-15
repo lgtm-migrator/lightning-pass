@@ -204,3 +204,8 @@ contain at least one special character.""",
         box.setText(f"Your {detail} has been successfully updated!")
         box.setIcon(QMessageBox.Question)
         box.exec_()
+
+
+__all__ = [
+    "MessageBoxes",
+]
