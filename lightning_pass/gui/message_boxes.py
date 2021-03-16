@@ -154,7 +154,7 @@ contain at least one special character.""",
         box.exec_()
 
     def no_options_generate(self, parent: str) -> None:
-        """Show a message box indicating that password can't be generated with the options.
+        """Show a message box indicating that password can't be generated with the chosen options.
 
         :param str parent: Specifies which window instantiated current box
 
@@ -192,8 +192,8 @@ contain at least one special character.""",
         box.buttonClicked.connect(event_handler)
         box.exec_()
 
-    def details_updated_box(self, detail: str, parent: str) -> None:
-        """Show message box indicating that password can't be generated with current case type option.
+    def detail_updated_box(self, detail: str, parent: str) -> None:
+        """Show message box indicating that a user details has been successfully updated.
 
         :param str detail: Specifies which detail was updated
         :param str parent: Specifies which window instantiated current box
@@ -203,6 +203,33 @@ contain at least one special character.""",
         box.setWindowTitle(f"{self.title} - {parent}")
         box.setText(f"Your {detail} has been successfully updated!")
         box.setIcon(QMessageBox.Question)
+        box.exec_()
+
+    def reset_email_sent_box(self, parent: str) -> None:
+        """Show message box indicating that a reset email has been sent.
+
+        :param str parent: Specifies which window instantiated current box
+
+        """
+
+        def event_handler(btn: QPushButton) -> None:
+            """Handle clicks on message box window.
+
+            :param btn: Clicked button
+
+            """
+            if re.findall("Yes", btn.text()):
+                self.events.reset_token_event()
+
+        box = QMessageBox(self.main_win)
+        box.setWindowTitle(f"{self.title} - {parent}")
+        box.setText("The reset email has been sent.")
+        box.setIcon(QMessageBox.Question)
+
+        box.setInformativeText("Would you like to move to the token page now?")
+        box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        box.setDefaultButton(QMessageBox.Yes)
+        box.buttonClicked.connect(event_handler)
         box.exec_()
 
 

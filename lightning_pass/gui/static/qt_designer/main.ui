@@ -18,7 +18,7 @@
     <bool>true</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout_9">
-    <item row="0" column="0">
+    <item row="0" column="1">
      <widget class="QStackedWidget" name="stacked_widget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -27,7 +27,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>7</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="loading">
        <property name="cursor">
@@ -137,6 +137,12 @@
           <property name="text">
            <string>Generate Password</string>
           </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
        </layout>
@@ -209,6 +215,12 @@
           </property>
           <property name="text">
            <string>Login</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -349,6 +361,12 @@
           <property name="text">
            <string>Register</string>
           </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item row="5" column="2" colspan="3">
@@ -408,10 +426,177 @@
           <property name="text">
            <string>Send reset token</string>
           </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item row="2" column="2">
          <widget class="QPushButton" name="forgot_pass_main_menu_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Main Menu</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="reset_token">
+       <layout class="QGridLayout" name="gridLayout_10">
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="reset_token_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe Print</family>
+            <pointsize>26</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Reset Token</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="reset_token_token_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Token:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="reset_token_token_line">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QPushButton" name="reset_token_submit_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Submit Reset Token</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="reset_token_main_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Main Menu</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="reset_password">
+       <layout class="QGridLayout" name="gridLayout_11">
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="reset_pass_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe Print</family>
+            <pointsize>26</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Reset Password</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="reset_pass_new_pass_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>New Password:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="reset_pass_new_pass_line">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="reset_pass_conf_new_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Confirm New Password</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="reset_pass_conf_new_line">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <widget class="QPushButton" name="reset_pass_confirm_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Confirm</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QPushButton" name="reset_pass_main_btn">
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -544,6 +729,12 @@
           <property name="text">
            <string>Generate</string>
           </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item row="2" column="5">
@@ -660,6 +851,12 @@
           <property name="text">
            <string>Copy Password</string>
           </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
          </widget>
         </item>
         <item row="4" column="2">
@@ -735,6 +932,12 @@
           </property>
           <property name="text">
            <string>Vault U+1F512</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -986,6 +1189,7 @@
      <addaction name="action_register"/>
      <addaction name="action_account"/>
      <addaction name="action_forgot_password"/>
+     <addaction name="action_reset_token"/>
     </widget>
     <addaction name="menu_account"/>
    </widget>
@@ -1083,7 +1287,7 @@
   </action>
   <action name="action_forgot_password">
    <property name="text">
-    <string>forgot_password</string>
+    <string>forgot password</string>
    </property>
    <property name="font">
     <font>
@@ -1128,6 +1332,17 @@
   <action name="action_account">
    <property name="text">
     <string>account</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="action_reset_token">
+   <property name="text">
+    <string>reset_token</string>
    </property>
    <property name="font">
     <font>

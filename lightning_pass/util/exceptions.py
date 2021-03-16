@@ -17,6 +17,10 @@ class InvalidEmail(AccountException):
     """Raised when an email doesn't meet a required email pattern."""
 
 
+class InvalidToken(AccountException):
+    """Raised when a token is invalid."""
+
+
 class UsernameAlreadyExists(AccountException):
     """Raised when a username is already registered in a database."""
 

@@ -11,7 +11,10 @@ from typing import Optional, Union
 
 import bcrypt
 import dotenv
+import email_validator
 import mysql
+import yagmail
+from PyQt5 import QtCore
 from mysql.connector import MySQLConnection
 from mysql.connector.connection import MySQLCursor
 
@@ -25,8 +28,6 @@ from lightning_pass.util.exceptions import (
     UsernameAlreadyExists,
 )
 
-REGEX_EMAIL = r"^[a-z0-9]+[._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
-
 
 @contextlib.contextmanager
 def database_manager() -> MySQLCursor:
@@ -35,7 +36,7 @@ def database_manager() -> MySQLCursor:
     Automatically yields the database connection on __enter__
     and closes the connection on __exit__.
 
-    :Yields: database connection cursor
+    :returns: database connection cursor
 
     """
     dotenv.load_dotenv()
@@ -53,7 +54,7 @@ def database_manager() -> MySQLCursor:
         try:
             con.commit()
         except TypeError as e:
-            raise ConnectionError("Please initialize your database connection") from e
+            raise ConnectionError("Please initialize your database connection.") from e
         con.close()
 
 
@@ -107,7 +108,7 @@ def get_user_item(
         db.execute(sql)
         result = db.fetchone()
     # raising an exception from the type error is more explicit than checking `if result`
-    # (like for example in Username.check_username_existence
+    # (like for example in Username.check_username_existence)
     try:
         return result[0]
     except TypeError as e:
@@ -117,7 +118,7 @@ def get_user_item(
 def set_user_item(
     user_identifier: Union[int, str, datetime],
     identifier_column: str,
-    result: Union[int, str, datetime],
+    result: Union[int, str, bytes, datetime],
     result_column: str,
 ) -> None:
     """Set new user item.
@@ -134,6 +135,45 @@ def set_user_item(
         # f-string SQl injection not an issue
         sql = f"UPDATE lightning_pass.credentials SET {result_column} = '{result}' WHERE id = {user_identifier}"
         db.execute(sql)
+
+
+def _check_item_existence(
+    item: str,
+    item_column: str,
+    table: str = "credentials",
+    should_exist: Optional[bool] = False,
+    second_key: Optional[int] = None,
+    second_key_column: Optional[str] = None,
+) -> bool:
+    """Check if a given item exists in the database.
+
+    :param str item: The item by which to check the column
+    :param str item_column: The column where the given time should exist
+    :param str table: Specify the database where the item should exist, defaults to 'credentials'
+    :param bool should_exist: Define how to approach the existence checking, defaults to False.
+        1) False - Item can not exist to pass the check
+        2) True - Item has to exist to pass the check
+    :param int second_key: Define extra condition for existence check
+    :param str second_key_column: Second key column
+
+    :returns: boolean value indicating whether the item exists or not.
+
+    """
+    # f-string sql injection not an issue
+    if second_key is not None and second_key_column is not None:
+        sql = f"""SELECT EXISTS(SELECT 1 FROM lightning_pass.{table}
+                   WHERE {item_column} = '{item}')
+                     AND {second_key_column} = {second_key}"""
+    else:
+        sql = f"SELECT EXISTS(SELECT 1 FROM lightning_pass.{table} WHERE {item_column} = '{item}')"
+
+    with database_manager() as db:
+        db.execute(sql)
+        result = db.fetchone()[0]
+
+    if (not result and should_exist) or (result and not should_exist):
+        return False
+    return True
 
 
 class Username:
@@ -158,6 +198,8 @@ class Username:
 
         :param bool should_exist: Defines how to approach username existence check
         :param str username: Username to check, defaults to None and uses class attribute
+
+        :returns: True if all checks have passed
 
         :raises AccountException: if there is no username to check
         :raises InvalidUsername: if pattern check fails
@@ -202,19 +244,12 @@ class Username:
         """Check whether a username already exists in a database and if it matches a required pattern.
 
         :param str username: Username to check
-        :param bool should_exist: Influences the checking type, default to False
+        :param bool should_exist: Influences the checking approach, defaults to False
 
         :returns: True or False depending on the result
 
         """
-        with database_manager() as db:
-            # f-string SQl injection not an issue
-            sql = f"SELECT EXISTS(SELECT 1 FROM lightning_pass.credentials WHERE username = '{username}')"
-            db.execute(sql)
-            result = db.fetchone()[0]
-        if (not result and should_exist) or (result and not should_exist):
-            return False
-        return True
+        return _check_item_existence(username, "username", should_exist=should_exist)
 
 
 class Password:
@@ -307,7 +342,7 @@ class Password:
         :returns: True or False depending on the result of the comparison
 
         """
-        # If password in bytes, turn into str
+        # if password in bytes, turn into str
         password, confirm_password = (str(x) for x in (password, confirm_password))
         if not secrets.compare_digest(password, confirm_password):
             return False
@@ -383,34 +418,63 @@ class Email:
     def check_email_pattern(email: str) -> bool:
         """Check whether given email matches email pattern.
 
-        Email pattern: defined by REGEX_EMAIL constant
-
         :param str email: Email to check
 
         :returns: True or False depending on the pattern check
 
         """
-        if not re.search(REGEX_EMAIL, email):
+        try:
+            email_validator.validate_email(
+                email,
+                check_deliverability=False,
+                allow_empty_local=True,
+            )
+        except email_validator.EmailSyntaxError:
             return False
         return True
 
     @staticmethod
-    def check_email_existence(email: str) -> bool:
+    def check_email_existence(email: str, should_exist: Optional[bool] = False) -> bool:
         """Check whether an email already exists.
 
         :param str email: Email to check
+        :param should_exist: Specify the logic of the existence check
 
         :returns: True or False depending on the existence check
 
         """
-        with database_manager() as db:
-            # f-string SQl injection not an issue
-            sql = f"SELECT EXISTS(SELECT 1 FROM lightning_pass.credentials WHERE email = '{email}')"
-            db.execute(sql)
-            result = db.fetchone()[0]
-        if result:
-            return False
-        return True
+        return _check_item_existence(email, "email", should_exist=should_exist)
+
+    @classmethod
+    def send_reset_email(cls, email: str) -> None:
+        """Send a email with instructions on how to reset a password.
+
+        Email contains the reset token and some general information.
+
+        :param str email: Recipients email
+
+        """
+        if cls.check_email_existence(email, should_exist=True):
+            dotenv.load_dotenv()
+            yag = yagmail.SMTP(
+                {os.getenv("EMAIL_USER"): "lightning_pass@noreply.com"},
+                os.getenv("EMAIL_PASS"),
+            )
+            yag.send(
+                to=email,
+                subject="Lightning Pass - reset email",
+                contents=f"""You have requested to reset your password in Lightning Pass.
+Please enter the reset token below into the application.
+    
+{Token.generate_reset_token(get_user_item(email, 'email', 'id'))}  
+    
+If you did not make this request, ignore this email and no changes will be made to your account.    
+    """,
+            )
+        else:
+            loop = QtCore.QEventLoop()
+            QtCore.QTimer.singleShot(2000, loop.quit)
+            loop.exec_()
 
 
 class ProfilePicture:
@@ -452,11 +516,50 @@ class ProfilePicture:
         return Path.joinpath(absolute_path, picture_path)
 
 
+class Token:
+    """This class holds various utils connected to token generation and checking."""
+
+    @staticmethod
+    def generate_reset_token(user_id: int) -> str:
+        """Clear all tokens older than 30 minutes. Insert new user's token into database and return it.
+
+        :param int user_id: Used to create a reference between the user and his token.
+
+        :returns: generated token
+
+        """
+        token = secrets.token_hex(15) + str(user_id)
+        with database_manager() as db:
+            sql = "DELETE FROM lightning_pass.tokens WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"
+            db.execute(sql)
+
+            sql = f"INSERT INTO lightning_pass.tokens (user_id, token) VALUES ({user_id}, '{token}')"
+            db.execute(sql)
+        return token
+
+    @staticmethod
+    def check_token_existence(token: str) -> Optional[bool]:
+        """Check if it's possible to use the entered token.
+
+        If token is valid, delete it from the database and proceed
+
+        :param str token: The token to evaluate
+
+        :returns: True if everything went correctly, False if token is invalid
+
+        """
+        if _check_item_existence(token, "token", "tokens", should_exist=True):
+            with database_manager() as db:
+                sql = f"DELETE FROM lightning_pass.tokens WHERE token = '{token}'"
+                db.execute(sql)
+            return True
+        return False
+
+
 __all__ = [
     "Email",
     "Password",
     "ProfilePicture",
-    "REGEX_EMAIL",
     "Username",
     "database_manager",
     "get_user_item",

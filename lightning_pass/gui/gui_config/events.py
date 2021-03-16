@@ -7,8 +7,7 @@ from typing import Callable, Optional
 
 import clipboard
 import qdarkstyle
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import QFileDialog, QMainWindow
+from PyQt5 import QtWidgets, QtGui
 
 import lightning_pass.gui.message_boxes as msg_box
 import lightning_pass.gui.mouse_randomness as mouse_rnd
@@ -22,11 +21,11 @@ from lightning_pass.util.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-from lightning_pass.util.util import ProfilePicture
+from lightning_pass.util.util import Email, ProfilePicture, Token
 
 
 def login_required(func: Callable) -> Callable:
-    """Decorator to ensure that a user has to be logged in to access a specific event.
+    """Decorate to ensure that a user has to be logged in to access a specific event.
 
     :param func: Function to decorate
 
@@ -36,7 +35,7 @@ def login_required(func: Callable) -> Callable:
 
     @functools.wraps(func)
     def wrapper(self: Events) -> Optional[Callable]:
-        """Wrapper, checks the "current_user" attribute.
+        """Check the "current_user" attribute.
 
         :param self: Class instance to give access to its attributes
 
@@ -56,7 +55,7 @@ class Events:
 
     def __init__(
         self,
-        parent: QMainWindow,
+        parent: QtWidgets.QMainWindow,
         *args: object,
         **kwargs: object,
     ) -> None:
@@ -113,15 +112,18 @@ class Events:
             msg_box.MessageBoxes.invalid_email_box(self.ui.message_boxes, "Register")
         except UsernameAlreadyExists:
             msg_box.MessageBoxes.username_already_exists_box(
-                self.ui.message_boxes, "Register"
+                self.ui.message_boxes,
+                "Register",
             )
         except EmailAlreadyExists:
             msg_box.MessageBoxes.email_already_exists_box(
-                self.ui.message_boxes, "Register"
+                self.ui.message_boxes,
+                "Register",
             )
         except PasswordsDoNotMatch:
             msg_box.MessageBoxes.passwords_do_not_match_box(
-                self.ui.message_boxes, "Register"
+                self.ui.message_boxes,
+                "Register",
             )
         else:
             msg_box.MessageBoxes.account_creation_box(self.ui.message_boxes, "Register")
@@ -130,6 +132,72 @@ class Events:
         """Switch to forgot password widget and reset previous email."""
         self.ui.forgot_pass_email_line.setText("")
         self.ui.stacked_widget.setCurrentWidget(self.ui.forgot_password)
+
+    def send_token_event(self) -> None:
+        """Send token and switch to token page."""
+        email = self.ui.forgot_pass_email_line.text()
+        check = Email.check_email_pattern(email)
+        if not check:
+            msg_box.MessageBoxes.invalid_email_box(
+                self.ui.message_boxes,
+                "Forgot Password",
+            )
+        else:
+            self.ui.reset_token_submit_btn.setEnabled(False)
+            Email.send_reset_email(email)
+            self.ui.reset_token_submit_btn.setEnabled(True)
+            msg_box.MessageBoxes.reset_email_sent_box(
+                self.ui.message_boxes,
+                "Forgot Password",
+            )
+
+    def reset_token_event(self) -> None:
+        """Switch to reset token page and reset previous values."""
+        self.ui.reset_token_token_line.setText("")
+        self.ui.stacked_widget.setCurrentWidget(self.ui.reset_token)
+
+    def submit_reset_token_event(self) -> None:
+        """If submitted token is correct, proceed to password change widget."""
+        if Token.check_token_existence(self.ui.reset_token_token_line.text()):
+            self.reset_password_event()
+        else:
+            msg_box.MessageBoxes.invalid_email_box(  # invalid token
+                self.ui.message_boxes,
+                "Reset Password",
+            )
+
+    def reset_password_event(self) -> None:
+        """Move to reset password page."""
+        self.ui.reset_pass_new_line.setText("")
+        self.ui.reset_pass_conf_new_line.setText("")
+        self.ui.stacked_widget.setCurrentWidget(self.ui.reset_password)
+
+    def submit_reset_password_event(self) -> None:
+        """Attempt to change user's password, show message box if something goes wrong, otherwise move to login page."""
+        try:
+            acc.change_password(
+                ...,
+                self.ui.reset_pass_new_pass_line.text(),
+                self.ui.reset_pass_conf_new_line.text(),
+            )
+        except InvalidPassword:
+            msg_box.MessageBoxes.invalid_password_box(
+                self.ui.message_boxes,
+                "Reset Password",
+            )
+        except PasswordsDoNotMatch:
+            msg_box.MessageBoxes.passwords_do_not_match_box(
+                self.ui.message_boxes,
+                "Reset Password",
+            )
+        else:
+            del self.parent.change_pass_id
+            msg_box.MessageBoxes.detail_updated_box(
+                self.ui.message_boxes,
+                "password",
+                "Reset Password",
+            )
+            self.login_event()
 
     def generate_pass_event(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
@@ -200,7 +268,7 @@ class Events:
     @login_required
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
-        fname, _ = QFileDialog.getOpenFileName(
+        fname, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.parent,
             "Lightning Pass - Open your new profile picture",
             "c:\\",

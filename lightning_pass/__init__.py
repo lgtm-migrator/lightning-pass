@@ -36,3 +36,18 @@ with util.database_manager() as db:
              COLLATE = utf8mb4_0900_ai_ci
              """
     db.execute(SQL)
+
+    SQL = """CREATE TABLE if not exists tokens(
+             `id` int NOT NULL AUTO_INCREMENT,
+             `user_id` int NOT NULL,
+             `token` varchar(255) NOT NULL,
+             `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+             PRIMARY KEY (`id`)
+             )
+             ENGINE=InnoDB
+             AUTO_INCREMENT = 1
+             DEFAULT CHARSET=utf8mb4
+             COLLATE=utf8mb4_0900_ai_ci
+             """
+
+    db.execute(SQL)

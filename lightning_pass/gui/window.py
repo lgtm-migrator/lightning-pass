@@ -42,6 +42,7 @@ class SplashScreen(QtWidgets.QWidget):
     """Splash Screen."""
 
     def __init__(self) -> None:
+        """Widget constuctor."""
         app = QtWidgets.QApplication(sys.argv)
 
         super().__init__()

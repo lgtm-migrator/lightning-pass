@@ -121,7 +121,7 @@ class PwdGenerator:
         random.seed(sd)
         flt = random.random()
 
-        indx = flt / (1 / 94)  # 0.0106382978723404  # 94 symbols... 0,0106382978723404
+        indx = flt / (1 / 94)  # 0.010638297872340425  # 94 symbols...
         return self._collect_char(str(string.printable)[int(indx)])
 
     def _collect_char(self, char: str) -> Optional[bool]:

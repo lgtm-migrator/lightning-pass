@@ -17,6 +17,18 @@ from lightning_pass.util.util import (
 )
 
 
+def change_password(user_id: int, password: str, confirm_password: str) -> None:
+    """Check eligibility of new passwords and possibly change the password.
+
+    :raises InvalidPassword: if the passwords do not match the required pattern.
+    :raises PasswordsDoNotMatch: if password and confirm_password are not the same.
+
+    """
+    # Exceptions: InvalidPassword, PasswordsDoNotMatch
+    Password(password, confirm_password).__call__()
+    set_user_item(user_id, "id", Password.hash_password(password), "password")
+
+
 class Account:
     """This class holds information about the currently logged in user."""
 
@@ -92,7 +104,7 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        # exception for the following checks: AccountDoesNotExist
+        # Exception: AccountDoesNotExist
         Username.check_username_existence(username, should_exist=True)
         stored_password = get_user_item(username, "username", "password")
         if not Password.authenticate_password(password, stored_password):
@@ -172,7 +184,8 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        Email(value)()  # Exceptions: EmailAlreadyExists, InvalidEmail
+        # Exceptions: EmailAlreadyExists, InvalidEmail
+        Email(value)()
         self.set_value(value, "email")
 
     @property
@@ -218,10 +231,11 @@ class Account:
             sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = {self.user_id}"
             db.execute(sql)
 
-    # lru caching the register date to avoid unnecessary database queries
     @functools.cached_property
     def register_date(self) -> datetime:
         """Last login date property.
+
+        Lru caching the register date to avoid unnecessary database queries.
 
         :returns: register date of current user
 

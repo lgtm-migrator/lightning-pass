@@ -56,6 +56,19 @@ class Buttons:
         self.ui.forgot_pass_main_menu_btn.clicked.connect(
             self.main_win.events.home_event,
         )
+        self.ui.forgot_pass_reset_btn.clicked.connect(
+            self.main_win.events.send_token_event,
+        )
+
+        self.ui.reset_token_main_btn.clicked.connect(self.main_win.events.home_event)
+        self.ui.reset_token_submit_btn.clicked.connect(
+            self.main_win.events.submit_reset_token_event,
+        )
+
+        self.ui.reset_pass_main_btn.clicked.connect(self.main_win.events.home_event)
+        self.ui.reset_pass_confirm_btn.clicked.connect(
+            self.main_win.events.submit_reset_password_event,
+        )
 
         self.ui.generate_pass_generate_btn.clicked.connect(
             self.main_win.events.generate_pass_phase2_event,
@@ -103,6 +116,9 @@ class Buttons:
         self.ui.action_account.triggered.connect(self.main_win.events.account_event)
         self.ui.action_forgot_password.triggered.connect(
             self.main_win.events.forgot_password_event,
+        )
+        self.ui.action_reset_token.triggered.connect(
+            self.main_win.events.reset_token_event,
         )
 
     def data_validation(self) -> None:
