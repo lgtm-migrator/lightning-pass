@@ -1,7 +1,6 @@
 """Module containing various utility functions used throughout the whole project."""
 from __future__ import annotations
 
-import contextlib
 import os
 import re
 import secrets
@@ -12,13 +11,11 @@ from typing import Optional, Union
 import bcrypt
 import dotenv
 import email_validator
-import mysql
 import yagmail
 from PyQt5 import QtCore
-from mysql.connector import MySQLConnection
-from mysql.connector.connection import MySQLCursor
 
-from lightning_pass.util.exceptions import (
+from .database import database_manager, enable_database_safe_mode
+from .exceptions import (
     AccountException,
     EmailAlreadyExists,
     InvalidEmail,
@@ -27,35 +24,6 @@ from lightning_pass.util.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-
-
-@contextlib.contextmanager
-def database_manager() -> MySQLCursor:
-    """Manage database queries easily with context manager.
-
-    Automatically yields the database connection on __enter__
-    and closes the connection on __exit__.
-
-    :returns: database connection cursor
-
-    """
-    dotenv.load_dotenv()
-    try:
-        con: MySQLConnection = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASS"),
-            database=os.getenv("DB_DB"),
-        )
-        # fix unread results with buffered cursor
-        cur: MySQLCursor = con.cursor(buffered=True)
-        yield cur
-    finally:
-        try:
-            con.commit()
-        except TypeError as e:
-            raise ConnectionError("Please initialize your database connection.") from e
-        con.close()
 
 
 def _get_user_id(column: str, value: str) -> Union[int, bool]:
@@ -462,14 +430,13 @@ class Email:
             )
             yag.send(
                 to=email,
-                subject="Lightning Pass - reset email",
+                subject="Lightning Pass - reset password",
                 contents=f"""You have requested to reset your password in Lightning Pass.
 Please enter the reset token below into the application.
     
-{Token.generate_reset_token(get_user_item(email, 'email', 'id'))}  
-    
-If you did not make this request, ignore this email and no changes will be made to your account.    
-    """,
+{Token.generate_reset_token(get_user_item(email, "email", "id"))}
+
+If you did not make this request, ignore this email and no changes will be made to your account.""",
             )
         else:
             loop = QtCore.QEventLoop()
@@ -520,8 +487,11 @@ class Token:
     """This class holds various utils connected to token generation and checking."""
 
     @staticmethod
+    @enable_database_safe_mode
     def generate_reset_token(user_id: int) -> str:
         """Clear all tokens older than 30 minutes. Insert new user's token into database and return it.
+
+        Database safe mode is used for the first query where the search is not based on the primary key.
 
         :param int user_id: Used to create a reference between the user and his token.
 

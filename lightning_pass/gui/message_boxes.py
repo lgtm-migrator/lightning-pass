@@ -16,19 +16,36 @@ class MessageBoxes(QWidget):
         self.main_win = child
         self.title = "Lightning Pass"
 
+    def __invalid_item_box(self, item: str, parent: str) -> None:
+        """Show message box indicating that the entered value is not correct.
+
+        :param str item: Specifies which detail was incorrect
+        :param str parent: Specifies which window instantiated current box
+
+        """
+        box = QMessageBox(self.main_win)
+        box.setWindowTitle(f"{self.title} - {parent}")
+        box.setText(f"This {item} is invalid.")
+        box.setIcon(QMessageBox.Warning)
+
+        if item == "username":
+            box.setInformativeText("Username be at least 5 characters long.")
+        elif item == "password":
+            box.setInformativeText(
+                """Password must be at least 8 characters long,
+    contain at least 1 capital letter,
+    contain at least 1 number and
+    contain at least one special character.""",
+            )
+        box.exec_()
+
     def invalid_username_box(self, parent: str) -> None:
         """Show invalid username message box.
 
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("This username is invalid.")
-        box.setIcon(QMessageBox.Warning)
-
-        box.setInformativeText("Username be at least 5 characters long.")
-        box.exec_()
+        self.__invalid_item_box("username", parent)
 
     def invalid_password_box(self, parent: str) -> None:
         """Show invalid password message box.
@@ -36,18 +53,7 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("This password is invalid.")
-        box.setIcon(QMessageBox.Warning)
-
-        box.setInformativeText(
-            """Password must be at least 8 characters long,
-contain at least 1 capital letter,
-contain at least 1 number and
-contain at least one special character.""",
-        )
-        box.exec_()
+        self.__invalid_item_box("password", parent)
 
     def invalid_email_box(self, parent: str) -> None:
         """Show invalid email message box.
@@ -55,37 +61,18 @@ contain at least one special character.""",
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("Please enter a valid email.")
-        box.setIcon(QMessageBox.Warning)
-        box.exec_()
+        self.__invalid_item_box("email", parent)
 
-    def invalid_login_box(self, parent: str) -> None:
-        """Show invalid login message box.
+    def __item_already_exists_box(self, item: str, parent: str) -> None:
+        """Handle message boxes with information about existence of entered values.
 
         :param str parent: Specifies which window instantiated current box
 
         """
-
-        def event_handler(btn: QPushButton) -> None:
-            """Handle clicks on message box window.
-
-            :param btn: Clicked button
-
-            """
-            if re.findall("Yes", btn.text()):
-                self.events.forgot_password_event()
-
         box = QMessageBox(self.main_win)
         box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("Invalid login details.")
+        box.setText(f"This {item} already exists. Please use different {item}.")
         box.setIcon(QMessageBox.Warning)
-
-        box.setInformativeText("Forgot password?")
-        box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        box.setDefaultButton(QMessageBox.Yes)
-        box.buttonClicked.connect(event_handler)
         box.exec_()
 
     def username_already_exists_box(self, parent: str) -> None:
@@ -94,11 +81,7 @@ contain at least one special character.""",
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("This username already exists.")
-        box.setIcon(QMessageBox.Warning)
-        box.exec_()
+        self.__item_already_exists_box("username", parent)
 
     def email_already_exists_box(self, parent: str) -> None:
         """Show email already exists message box.
@@ -106,11 +89,7 @@ contain at least one special character.""",
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("This email already exists.")
-        box.setIcon(QMessageBox.Warning)
-        box.exec_()
+        self.__item_already_exists_box("email", parent)
 
     def passwords_do_not_match_box(self, parent: str) -> None:
         """Show passwords do not match message box.
@@ -122,6 +101,7 @@ contain at least one special character.""",
         box.setWindowTitle(f"{self.title} - {parent}")
         box.setText("Passwords don't match.")
         box.setIcon(QMessageBox.Warning)
+        box.setInformativeText("Please try again.")
         box.exec_()
 
     def account_creation_box(self, parent: str) -> None:
@@ -153,16 +133,31 @@ contain at least one special character.""",
         box.buttonClicked.connect(event_handler)
         box.exec_()
 
-    def no_options_generate(self, parent: str) -> None:
-        """Show a message box indicating that password can't be generated with the chosen options.
+    def invalid_login_box(self, parent: str) -> None:
+        """Show invalid login message box.
 
         :param str parent: Specifies which window instantiated current box
 
         """
+
+        def event_handler(btn: QPushButton) -> None:
+            """Handle clicks on message box window.
+
+            :param btn: Clicked button
+
+            """
+            if re.findall("Yes", btn.text()):
+                self.events.forgot_password_event()
+
         box = QMessageBox(self.main_win)
         box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("Password can't be generate without a single parameter.")
+        box.setText("Invalid login details.")
         box.setIcon(QMessageBox.Warning)
+
+        box.setInformativeText("Forgot password?")
+        box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+        box.setDefaultButton(QMessageBox.Yes)
+        box.buttonClicked.connect(event_handler)
         box.exec_()
 
     def login_required_box(self, parent: str) -> None:
@@ -220,6 +215,8 @@ contain at least one special character.""",
             """
             if re.findall("Yes", btn.text()):
                 self.events.reset_token_event()
+            else:
+                self.events.forgot_password_event()
 
         box = QMessageBox(self.main_win)
         box.setWindowTitle(f"{self.title} - {parent}")
@@ -230,6 +227,18 @@ contain at least one special character.""",
         box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         box.setDefaultButton(QMessageBox.Yes)
         box.buttonClicked.connect(event_handler)
+        box.exec_()
+
+    def no_options_generate(self, parent: str) -> None:
+        """Show a message box indicating that password can't be generated with the chosen options.
+
+        :param str parent: Specifies which window instantiated current box
+
+        """
+        box = QMessageBox(self.main_win)
+        box.setWindowTitle(f"{self.title} - {parent}")
+        box.setText("Password can't be generate without a single parameter.")
+        box.setIcon(QMessageBox.Warning)
         box.exec_()
 
 

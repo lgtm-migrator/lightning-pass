@@ -6,7 +6,7 @@ from datetime import datetime
 from typing import Optional, Union
 
 from lightning_pass.util.exceptions import AccountDoesNotExist
-from lightning_pass.util.util import (
+from lightning_pass.util.credentials import (
     Email,
     Password,
     ProfilePicture,

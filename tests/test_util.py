@@ -5,7 +5,7 @@ from typing import Union
 
 import pytest
 
-from lightning_pass.util.util import Username, Password, Email
+from lightning_pass.util.credentials import Username, Password, Email
 
 
 @pytest.fixture()

@@ -3,9 +3,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .util import util
+from .util import credentials
 
-__all__ = ["gui", "users", "util"]
+__all__ = ["gui", "users", "credentials"]
 
 
 def _copy(self: Path, target: Path) -> None:
@@ -19,7 +19,7 @@ def _copy(self: Path, target: Path) -> None:
 # noinspection PyTypeHints
 Path.copy = _copy  # type: ignore
 
-with util.database_manager() as db:
+with credentials.database_manager() as db:
     SQL = """CREATE TABLE if not exists credentials(
             `id` int NOT NULL AUTO_INCREMENT,
             `username` varchar(255) NOT NULL,

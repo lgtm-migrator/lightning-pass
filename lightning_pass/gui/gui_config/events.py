@@ -21,7 +21,7 @@ from lightning_pass.util.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-from lightning_pass.util.util import Email, ProfilePicture, Token
+from lightning_pass.util.credentials import Email, ProfilePicture, Token
 
 
 def login_required(func: Callable) -> Callable:
@@ -168,7 +168,7 @@ class Events:
 
     def reset_password_event(self) -> None:
         """Move to reset password page."""
-        self.ui.reset_pass_new_line.setText("")
+        self.ui.reset_pass_new_pass_line.setText("")
         self.ui.reset_pass_conf_new_line.setText("")
         self.ui.stacked_widget.setCurrentWidget(self.ui.reset_password)
 
