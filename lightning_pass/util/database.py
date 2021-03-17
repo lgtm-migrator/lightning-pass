@@ -14,11 +14,11 @@ from mysql.connector.cursor import MySQLCursor
 def database_manager() -> MySQLCursor:
     """Manage database queries easily with context manager.
 
-    Automatically yields the database connection on __enter__
-    and closes the connection on __exit__.
+    Automatically yields the database connection on __enter__ and closes the
+    connection on __exit__.
 
-    :returns: database connection cursor
-
+    Returns:
+        database connection cursor
     """
     dotenv.load_dotenv()
     try:
@@ -42,10 +42,11 @@ def database_manager() -> MySQLCursor:
 def enable_database_safe_mode(func: Callable) -> Callable:
     """Decorate func to temporarily enable safe updates in database queries.
 
-    :param func: Function to decorate
+    Args:
+        func (Callable): Function to decorate
 
-    :return: the decorated function
-
+    Returns:
+        the decorated function
     """
 
     @functools.wraps(func)

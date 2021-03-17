@@ -3,13 +3,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from .util import credentials
+from .util import database
 
-__all__ = ["gui", "users", "credentials"]
+__all__ = ["gui", "users", "util"]
 
 
 def _copy(self: Path, target: Path) -> None:
-    """Monkey Patch copy functionality into pathlib.Path object."""
+    """Monkey Patch copy functionality into Path object.
+
+    :param Path self: Patch this
+    :param Path target: With this
+
+    """
     import shutil
 
     assert self.is_file()
@@ -19,7 +24,7 @@ def _copy(self: Path, target: Path) -> None:
 # noinspection PyTypeHints
 Path.copy = _copy  # type: ignore
 
-with credentials.database_manager() as db:
+with database.database_manager() as db:
     SQL = """CREATE TABLE if not exists credentials(
             `id` int NOT NULL AUTO_INCREMENT,
             `username` varchar(255) NOT NULL,

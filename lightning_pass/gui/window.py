@@ -64,7 +64,9 @@ class SplashScreen(QtWidgets.QWidget):
         app.exec_()
 
     def increase(self) -> None:
-        """Increase loading bar progress by 1 point and close widget if 100% has been reached."""
+        """Increase loading bar progress by 1 point and close widget if 100% has
+        been reached.
+        """
         self.ui.loading_progress_bar.setValue(self.progress)
         if self.progress > 100:
             self.timer.stop()
@@ -75,13 +77,8 @@ class SplashScreen(QtWidgets.QWidget):
 class LightningPassWindow(QtWidgets.QMainWindow):
     """Main Window."""
 
-    def __init__(self, *args: iter, **kwargs: iter) -> None:
-        """Construct the class.
-
-        :param args: ...
-        :param kwargs: ...
-
-        """
+    def __init__(self, *args: object, **kwargs: object) -> None:
+        """Construct the class."""
         super().__init__(*args, **kwargs)
 
         self.main_win = QtWidgets.QMainWindow()
@@ -116,7 +113,9 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.main_win.show()
 
     def general_setup(self) -> None:
-        """Move function __init__ function call into a function for simplicity."""
+        """Move function __init__ function call into a function for
+        simplicity.
+        """
         self.events.toggle_stylesheet_dark()  # Dark mode is the default theme.
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()

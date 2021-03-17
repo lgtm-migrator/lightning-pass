@@ -11,6 +11,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_loading_widget:
     def setupUi(self, loading_widget):
+        """
+        Args:
+            loading_widget:
+        """
         loading_widget.setObjectName("loading_widget")
         loading_widget.resize(410, 143)
         self.gridLayout = QtWidgets.QGridLayout(loading_widget)
@@ -36,6 +40,10 @@ class Ui_loading_widget:
         QtCore.QMetaObject.connectSlotsByName(loading_widget)
 
     def retranslateUi(self, loading_widget):
+        """
+        Args:
+            loading_widget:
+        """
         _translate = QtCore.QCoreApplication.translate
         loading_widget.setWindowTitle(_translate("loading_widget", "Form"))
         self.loading_label.setText(

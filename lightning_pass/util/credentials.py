@@ -1,4 +1,4 @@
-"""Module containing various utility functions used throughout the whole project."""
+"""Module containing various functions connected to credentials used throughout the whole project."""
 from __future__ import annotations
 
 import os
@@ -10,7 +10,6 @@ from typing import Optional, Union
 
 import bcrypt
 import dotenv
-import email_validator
 import yagmail
 from PyQt5 import QtCore
 
@@ -312,9 +311,7 @@ class Password:
         """
         # if password in bytes, turn into str
         password, confirm_password = (str(x) for x in (password, confirm_password))
-        if not secrets.compare_digest(password, confirm_password):
-            return False
-        return True
+        return secrets.compare_digest(password, confirm_password)
 
     @staticmethod
     def hash_password(password: str) -> bytes:
@@ -340,12 +337,10 @@ class Password:
         :returns: True or False based on the authentication result
 
         """
-        if not bcrypt.checkpw(
+        return bcrypt.checkpw(
             password.encode("utf-8"),
             current_password.encode("utf-8"),
-        ):
-            return False
-        return True
+        )
 
 
 class Email:
@@ -388,18 +383,11 @@ class Email:
 
         :param str email: Email to check
 
-        :returns: True or False depending on the pattern check
+        :returns: boolean value depending on the pattern check
 
         """
-        try:
-            email_validator.validate_email(
-                email,
-                check_deliverability=False,
-                allow_empty_local=True,
-            )
-        except email_validator.EmailSyntaxError:
-            return False
-        return True
+        regex_email = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{2,4}$"
+        return bool(re.search(regex_email, email))
 
     @staticmethod
     def check_email_existence(email: str, should_exist: Optional[bool] = False) -> bool:

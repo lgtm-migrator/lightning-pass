@@ -13,6 +13,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_lightning_pass(object):
     def setupUi(self, lightning_pass):
+        """
+        Args:
+            lightning_pass:
+        """
         lightning_pass.setObjectName("lightning_pass")
         lightning_pass.resize(661, 372)
         self.centralwidget = QtWidgets.QWidget(lightning_pass)
@@ -856,6 +860,10 @@ class Ui_lightning_pass(object):
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):
+        """
+        Args:
+            lightning_pass:
+        """
         _translate = QtCore.QCoreApplication.translate
         lightning_pass.setWindowTitle(_translate("lightning_pass", "Lightning Pass"))
         self.loading_lbl.setText(

@@ -12,10 +12,11 @@ from lightning_pass.gui.window import LightningPassWindow
 def app(qtbot: QtBot) -> LightningPassWindow:
     """Fixture for GUI tests.
 
-    :param QtBot qtbot: Click on buttons like a human
+    Args:
+        qtbot (QtBot): Click on buttons like a human
 
-    :returns: app instance with QtBot widget
-
+    Returns:
+        app instance with QtBot widget
     """
     test_app = LightningPassWindow()
     qtbot.addWidget(test_app)
@@ -27,7 +28,7 @@ def app(qtbot: QtBot) -> LightningPassWindow:
     [
         ("home_login_btn", 2),
         ("home_register_btn", 3),
-        ("home_generate_password_btn", 5),
+        ("home_generate_password_btn", 7),
         ("log_main_btn", 1),
         ("log_forgot_pass_btn", 4),
         ("reg_main_btn", 1),
@@ -45,11 +46,6 @@ def test_buttons(
 ) -> None:
     """Test if each button correctly switches to correct stacked_widget index.
 
-    :param LightningPassWindow app: Main window instance
-    :param QtBot qtbot: QtBot instance
-    :param str widget: QPushButton pointer
-    :param int index: stacked_widget expected index
-
     Index description:
         1) index 1: app.ui.home
         2) index 2: app.ui.login
@@ -61,6 +57,11 @@ def test_buttons(
 
     Fails if stacked_widget didn't change index.
 
+    Args:
+        app (LightningPassWindow): Main window instance
+        qtbot (QtBot): QtBot instance
+        widget (str): QPushButton pointer
+        index (int): stacked_widget expected index
     """
     widget = getattr(app.ui, widget)
 
@@ -73,18 +74,15 @@ def test_buttons(
     "menu_bar_action, index",
     [
         ("action_main_menu", 1),
-        ("action_generate", 5),
+        ("action_generate", 7),
         ("action_login", 2),
         ("action_register", 3),
         ("action_forgot_password", 4),
     ],
 )
 def test_menu_bar(app: LightningPassWindow, menu_bar_action: str, index: int) -> None:
-    """Test if each menu bar action correctly switches to correct stacked_widget index.
-
-    :param LightningPassWindow app: Main window instance
-    :param str menu_bar_action: QPushButton pointer
-    :param int index: stacked_widget expected index
+    """Test if each menu bar action correctly switches to correct stacked_widget
+    index.
 
     Index description:
         1) index 1: app.ui.home
@@ -97,6 +95,10 @@ def test_menu_bar(app: LightningPassWindow, menu_bar_action: str, index: int) ->
 
     Fails if stacked_widget didn't change index.
 
+    Args:
+        app (LightningPassWindow): Main window instance
+        menu_bar_action (str): QPushButton pointer
+        index (int): stacked_widget expected index
     """
     action = getattr(app.ui, menu_bar_action)
 
