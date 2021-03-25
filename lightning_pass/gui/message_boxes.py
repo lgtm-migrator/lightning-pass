@@ -1,9 +1,45 @@
 """Module containing the MessageBoxes class used for showing various message boxes."""
-from __future__ import annotations
-
-import re
+from contextlib import suppress
+from functools import partial
+from typing import Union, Callable, Optional, Any
 
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, QWidget
+
+
+def partial_factory(func: Callable, *args: Optional[Any], **kwargs: Optional[Any]):
+    """Create a new partial function.
+
+    :param func: The function which will be made partial
+    :param args: Optional positional arguments
+    :param kwargs: Optional keyword arguments
+
+    :returns: the partial function
+
+    """
+    return partial(func, *args, **kwargs)
+
+
+def event_handler_factory(options: dict[str, Callable[[], None]]) -> Callable[[], None]:
+    """Generate a new event handler.
+
+    :param options: Dictionary containing keys and functions tied to them.
+
+    :returns: the event handler
+
+    """
+
+    def handler(btn: QPushButton) -> None:
+        """Handle clicks on message box window.
+
+        :param btn: Clicked button
+
+        """
+        with suppress(KeyError):
+            event = options[btn.text()]
+        with suppress(UnboundLocalError):
+            event()
+
+    return handler
 
 
 class MessageBoxes(QWidget):
@@ -16,28 +52,81 @@ class MessageBoxes(QWidget):
         self.main_win = child
         self.title = "Lightning Pass"
 
-    def __invalid_item_box(self, item: str, parent: str) -> None:
+    def message_box_factory(
+        self,
+        parent: str,
+        text: str,
+        icon: QMessageBox.Icon,
+        informative_text: str = None,
+        standard_buttons: Union[
+            QMessageBox.StandardButtons,
+            QMessageBox.StandardButton,
+        ] = None,
+        default_button: QMessageBox.StandardButton = None,
+        event_handler: Callable = None,
+    ) -> QMessageBox:
+        """Return a message box initialized with the given params.
+
+        :param parent: Specifies which window instantiated the new message box
+        :param text: Main text to be displayed on the message box
+        :param icon: Message box icon type
+        :param informative_text: Additional text, defaults to None
+        :param standard_buttons: Extra buttons to be shown on the message box, defaults to None
+        :param default_button: Default button, defaults to None
+        :param event_handler: Handler for clicks on buttons, defaults to None
+
+        :returns: the message box
+
+        """
+        box = QMessageBox(self.main_win)
+        box.setWindowTitle(f"{self.title} - {parent}")
+        box.setText(text)
+        box.setIcon(icon)
+        box.setInformativeText(informative_text)
+
+        with suppress(TypeError):
+            box.setStandardButtons(standard_buttons)
+            box.setDefaultButton(default_button)
+            box.buttonClicked.connect(event_handler)
+
+        return box
+
+    def _invalid_item_box(self, item: str, parent: str) -> message_box_factory:
         """Show message box indicating that the entered value is not correct.
 
         :param str item: Specifies which detail was incorrect
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText(f"This {item} is invalid.")
-        box.setIcon(QMessageBox.Warning)
+        return partial_factory(
+            self.message_box_factory,
+            parent,
+            f"This {item} is invalid.",
+            QMessageBox.Warning,
+        )
 
-        if item == "username":
-            box.setInformativeText("Username be at least 5 characters long.")
-        elif item == "password":
-            box.setInformativeText(
-                """Password must be at least 8 characters long,
-    contain at least 1 capital letter,
-    contain at least 1 number and
-    contain at least one special character.""",
-            )
-        box.exec_()
+    def _item_already_exists_box(self, item: str, parent: str) -> message_box_factory:
+        """Handle message boxes with information about existence of entered values.
+
+        :param str parent: Specifies which window instantiated current box
+
+        """
+        return partial_factory(
+            self.message_box_factory,
+            parent,
+            f"This {item} already exists. Please use different {item}.",
+            QMessageBox.Warning,
+        )
+
+    def _yes_no_box(
+        self, default_btn: QMessageBox.StandardButton, handler
+    ) -> message_box_factory:
+        return partial_factory(
+            self.message_box_factory,
+            standard_buttons=QMessageBox.Yes | QMessageBox.No,
+            default_button=default_btn,
+            event_handler=handler,
+        )
 
     def invalid_username_box(self, parent: str) -> None:
         """Show invalid username message box.
@@ -45,7 +134,8 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
-        self.__invalid_item_box("username", parent)
+        box = self._invalid_item_box(item="username", parent=parent)
+        box(informative_text="Username be at least 5 characters long.").exec_()
 
     def invalid_password_box(self, parent: str) -> None:
         """Show invalid password message box.
@@ -53,7 +143,15 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
-        self.__invalid_item_box("password", parent)
+        box = self._invalid_item_box(item="password", parent=parent)
+        box(
+            informative_text=(
+                """Password must be at least 8 characters long,
+contain at least 1 capital letter,
+contain at least 1 number and
+contain at least one special character."""
+            )
+        ).exec_()
 
     def invalid_email_box(self, parent: str) -> None:
         """Show invalid email message box.
@@ -61,19 +159,25 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
-        self.__invalid_item_box("email", parent)
+        self._invalid_item_box(item="email", parent=parent)().exec_()
 
-    def __item_already_exists_box(self, item: str, parent: str) -> None:
-        """Handle message boxes with information about existence of entered values.
+    def invalid_token_box(self, parent: str) -> None:
+        """Show invalid token message box.
 
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText(f"This {item} already exists. Please use different {item}.")
-        box.setIcon(QMessageBox.Warning)
-        box.exec_()
+        event_handler = event_handler_factory(
+            {"&Yes": self.events.forgot_password_event}
+        )
+
+        box = self._yes_no_box(QMessageBox.Yes, event_handler)
+        box(
+            parent=parent,
+            text="This token is invalid",
+            icon=QMessageBox.Warning,
+            informative_text="Would you like to generate a token?",
+        ).exec_()
 
     def username_already_exists_box(self, parent: str) -> None:
         """Show username already exists message box.
@@ -81,7 +185,7 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
-        self.__item_already_exists_box("username", parent)
+        self._item_already_exists_box(item="username", parent=parent)().exec_()
 
     def email_already_exists_box(self, parent: str) -> None:
         """Show email already exists message box.
@@ -89,7 +193,7 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
-        self.__item_already_exists_box("email", parent)
+        self._item_already_exists_box(item="email", parent=parent)().exec_()
 
     def passwords_do_not_match_box(self, parent: str) -> None:
         """Show passwords do not match message box.
@@ -97,12 +201,12 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("Passwords don't match.")
-        box.setIcon(QMessageBox.Warning)
-        box.setInformativeText("Please try again.")
-        box.exec_()
+        self.message_box_factory(
+            parent,
+            "Passwords don't match.",
+            QMessageBox.Warning,
+            informative_text="Please try again.",
+        ).exec_()
 
     def account_creation_box(self, parent: str) -> None:
         """Show successful account creatio message box.
@@ -110,28 +214,17 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
+        event_handler = event_handler_factory(
+            {"&Yes": self.self.events.login_event, "&No": self.events.register_event},
+        )
 
-        def event_handler(btn: QPushButton) -> None:
-            """Handle clicks on message box window.
-
-            :param btn: Clicked button
-
-            """
-            if re.findall("Yes", btn.text()):
-                self.events.login_event()
-            elif re.findall("No", btn.text()):
-                self.events.register_event()
-
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(parent)
-        box.setText("Account successfuly created.")
-        box.setIcon(QMessageBox.Question)
-
-        box.setInformativeText("Would you like to move to the login page?")
-        box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        box.setDefaultButton(QMessageBox.Yes)
-        box.buttonClicked.connect(event_handler)
-        box.exec_()
+        box = self._yes_no_box(QMessageBox.Yes, event_handler)
+        box(
+            parent=parent,
+            text="Account successfully created.",
+            icon=QMessageBox.Question,
+            informative_text="Would you like to move to the login page?",
+        ).exec_()
 
     def invalid_login_box(self, parent: str) -> None:
         """Show invalid login message box.
@@ -139,26 +232,17 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
+        event_handler = event_handler_factory(
+            {"&Yes": self.events.forgot_password_event}
+        )
 
-        def event_handler(btn: QPushButton) -> None:
-            """Handle clicks on message box window.
-
-            :param btn: Clicked button
-
-            """
-            if re.findall("Yes", btn.text()):
-                self.events.forgot_password_event()
-
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("Invalid login details.")
-        box.setIcon(QMessageBox.Warning)
-
-        box.setInformativeText("Forgot password?")
-        box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        box.setDefaultButton(QMessageBox.Yes)
-        box.buttonClicked.connect(event_handler)
-        box.exec_()
+        box = self._yes_no_box(QMessageBox.Yes, event_handler)
+        box(
+            parent=parent,
+            text="Invalid login details.",
+            icon=QMessageBox.Warning,
+            informative_text="Forgot password?",
+        ).exec_()
 
     def login_required_box(self, parent: str) -> None:
         """Show message box indicating that password can't be generated with current case type option.
@@ -166,26 +250,15 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
+        event_handler = event_handler_factory({"&Yes": self.events.login_event})
 
-        def event_handler(btn: QPushButton) -> None:
-            """Handle clicks on message box window.
-
-            :param btn: Clicked button
-
-            """
-            if re.findall("Yes", btn.text()):
-                self.events.login_event()
-
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("Please log in to access that page.")
-        box.setIcon(QMessageBox.Warning)
-
-        box.setInformativeText("Would you like to move to the login page?")
-        box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        box.setDefaultButton(QMessageBox.No)
-        box.buttonClicked.connect(event_handler)
-        box.exec_()
+        box = self._yes_no_box(QMessageBox.No, event_handler)
+        box(
+            parent=parent,
+            text="Please log in to access that page.",
+            icon=QMessageBox.Warning,
+            informative_text="Would you like to move to the login page?",
+        ).exec_()
 
     def detail_updated_box(self, detail: str, parent: str) -> None:
         """Show message box indicating that a user details has been successfully updated.
@@ -194,11 +267,11 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText(f"Your {detail} has been successfully updated!")
-        box.setIcon(QMessageBox.Question)
-        box.exec_()
+        self.message_box_factory(
+            parent,
+            f"Your {detail} has been successfully updated!",
+            QMessageBox.Question,
+        ).exec_()
 
     def reset_email_sent_box(self, parent: str) -> None:
         """Show message box indicating that a reset email has been sent.
@@ -206,40 +279,27 @@ class MessageBoxes(QWidget):
         :param str parent: Specifies which window instantiated current box
 
         """
+        event_handler = event_handler_factory({"&Yes": self.events.reset_token_event})
 
-        def event_handler(btn: QPushButton) -> None:
-            """Handle clicks on message box window.
-
-            :param btn: Clicked button
-
-            """
-            if re.findall("Yes", btn.text()):
-                self.events.reset_token_event()
-            else:
-                self.events.forgot_password_event()
-
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("The reset email has been sent.")
-        box.setIcon(QMessageBox.Question)
-
-        box.setInformativeText("Would you like to move to the token page now?")
-        box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        box.setDefaultButton(QMessageBox.Yes)
-        box.buttonClicked.connect(event_handler)
-        box.exec_()
+        box = self._yes_no_box(QMessageBox.Yes, event_handler)
+        box(
+            parent=parent,
+            text="The reset email has been sent.",
+            icon=QMessageBox.Question,
+            informative_text="Would you like to move to the token page now?",
+        ).exec_()
 
     def no_options_generate(self, parent: str) -> None:
-        """Show a message box indicating that password can't be generated with the chosen options.
+        """Show a message box indicating that password can't be generated without a single option.
 
         :param str parent: Specifies which window instantiated current box
 
         """
-        box = QMessageBox(self.main_win)
-        box.setWindowTitle(f"{self.title} - {parent}")
-        box.setText("Password can't be generate without a single parameter.")
-        box.setIcon(QMessageBox.Warning)
-        box.exec_()
+        self.message_box_factory(
+            parent,
+            "Password can't be generate without a single parameter.",
+            QMessageBox.Warning,
+        ).exec_()
 
 
 __all__ = [

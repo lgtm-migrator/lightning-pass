@@ -1,6 +1,4 @@
 """Module containing various functions connected to credentials used throughout the whole project."""
-from __future__ import annotations
-
 import os
 import re
 import secrets

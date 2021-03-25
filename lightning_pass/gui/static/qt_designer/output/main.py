@@ -992,3 +992,6 @@ class Ui_lightning_pass(object):
         self.action_dark.setText(_translate("lightning_pass", "dark"))
         self.action_account.setText(_translate("lightning_pass", "account"))
         self.action_reset_token.setText(_translate("lightning_pass", "reset_token"))
+
+
+__all__ = ["Ui_lightning_pass"]

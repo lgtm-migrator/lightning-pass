@@ -39,7 +39,7 @@ def login_required(func: Callable) -> Callable:
 
         :param self: Class instance to give access to its attributes
 
-        :return: executed function or None and shows a message box indicating needed log in
+        :return: executed function or None and show a message box indicating need log in
 
         """
         if not hasattr(self, "current_user"):
@@ -161,7 +161,7 @@ class Events:
         if Token.check_token_existence(self.ui.reset_token_token_line.text()):
             self.reset_password_event()
         else:
-            msg_box.MessageBoxes.invalid_email_box(  # invalid token
+            msg_box.MessageBoxes.invalid_token_box(
                 self.ui.message_boxes,
                 "Reset Password",
             )

@@ -1,9 +1,7 @@
 """Module containing classes used for operations with mouse randomness generation."""
-from __future__ import annotations
-
 import random
 import string
-from typing import Generator, Optional, List, Tuple
+from typing import Generator, Optional
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -35,7 +33,7 @@ class MouseTracker(QtCore.QObject):
         """
         return self._widget
 
-    def eventFilter(  # Non PEP-8 due to PyQt naming
+    def eventFilter(
         self, label: QtWidgets.QLabel, event: QtCore.QEvent.MouseMove
     ) -> object:
         """Event filter.
@@ -64,7 +62,7 @@ class Collector:
 
     def __init__(self) -> None:
         """Class contructor."""
-        self.randomness_lst: List[Tuple[int, int]] = []
+        self.randomness_lst: list[tuple[int, int]] = []
 
     def __repr__(self) -> str:
         """Provide information about this class."""

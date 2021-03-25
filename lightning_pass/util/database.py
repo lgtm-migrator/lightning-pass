@@ -2,7 +2,7 @@
 import contextlib
 import functools
 import os
-from typing import Callable
+from typing import Callable, Iterator
 
 import dotenv
 import mysql
@@ -11,14 +11,14 @@ from mysql.connector.cursor import MySQLCursor
 
 
 @contextlib.contextmanager
-def database_manager() -> MySQLCursor:
+def database_manager() -> Iterator[None]:
     """Manage database queries easily with context manager.
 
     Automatically yields the database connection on __enter__ and closes the
-    connection on __exit__.
+        connection on __exit__.
 
-    Returns:
-        database connection cursor
+    :returns: database connection cursor
+
     """
     dotenv.load_dotenv()
     try:
@@ -42,18 +42,17 @@ def database_manager() -> MySQLCursor:
 def enable_database_safe_mode(func: Callable) -> Callable:
     """Decorate func to temporarily enable safe updates in database queries.
 
-    Args:
-        func (Callable): Function to decorate
+    :param: Callable func: Function to decorate
 
-    Returns:
-        the decorated function
+    :returns:the decorated function
+
     """
 
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> None:
         """Wrap the functions by 2 extra queries on __enter__ and __exit__.
 
-        Two context managers are needed so that each query is actually commited to the database.
+        Two context managers are needed so that each query is actually committed to the database.
 
         :return: executed function or None and shows a message box indicating needed log in
 
@@ -72,3 +71,6 @@ def enable_database_safe_mode(func: Callable) -> Callable:
             return val
 
     return wrapper
+
+
+__all__ = ["database_manager", "enable_database_safe_mode"]

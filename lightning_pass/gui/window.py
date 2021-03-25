@@ -1,6 +1,4 @@
 """Module containing the main GUI classes."""
-from __future__ import annotations
-
 import pathlib
 import sys
 
@@ -64,9 +62,7 @@ class SplashScreen(QtWidgets.QWidget):
         app.exec_()
 
     def increase(self) -> None:
-        """Increase loading bar progress by 1 point and close widget if 100% has
-        been reached.
-        """
+        """Increase loading bar progress by 1 point and close widget if 100% has been reached."""
         self.ui.loading_progress_bar.setValue(self.progress)
         if self.progress > 100:
             self.timer.stop()

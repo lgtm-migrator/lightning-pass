@@ -3,8 +3,6 @@
 Used for connecting each button on the GUI to various events or lambdas.
 
 """
-from __future__ import annotations
-
 import pathlib
 
 from PyQt5 import QtCore, QtGui, QtWidgets
