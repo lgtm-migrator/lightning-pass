@@ -4,5 +4,8 @@
 # Enviroment
 /.env
 
+# Logs
+/misc/*.log
+
 # Useless profile pictures
 /lightning_pass/users/profile_pictures/
