@@ -21,6 +21,7 @@ from .exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
+from lightning_pass.settings import PFP_FOLDER
 
 
 def _get_user_id(column: str, value: str) -> Union[int, bool]:
@@ -39,9 +40,10 @@ def _get_user_id(column: str, value: str) -> Union[int, bool]:
         sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
         db.execute(sql)
         result = db.fetchone()
-    if not result:
-        raise AccountException
-    return result[0]
+    try:
+        return result[0]
+    except TypeError as e:
+        raise AccountException from e
 
 
 def get_user_item(
@@ -72,8 +74,6 @@ def get_user_item(
         sql = f"SELECT {result_column} FROM lightning_pass.credentials WHERE id = {user_id}"
         db.execute(sql)
         result = db.fetchone()
-    # raising an exception from the type error is more explicit than checking `if result`
-    # (like for example in Username.check_username_existence)
     try:
         return result[0]
     except TypeError as e:
@@ -97,7 +97,6 @@ def set_user_item(
     if identifier_column != "id":
         user_identifier = _get_user_id(identifier_column, user_identifier)
     with database_manager() as db:
-        # f-string SQl injection not an issue
         sql = f"UPDATE lightning_pass.credentials SET {result_column} = '{result}' WHERE id = {user_identifier}"
         db.execute(sql)
 
@@ -124,7 +123,6 @@ def _check_item_existence(
     :returns: boolean value indicating whether the item exists or not.
 
     """
-    # f-string sql injection not an issue
     if second_key is not None and second_key_column is not None:
         sql = f"""SELECT EXISTS(SELECT 1 FROM lightning_pass.{table}
                    WHERE {item_column} = '{item}')
@@ -444,14 +442,8 @@ class ProfilePicture:
         :returns: the filename of the saved picture
 
         """
-        random_hex = secrets.token_hex(8)
-        f_ext = picture_path.suffix
-        picture_filename = random_hex + f_ext
-
-        absolute_path = Path().absolute()
-        save_path = f"lightning_pass/users/profile_pictures/{picture_filename}"
-        final_path = Path.joinpath(absolute_path, save_path)
-
+        picture_filename = secrets.token_hex(8) + picture_path.suffix
+        final_path = PFP_FOLDER / picture_filename
         Path.copy(picture_path, final_path)
         return picture_filename
 
@@ -464,9 +456,7 @@ class ProfilePicture:
         :returns: path to the profile picture
 
         """
-        absolute_path = Path().absolute()
-        picture_path = f"lightning_pass/users/profile_pictures/{profile_picture}"
-        return Path.joinpath(absolute_path, picture_path)
+        return PFP_FOLDER / profile_picture
 
 
 class Token:

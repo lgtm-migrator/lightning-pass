@@ -3,9 +3,9 @@
 Used for connecting each button on the GUI to various events or lambdas.
 
 """
-import pathlib
-
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+from lightning_pass.settings import LIGHT_STYLESHEET, DARK_STYLESHEET
 
 
 class Buttons:
@@ -97,14 +97,10 @@ class Buttons:
         """Connect all menu bar actions."""
         self.ui.action_main_menu.triggered.connect(self.main_win.events.home_event)
         self.ui.action_light.triggered.connect(
-            lambda: self.main_win.events.toggle_stylesheet_light(
-                f"{pathlib.Path(__file__).parent}/static/light.qss",
-            ),
+            lambda: self.main_win.events.toggle_stylesheet_light(LIGHT_STYLESHEET),
         )
         self.ui.action_dark.triggered.connect(
-            lambda: self.main_win.events.toggle_stylesheet_dark(
-                f"{pathlib.Path(__file__).parent}/static/dark.qss",
-            ),
+            lambda: self.main_win.events.toggle_stylesheet_dark(DARK_STYLESHEET),
         )
         self.ui.action_generate.triggered.connect(
             self.main_win.events.generate_pass_event,

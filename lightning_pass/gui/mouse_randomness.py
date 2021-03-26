@@ -1,7 +1,7 @@
 """Module containing classes used for operations with mouse randomness generation."""
 import random
 import string
-from typing import Generator, Optional
+from typing import Generator
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -104,7 +104,7 @@ class PwdGenerator:
         lowercase: bool,
         uppercase: bool,
     ) -> None:
-        """Class contructor."""
+        """Class constructor."""
         self.length = length
         self.numbers = numbers
         self.symbols = symbols
@@ -113,16 +113,20 @@ class PwdGenerator:
 
         self.password = ""
 
-    def get_character(self, position: tuple[int, int]) -> Optional[bool]:
-        """Get a eligible password character by generating a random seed from the mouse position tuple."""
+    def get_character(self, position: tuple[int, int]) -> None:
+        """Get a eligible password character by generating a random seed from the mouse position tuple.
+
+        :raises StopIteration: if password length matches the given length
+
+        """
         sd = position[0] + 1j * position[1]
         random.seed(sd)
         flt = random.random()
 
         indx = flt / (1 / 94)  # 0.010638297872340425  # 94 symbols...
-        return self._collect_char(str(string.printable)[int(indx)])
+        self._collect_char(str(string.printable)[int(indx)])
 
-    def _collect_char(self, char: str) -> Optional[bool]:
+    def _collect_char(self, char: str) -> None:
         """Collect a password character.
 
         Password generation is based on the chosen parameters in the GUI.
@@ -131,9 +135,11 @@ class PwdGenerator:
 
         :returns: False if password is already long enough
 
+        :raises StopIteration: if password length matches the given length
+
         """
         if len(self.password) > self.length:
-            return False
+            raise StopIteration
         if (
             (char.isdigit() and self.numbers)
             or (char.islower() and self.lowercase)

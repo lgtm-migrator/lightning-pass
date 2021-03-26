@@ -1,6 +1,6 @@
 """Module containing the MessageBoxes class used for showing various message boxes."""
-from contextlib import suppress
-from functools import partial
+import contextlib
+import functools
 from typing import Union, Callable, Optional, Any
 
 from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, QWidget
@@ -16,7 +16,7 @@ def partial_factory(func: Callable, *args: Optional[Any], **kwargs: Optional[Any
     :returns: the partial function
 
     """
-    return partial(func, *args, **kwargs)
+    return functools.partial(func, *args, **kwargs)
 
 
 def event_handler_factory(options: dict[str, Callable[[], None]]) -> Callable[[], None]:
@@ -34,9 +34,9 @@ def event_handler_factory(options: dict[str, Callable[[], None]]) -> Callable[[]
         :param btn: Clicked button
 
         """
-        with suppress(KeyError):
+        with contextlib.suppress(KeyError):
             event = options[btn.text()]
-        with suppress(UnboundLocalError):
+        with contextlib.suppress(UnboundLocalError):
             event()
 
     return handler
@@ -84,7 +84,7 @@ class MessageBoxes(QWidget):
         box.setIcon(icon)
         box.setInformativeText(informative_text)
 
-        with suppress(TypeError):
+        with contextlib.suppress(TypeError):
             box.setStandardButtons(standard_buttons)
             box.setDefaultButton(default_button)
             box.buttonClicked.connect(event_handler)

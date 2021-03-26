@@ -227,7 +227,6 @@ class Account:
     def update_last_login_date(self) -> None:
         """Set last login date."""
         with database_manager() as db:
-            # f-string SQl injection not an issue
             sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = {self.user_id}"
             db.execute(sql)
 

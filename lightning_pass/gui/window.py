@@ -1,14 +1,23 @@
 """Module containing the main GUI classes."""
-import pathlib
+import logging
 import sys
 
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
+from lightning_pass.settings import LOG, TRAY_ICON
 from lightning_pass.gui import message_boxes, mouse_randomness
 from lightning_pass.gui.gui_config import buttons, events
 from lightning_pass.gui.static.qt_designer.output import main, splash_screen
 from lightning_pass.util.exceptions import StopCollectingPositions
+
+log = logging.getLogger(__name__)
+formatter = logging.Formatter("%(asctime)s: %(name)s: %(levelname)s: %(message)s")
+fh = logging.FileHandler(LOG)
+fh.setFormatter(formatter)
+log.addHandler(fh)
+
+log.error("Ran out of mouse positions during password generation.")
 
 
 def run() -> None:
@@ -19,9 +28,7 @@ def run() -> None:
 
     # tray icon setup
     tray_icon = QtWidgets.QSystemTrayIcon(
-        QtGui.QIcon(
-            str(pathlib.Path(__file__).parent.parent / "gui/static/tray_icon.png")
-        ),
+        QtGui.QIcon(TRAY_ICON),
         app,
     )
     tray_icon.setToolTip("Lightning Pass")
@@ -40,7 +47,7 @@ class SplashScreen(QtWidgets.QWidget):
     """Splash Screen."""
 
     def __init__(self) -> None:
-        """Widget constuctor."""
+        """Widget constructor."""
         app = QtWidgets.QApplication(sys.argv)
 
         super().__init__()
@@ -73,7 +80,7 @@ class SplashScreen(QtWidgets.QWidget):
 class LightningPassWindow(QtWidgets.QMainWindow):
     """Main Window."""
 
-    def __init__(self, *args: object, **kwargs: object) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """Construct the class."""
         super().__init__(*args, **kwargs)
 
@@ -109,9 +116,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.main_win.show()
 
     def general_setup(self) -> None:
-        """Move function __init__ function call into a function for
-        simplicity.
-        """
+        """Move function __init__ function call into a function for simplicity."""
         self.events.toggle_stylesheet_dark()  # Dark mode is the default theme.
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
@@ -136,9 +141,13 @@ class LightningPassWindow(QtWidgets.QMainWindow):
             if not self.ui.generate_pass_p2_final_pass_line.text():
                 gen = self.events.get_generator()
                 for i in self.collector.generator():
-                    length_check = gen.get_character(i)
-                    if length_check is False:
+                    try:
+                        gen.get_character(i)
+                    except StopIteration:
                         break
+                else:
+                    log.error("Ran out of mouse positions during password generation.")
+
                 self.ui.generate_pass_p2_final_pass_line.setText(gen.get_password())
         else:
             self.pass_progress += 1
