@@ -1,5 +1,4 @@
 """Module containing various functions connected to credentials used throughout the whole project."""
-import os
 import re
 import secrets
 from datetime import datetime
@@ -7,7 +6,6 @@ from pathlib import Path
 from typing import Optional, Union
 
 import bcrypt
-import dotenv
 import yagmail
 from PyQt5 import QtCore
 
@@ -21,7 +19,7 @@ from .exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-from lightning_pass.settings import PFP_FOLDER
+from lightning_pass.settings import EMAIL_DICT, PFP_FOLDER
 
 
 def _get_user_id(column: str, value: str) -> Union[int, bool]:
@@ -277,7 +275,7 @@ class Password:
         :returns: True or False depending on the pattern check
 
         """
-        # if password in bytes, turn into str
+        # if password in bytes, cast into str
         password = str(password)
         if (
             # length
@@ -383,7 +381,10 @@ class Email:
 
         """
         regex_email = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{2,4}$"
-        return bool(re.search(regex_email, email))
+        try:
+            return bool(re.search(regex_email, email))
+        except TypeError:
+            return False
 
     @staticmethod
     def check_email_existence(email: str, should_exist: Optional[bool] = False) -> bool:
@@ -407,10 +408,9 @@ class Email:
 
         """
         if cls.check_email_existence(email, should_exist=True):
-            dotenv.load_dotenv()
             yag = yagmail.SMTP(
-                {os.getenv("EMAIL_USER"): "lightning_pass@noreply.com"},
-                os.getenv("EMAIL_PASS"),
+                {EMAIL_DICT["username"]: "lightning_pass@noreply.com"},
+                EMAIL_DICT["password"],
             )
             yag.send(
                 to=email,

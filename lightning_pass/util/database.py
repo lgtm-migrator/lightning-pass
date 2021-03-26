@@ -1,13 +1,30 @@
 """Module containing various utils connected to database management."""
 import contextlib
 import functools
-import os
 from typing import Callable, Iterator
 
-import dotenv
 import mysql
 from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
+
+
+def retry_if_exception(exception=Exception, ntimes=3) -> Callable:
+    def outer(func):
+        @functools.wraps(func)
+        def wrapper(*args, **kwargs):
+            x = ntimes
+            while x:
+                try:
+                    val = func(*args, **kwargs)
+                except exception:
+                    print(x)
+                    x -= 1
+                else:
+                    return val
+
+        return wrapper
+
+    return outer
 
 
 @contextlib.contextmanager
@@ -20,23 +37,27 @@ def database_manager() -> Iterator[None]:
     :returns: database connection cursor
 
     """
-    dotenv.load_dotenv()
+    from lightning_pass.settings import DB_DICT
+
     try:
         con: MySQLConnection = mysql.connector.connect(
-            host=os.getenv("DB_HOST"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASS"),
-            database=os.getenv("DB_DB"),
+            host=DB_DICT["host"],
+            user=DB_DICT["user"],
+            password=DB_DICT["password"],
+            database=DB_DICT["database"],
         )
         # fix unread results with buffered cursor
         cur: MySQLCursor = con.cursor(buffered=True)
-        yield cur
-    except mysql.connector.InternalError as e:
-        raise ConnectionError("Please initialize your database connection") from e
+    except mysql.connector.errors.InterfaceError as e:
+        raise ConnectionRefusedError(
+            "Please make sure that your database is running."
+        ) from e
     else:
-        con.commit()
+        yield cur
     finally:
-        con.close()
+        with contextlib.suppress(UnboundLocalError):
+            con.commit()
+            con.close()
 
 
 def enable_database_safe_mode(func: Callable) -> Callable:

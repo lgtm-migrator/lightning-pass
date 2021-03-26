@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, QWidget
 
 
 def partial_factory(func: Callable, *args: Optional[Any], **kwargs: Optional[Any]):
-    """Create a new partial function.
+    """Return a new partial function.
 
     :param func: The function which will be made partial
     :param args: Optional positional arguments
@@ -215,7 +215,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.self.events.login_event, "&No": self.events.register_event},
+            {"&Yes": self.events.login_event, "&No": self.events.register_event},
         )
 
         box = self._yes_no_box(QMessageBox.Yes, event_handler)

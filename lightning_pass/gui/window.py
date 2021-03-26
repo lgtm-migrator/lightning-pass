@@ -28,7 +28,7 @@ def run() -> None:
 
     # tray icon setup
     tray_icon = QtWidgets.QSystemTrayIcon(
-        QtGui.QIcon(TRAY_ICON),
+        QtGui.QIcon(str(TRAY_ICON)),
         app,
     )
     tray_icon.setToolTip("Lightning Pass")

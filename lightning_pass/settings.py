@@ -1,6 +1,8 @@
 """Module with project constants and settings."""
 from __future__ import annotations
 
+import dotenv
+import os
 from pathlib import Path
 
 from .util import database
@@ -16,10 +18,24 @@ def static_folder() -> Path:
     return parent_folder() / "gui/static"
 
 
+dotenv.load_dotenv()
+DB_DICT = {
+    "host": os.getenv("DB_HOST"),
+    "user": os.getenv("DB_USER"),
+    "password": os.getenv("DB_PASS"),
+    "database": os.getenv("DB_DB"),
+}
+EMAIL_DICT = {
+    "email": os.getenv("EMAIL_USER"),
+    "password": os.getenv("EMAIL_PASS"),
+}
+
 LIGHT_STYLESHEET: Path = static_folder() / "light.qss"
 DARK_STYLESHEET: Path = static_folder() / "dark.qss"
+
 TRAY_ICON: Path = static_folder() / "tray_icon.png"
 PFP_FOLDER: Path = parent_folder() / "users/profile_pictures"
+
 LOG: Path = parent_folder().parent / "misc/logs.log"
 
 
@@ -36,12 +52,12 @@ def _copy(self: Path, target: Path) -> None:
     shutil.copy(self, target)
 
 
-# Monkey Patch copy functionality into Path object.
+# monkey Patch copy functionality into every pathlib.Path instance
 # noinspection PyTypeHints
 Path.copy = _copy  # type: ignore
 
 with database.database_manager() as db:
-    SQL = """CREATE TABLE if not exists credentials(
+    sql = """CREATE TABLE if not exists credentials(
             `id` int NOT NULL AUTO_INCREMENT,
             `username` varchar(255) NOT NULL,
             `password` varchar(255) NOT NULL,
@@ -56,9 +72,9 @@ with database.database_manager() as db:
              DEFAULT CHARSET = utf8mb4
              COLLATE = utf8mb4_0900_ai_ci
              """
-    db.execute(SQL)
+    db.execute(sql)
 
-    SQL = """CREATE TABLE if not exists tokens(
+    sql = """CREATE TABLE if not exists tokens(
              `id` int NOT NULL AUTO_INCREMENT,
              `user_id` int NOT NULL,
              `token` varchar(255) NOT NULL,
@@ -71,4 +87,4 @@ with database.database_manager() as db:
              COLLATE=utf8mb4_0900_ai_ci
              """
 
-    db.execute(SQL)
+    db.execute(sql)
