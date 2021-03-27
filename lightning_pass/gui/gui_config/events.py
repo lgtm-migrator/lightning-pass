@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import functools
 import pathlib
-from typing import Callable, Optional
+from typing import Callable, Optional, Union
 
 import clipboard
 import qdarkstyle
@@ -34,7 +34,7 @@ def login_required(func: Callable) -> Callable:
     """
 
     @functools.wraps(func)
-    def wrapper(self: Events) -> Optional[Callable]:
+    def wrapper(self: Events, *args, **kwargs) -> Optional[Callable]:
         """Check the "current_user" attribute.
 
         :param self: Class instance to give access to its attributes
@@ -45,7 +45,43 @@ def login_required(func: Callable) -> Callable:
         if not hasattr(self, "current_user"):
             msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "account")
         else:
-            return func(self)
+            return func(self, *args, **kwargs)
+
+    return wrapper
+
+
+def vault_unlock_required(func: Callable) -> Callable:
+    """Decorate to ensure that a vault is unlocked to access a specific event.
+
+    :param func: Function to decorate
+
+    :return: the decorated function
+
+    """
+
+    @functools.wraps(func)
+    def wrapper(self: Events, *args, **kwargs) -> Optional[Callable]:
+        """Check the vault_unlocked attribute of the current user.
+
+        If current user does not exist show normal login required box.
+        If vault is not unlocked show box indicating need to unlock it.
+
+        :param self: Class instance to give access to its attributes
+        :param args: Optional positional arguments
+        :param kwargs: Optional keyword arguments
+
+        :return: executed function or None and show a message box indicating need log in
+
+        """
+        try:
+            vault = self.current_user.vault_unlocked
+        except AttributeError:
+            msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "account")
+        else:
+            if not vault:
+                msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "TEST")
+            else:
+                return func(self, *args, **kwargs)
 
     return wrapper
 
@@ -327,6 +363,12 @@ class Events:
                     "email",
                     "Account",
                 )
+
+    @vault_unlock_required
+    @login_required
+    def vault_event(self) -> None:
+        """Switch to vault window."""
+        self.ui.stacked_widget.setCurrentWidget(self.ui.vault)
 
     def toggle_stylesheet_light(self, *args: object) -> None:
         """Change stylesheet to light mode."""

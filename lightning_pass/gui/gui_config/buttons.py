@@ -107,7 +107,8 @@ class Buttons:
         )
         self.ui.action_login.triggered.connect(self.main_win.events.login_event)
         self.ui.action_register.triggered.connect(self.main_win.events.register_event)
-        self.ui.action_account.triggered.connect(self.main_win.events.account_event)
+        self.ui.action_profile.triggered.connect(self.main_win.events.account_event)
+        self.ui.action_vault.triggered.connect(self.main_win.events.vault_event)
         self.ui.action_forgot_password.triggered.connect(
             self.main_win.events.forgot_password_event,
         )

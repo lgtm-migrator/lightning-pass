@@ -1260,9 +1260,16 @@
      <property name="title">
       <string>account</string>
      </property>
+     <widget class="QMenu" name="menuaccount">
+      <property name="title">
+       <string>account</string>
+      </property>
+      <addaction name="action_profile"/>
+      <addaction name="action_vault"/>
+     </widget>
      <addaction name="action_login"/>
      <addaction name="action_register"/>
-     <addaction name="action_account"/>
+     <addaction name="menuaccount"/>
      <addaction name="action_forgot_password"/>
      <addaction name="action_reset_token"/>
     </widget>
@@ -1404,9 +1411,9 @@
     </font>
    </property>
   </action>
-  <action name="action_account">
+  <action name="action_reset_token">
    <property name="text">
-    <string>account</string>
+    <string>reset_token</string>
    </property>
    <property name="font">
     <font>
@@ -1415,9 +1422,20 @@
     </font>
    </property>
   </action>
-  <action name="action_reset_token">
+  <action name="action_profile">
    <property name="text">
-    <string>reset_token</string>
+    <string>profile</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+  </action>
+  <action name="action_vault">
+   <property name="text">
+    <string>vault</string>
    </property>
    <property name="font">
     <font>

@@ -39,6 +39,7 @@ class Account:
 
         """
         self.user_id = int(user_id)
+        self.vault_unlocked = False
 
     def __repr__(self) -> str:
         """Provide information about this class."""

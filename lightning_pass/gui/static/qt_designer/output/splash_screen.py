@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Form implementation generated from reading ui file 'splash_screen.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.3
@@ -9,12 +11,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_loading_widget:
+class Ui_loading_widget(object):
     def setupUi(self, loading_widget):
-        """
-        Args:
-            loading_widget:
-        """
         loading_widget.setObjectName("loading_widget")
         loading_widget.resize(410, 143)
         self.gridLayout = QtWidgets.QGridLayout(loading_widget)
@@ -40,15 +38,8 @@ class Ui_loading_widget:
         QtCore.QMetaObject.connectSlotsByName(loading_widget)
 
     def retranslateUi(self, loading_widget):
-        """
-        Args:
-            loading_widget:
-        """
         _translate = QtCore.QCoreApplication.translate
         loading_widget.setWindowTitle(_translate("loading_widget", "Form"))
         self.loading_label.setText(
             _translate("loading_widget", "Loading Lightning Pass...")
         )
-
-
-__all__ = ["Ui_loading_widget"]
