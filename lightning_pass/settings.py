@@ -19,13 +19,13 @@ def static_folder() -> Path:
 
 
 dotenv.load_dotenv()
-DB_DICT = {
+DB_DICT: dict = {
     "host": os.getenv("DB_HOST"),
     "user": os.getenv("DB_USER"),
     "password": os.getenv("DB_PASS"),
     "database": os.getenv("DB_DB"),
 }
-EMAIL_DICT = {
+EMAIL_DICT: dict = {
     "email": os.getenv("EMAIL_USER"),
     "password": os.getenv("EMAIL_PASS"),
 }

@@ -1,7 +1,9 @@
 """Module containing classes used for operations with mouse randomness generation."""
+import contextlib
+import functools
 import random
 import string
-from typing import Generator
+from typing import Generator, Optional, Union
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -104,7 +106,7 @@ class PwdGenerator:
         lowercase: bool,
         uppercase: bool,
     ) -> None:
-        """Class constructor."""
+        """Construct the class."""
         self.length = length
         self.numbers = numbers
         self.symbols = symbols
@@ -113,53 +115,67 @@ class PwdGenerator:
 
         self.password = ""
 
-    def get_character(self, position: tuple[int, int]) -> None:
+    def get_character(self, position: tuple[int, int]) -> Optional[str]:
         """Get a eligible password character by generating a random seed from the mouse position tuple.
 
-        :raises StopIteration: if password length matches the given length
+        Chooses an item from the string.printable property based on the calculated index.
+
+        :returns: Generated password if it reached the wanted length
 
         """
+        if len(self.password) > self.length:
+            return self.password
+
         sd = position[0] + 1j * position[1]
         random.seed(sd)
         flt = random.random()
+        div = 1 / 94  # 0.010638297872340425 : 94 eligible symbols in string.printable
 
-        indx = flt / (1 / 94)  # 0.010638297872340425  # 94 symbols...
-        self._collect_char(str(string.printable)[int(indx)])
+        indx = flt / div
 
-    def _collect_char(self, char: str) -> None:
+        char = str(string.printable)[int(indx)]
+
+        with contextlib.suppress(ValueError):
+            char = int(char)
+
+        self.collect_char(char)
+
+    @functools.singledispatchmethod
+    def collect_char(self, char: Union[int, str]) -> None:
         """Collect a password character.
 
         Password generation is based on the chosen parameters in the GUI.
 
-        :param str char: character to evaluate and potentially add to the current password.
+        :param char: character to evaluate and potentially add to the current password.
 
-        :returns: False if password is already long enough
-
-        :raises StopIteration: if password length matches the given length
+        :raises NotImplementedError: if char type is not registered
 
         """
-        if len(self.password) > self.length:
-            raise StopIteration
+        raise NotImplementedError("This character type is not supported.")
+
+    @collect_char.register(str)
+    def _(self, char: str) -> None:
+        """Evaluate string type.
+
+        :param char: Character
+
+        """
         if (
-            (char.isdigit() and self.numbers)
-            or (char.islower() and self.lowercase)
+            (char.islower() and self.lowercase)
             or (char.isupper() and self.uppercase)
-            or (
-                not char.isdigit()
-                and not char.islower()
-                and not char.isupper()
-                and self.symbols
-            )
+            or self.symbols
         ):
             self.password += char
 
-    def get_password(self) -> str:
-        """Return generated password.
+    @collect_char.register(int)
+    def _(self, char: int) -> None:
+        """Evaluate int type.
 
-        :returns: generated password
+        :param char: Character
 
         """
-        return self.password
+        if self.numbers:
+            self.password += str(char)
 
 
 __all__ = [

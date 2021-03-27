@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>661</width>
-    <height>372</height>
+    <height>374</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,7 +18,7 @@
     <bool>true</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout_9">
-    <item row="0" column="1">
+    <item row="0" column="0">
      <widget class="QStackedWidget" name="stacked_widget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -27,7 +27,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>6</number>
+       <number>10</number>
       </property>
       <widget class="QWidget" name="loading">
        <property name="cursor">
@@ -1147,6 +1147,81 @@
           </property>
           <property name="text">
            <string>Main Menu</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="vault">
+       <layout class="QGridLayout" name="gridLayout_12">
+        <item row="4" column="0">
+         <widget class="QPushButton" name="vault_add_login_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Add a login</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QPushButton" name="pushButton_2">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Remove current login</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="vault_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe Print</family>
+            <pointsize>26</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Vault</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1" rowspan="6">
+         <widget class="QStackedWidget" name="vault_stacked_widget">
+          <widget class="QWidget" name="vault_dummy_page1"/>
+          <widget class="QWidget" name="vault_dummy_page2"/>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="vault_current_user_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Current user: __username__</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="vault_last_unlock_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Last unlock date: 0000-00-00 00:00:00.</string>
           </property>
          </widget>
         </item>

@@ -141,16 +141,15 @@ class LightningPassWindow(QtWidgets.QMainWindow):
             if not self.ui.generate_pass_p2_final_pass_line.text():
                 gen = self.events.get_generator()
                 for i in self.collector.generator():
-                    try:
-                        gen.get_character(i)
-                    except StopIteration:
+                    if gen.get_character(i) is not None:
                         break
                 else:
                     log.error("Ran out of mouse positions during password generation.")
 
-                self.ui.generate_pass_p2_final_pass_line.setText(gen.get_password())
+                self.ui.generate_pass_p2_final_pass_line.setText(gen.password)
         else:
             self.pass_progress += 1
+        finally:
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.pass_progress)
 
 
