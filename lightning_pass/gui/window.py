@@ -8,7 +8,11 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from lightning_pass.settings import LOG, TRAY_ICON
 from lightning_pass.gui import message_boxes, mouse_randomness
 from lightning_pass.gui.gui_config import buttons, events
-from lightning_pass.gui.static.qt_designer.output import main, splash_screen
+from lightning_pass.gui.static.qt_designer.output import (
+    main,
+    splash_screen,
+    vault_widget,
+)
 from lightning_pass.util.exceptions import StopCollectingPositions
 
 log = logging.getLogger(__name__)
@@ -151,6 +155,14 @@ class LightningPassWindow(QtWidgets.QMainWindow):
             self.pass_progress += 1
         finally:
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.pass_progress)
+
+
+class VaultWidget(QtWidgets.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.widget = QtWidgets.QWidget()
+        self.ui = vault_widget.Ui_vault_widget()
+        self.ui.setupUi(self.widget)
 
 
 __all__ = [

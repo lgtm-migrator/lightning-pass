@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import functools
 import pathlib
-from typing import Callable, Optional, Union
+from typing import Callable, Optional
 
 import clipboard
 import qdarkstyle
@@ -45,7 +45,7 @@ def login_required(func: Callable) -> Callable:
         if not hasattr(self, "current_user"):
             msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "account")
         else:
-            return func(self, *args, **kwargs)
+            return func(self)
 
     return wrapper
 
@@ -81,7 +81,7 @@ def vault_unlock_required(func: Callable) -> Callable:
             if not vault:
                 msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "TEST")
             else:
-                return func(self, *args, **kwargs)
+                return func(self)
 
     return wrapper
 
@@ -343,7 +343,7 @@ class Events:
                     "Account",
                 )
             else:
-                msg_box.MessageBoxes.details_updated_box(
+                msg_box.MessageBoxes.detail_updated_box(
                     self.ui.message_boxes,
                     "username",
                     "Account",
@@ -368,10 +368,29 @@ class Events:
     @login_required
     def vault_event(self) -> None:
         """Switch to vault window."""
+        from lightning_pass.gui.window import VaultWidget
+
+        self.ui.vault_widget = VaultWidget().widget
+
+        self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget)
+        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget)
+
+        self.ui.vault_username_lbl.setText(
+            f"Current user: {self.current_user.username}",
+        )
+        self.ui.vault_date_lbl.setText(
+            f"Last unlock date: {str(self.current_user.register_date)}",
+        )
         self.ui.stacked_widget.setCurrentWidget(self.ui.vault)
+
+    def vault_lock_event(self) -> None:
+        """Lock vault."""
+        self.current_user.vault_unlocked = False
+        self.account_event()
 
     def toggle_stylesheet_light(self, *args: object) -> None:
         """Change stylesheet to light mode."""
+        self.current_user.vault_unlocked = True
         if args:
             ...
         self.main_win.setStyleSheet("")

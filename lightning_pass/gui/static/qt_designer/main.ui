@@ -18,7 +18,7 @@
     <bool>true</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout_9">
-    <item row="0" column="0">
+    <item row="1" column="0">
      <widget class="QStackedWidget" name="stacked_widget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -917,7 +917,7 @@
          </widget>
         </item>
         <item row="2" column="4" rowspan="3">
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="account_vault_btn">
           <property name="sizePolicy">
            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
             <horstretch>0</horstretch>
@@ -1026,7 +1026,7 @@
            </font>
           </property>
           <property name="text">
-           <string>Save Picture</string>
+           <string>Change Picture</string>
           </property>
          </widget>
         </item>
@@ -1154,8 +1154,47 @@
       </widget>
       <widget class="QWidget" name="vault">
        <layout class="QGridLayout" name="gridLayout_12">
-        <item row="4" column="0">
-         <widget class="QPushButton" name="vault_add_login_btn">
+        <item row="1" column="2">
+         <widget class="Line" name="line_2">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="Line" name="line_3">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="midLineWidth">
+           <number>5</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="Line" name="line">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QPushButton" name="vault_lock_btn">
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -1163,12 +1202,34 @@
            </font>
           </property>
           <property name="text">
-           <string>Add a login</string>
+           <string>Lock vault</string>
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
-         <widget class="QPushButton" name="pushButton_2">
+        <item row="1" column="0" colspan="2">
+         <widget class="QLabel" name="vault_username_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Current user: __username__</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="3" rowspan="6">
+         <widget class="QStackedWidget" name="vault_stacked_widget">
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="vault_dummy_page1"/>
+          <widget class="QWidget" name="vault_dummy_page2"/>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <widget class="QPushButton" name="vault_remove_current_btn">
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -1180,7 +1241,17 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
+        <item row="5" column="2">
+         <widget class="Line" name="line_6">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
          <widget class="QLabel" name="vault_lbl">
           <property name="font">
            <font>
@@ -1193,14 +1264,8 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="1" rowspan="6">
-         <widget class="QStackedWidget" name="vault_stacked_widget">
-          <widget class="QWidget" name="vault_dummy_page1"/>
-          <widget class="QWidget" name="vault_dummy_page2"/>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="vault_current_user_lbl">
+        <item row="3" column="0" colspan="2">
+         <widget class="QPushButton" name="vault_add_login_btn">
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -1208,12 +1273,12 @@
            </font>
           </property>
           <property name="text">
-           <string>Current user: __username__</string>
+           <string>Add a login</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="vault_last_unlock_lbl">
+        <item row="5" column="1">
+         <widget class="QPushButton" name="vault_menu_btn">
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -1221,7 +1286,46 @@
            </font>
           </property>
           <property name="text">
-           <string>Last unlock date: 0000-00-00 00:00:00.</string>
+           <string>Main menu</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="Line" name="line_5">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
+          <property name="midLineWidth">
+           <number>0</number>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0" colspan="2">
+         <widget class="QLabel" name="vault_date_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Last unlock date: 0000-00-00 00:00:00</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="Line" name="line_4">
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
           </property>
          </widget>
         </item>

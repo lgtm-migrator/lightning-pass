@@ -33,24 +33,28 @@ class Buttons:
         self.data_validation()
 
     def setup_buttons(self) -> None:
-        """Connect all buttons."""
+        """Connect all buttons on all widgets"""
+        # home
         self.ui.home_login_btn.clicked.connect(self.main_win.events.login_event)
         self.ui.home_register_btn.clicked.connect(self.main_win.events.register_event)
         self.ui.home_generate_password_btn.clicked.connect(
             self.main_win.events.generate_pass_event,
         )
 
+        # login
         self.ui.log_main_btn.clicked.connect(self.main_win.events.home_event)
         self.ui.log_forgot_pass_btn.clicked.connect(
             self.main_win.events.forgot_password_event,
         )
         self.ui.log_login_btn_2.clicked.connect(self.main_win.events.login_user_event)
 
+        # register
         self.ui.reg_main_btn.clicked.connect(self.main_win.events.home_event)
         self.ui.reg_register_btn.clicked.connect(
             self.main_win.events.register_user_event,
         )
 
+        # forgot_password
         self.ui.forgot_pass_main_menu_btn.clicked.connect(
             self.main_win.events.home_event,
         )
@@ -58,22 +62,27 @@ class Buttons:
             self.main_win.events.send_token_event,
         )
 
+        # reset_token
         self.ui.reset_token_main_btn.clicked.connect(self.main_win.events.home_event)
         self.ui.reset_token_submit_btn.clicked.connect(
             self.main_win.events.submit_reset_token_event,
         )
 
+        # reset_password
         self.ui.reset_pass_main_btn.clicked.connect(self.main_win.events.home_event)
         self.ui.reset_pass_confirm_btn.clicked.connect(
             self.main_win.events.submit_reset_password_event,
         )
 
+        # generate_pass
         self.ui.generate_pass_generate_btn.clicked.connect(
             self.main_win.events.generate_pass_phase2_event,
         )
         self.ui.generate_pass_main_menu_btn.clicked.connect(
             self.main_win.events.home_event,
         )
+
+        # generate_pass_phase2
         self.ui.generate_pass_p2_main_btn.clicked.connect(
             self.main_win.events.home_event,
         )
@@ -81,6 +90,7 @@ class Buttons:
             self.main_win.events.copy_password_event,
         )
 
+        # account
         self.ui.account_main_menu_btn.clicked.connect(self.main_win.events.home_event)
         self.ui.account_change_pfp_btn.clicked.connect(
             self.main_win.events.change_pfp_event,
@@ -92,6 +102,11 @@ class Buttons:
         self.ui.account_edit_details_btn.clicked.connect(
             self.main_win.events.edit_details_event,
         )
+        self.ui.account_vault_btn.clicked.connect(self.main_win.events.vault_event)
+
+        # vault
+        self.ui.vault_menu_btn.clicked.connect(self.main_win.events.home_event)
+        self.ui.vault_lock_btn.clicked.connect(self.main_win.events.vault_lock_event)
 
     def setup_menu_bar(self) -> None:
         """Connect all menu bar actions."""
