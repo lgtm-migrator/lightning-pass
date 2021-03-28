@@ -101,15 +101,23 @@ class Events:
         self.main_win = parent.main_win
         self.ui = parent.ui
 
+    def _set_current_widget(self, widget: str) -> None:
+        """Set a new current widget.
+
+        :param widget: The widget to switch to
+
+        """
+        self.ui.stacked_widget.setCurrentWidget(getattr(self.ui, widget))
+
     def home_event(self) -> None:
         """Switch to home widget."""
-        self.ui.stacked_widget.setCurrentWidget(self.ui.home)
+        self._set_current_widget("home")
 
     def login_event(self) -> None:
         """Switch to login widget and reset previous values."""
         self.ui.log_username_line_edit.setText("")
         self.ui.log_password_line_edit.setText("")
-        self.ui.stacked_widget.setCurrentWidget(self.ui.login)
+        self._set_current_widget("login")
 
     def login_user_event(self) -> None:
         """Try to login a user. If successful, show the account widget."""
@@ -129,7 +137,7 @@ class Events:
         self.ui.reg_password_line.setText("")
         self.ui.reg_conf_pass_line.setText("")
         self.ui.reg_email_line.setText("")
-        self.ui.stacked_widget.setCurrentWidget(self.ui.register_2)
+        self._set_current_widget("register_2")
 
     def register_user_event(self) -> None:
         """Try to register a user. If successful, show login widget."""
@@ -167,7 +175,7 @@ class Events:
     def forgot_password_event(self) -> None:
         """Switch to forgot password widget and reset previous email."""
         self.ui.forgot_pass_email_line.setText("")
-        self.ui.stacked_widget.setCurrentWidget(self.ui.forgot_password)
+        self._set_current_widget("forgot_password")
 
     def send_token_event(self) -> None:
         """Send token and switch to token page."""
@@ -190,7 +198,7 @@ class Events:
     def reset_token_event(self) -> None:
         """Switch to reset token page and reset previous values."""
         self.ui.reset_token_token_line.setText("")
-        self.ui.stacked_widget.setCurrentWidget(self.ui.reset_token)
+        self._set_current_widget("reset_token")
 
     def submit_reset_token_event(self) -> None:
         """If submitted token is correct, proceed to password change widget."""
@@ -206,7 +214,7 @@ class Events:
         """Move to reset password page."""
         self.ui.reset_pass_new_pass_line.setText("")
         self.ui.reset_pass_conf_new_line.setText("")
-        self.ui.stacked_widget.setCurrentWidget(self.ui.reset_password)
+        self._set_current_widget("reset_password")
 
     def submit_reset_password_event(self) -> None:
         """Attempt to change user's password, show message box if something goes wrong, otherwise move to login page."""
@@ -242,7 +250,8 @@ class Events:
         self.ui.generate_pass_symbols_check.setChecked(True)
         self.ui.generate_pass_lower_check.setChecked(True)
         self.ui.generate_pass_upper_check.setChecked(True)
-        self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass)
+
+        self._set_current_widget("generate_pass")
 
     def get_generator(self) -> mouse_rnd.PwdGenerator:
         """Get Generator from current password params.
@@ -276,7 +285,8 @@ class Events:
             self.parent.pass_progress = 0
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
             self.ui.generate_pass_p2_final_pass_line.setText("")
-            self.ui.stacked_widget.setCurrentWidget(self.ui.generate_pass_phase2)
+
+            self._set_current_widget("generate_pass_phase2")
 
     def copy_password_event(self) -> None:
         """Copy generated password into clipboard."""
@@ -298,7 +308,8 @@ class Events:
         self.ui.account_pfp_pixmap_lbl.setPixmap(
             QtGui.QPixmap(self.current_user.profile_picture_path),
         )
-        self.ui.stacked_widget.setCurrentWidget(self.ui.account)
+
+        self._set_current_widget("account")
 
     @login_required
     def change_pfp_event(self) -> None:
@@ -380,7 +391,8 @@ class Events:
         self.ui.vault_date_lbl.setText(
             f"Last unlock date: {str(self.current_user.register_date)}",
         )
-        self.ui.stacked_widget.setCurrentWidget(self.ui.vault)
+
+        self._set_current_widget("vault")
 
     def vault_lock_event(self) -> None:
         """Lock vault."""

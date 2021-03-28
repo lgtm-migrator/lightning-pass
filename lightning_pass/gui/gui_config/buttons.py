@@ -3,6 +3,8 @@
 Used for connecting each button on the GUI to various events or lambdas.
 
 """
+from typing import Any
+
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from lightning_pass.settings import LIGHT_STYLESHEET, DARK_STYLESHEET
@@ -14,8 +16,8 @@ class Buttons:
     def __init__(
         self,
         parent: QtWidgets.QMainWindow,
-        *args: object,
-        **kwargs: object,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         """Buttons constructor.
 
@@ -78,6 +80,8 @@ class Buttons:
                 getattr(self.main_win.events, event),
             )
 
+        del buttons_dict
+
     def setup_menu_bar(self) -> None:
         """Connect all menu bar actions."""
         menu_bar_dict = {
@@ -95,6 +99,8 @@ class Buttons:
             getattr(self.ui, action).triggered.connect(
                 getattr(self.main_win.events, event),
             )
+
+        del menu_bar_dict
 
         self.ui.action_light.triggered.connect(
             lambda: self.main_win.events.toggle_stylesheet_light(LIGHT_STYLESHEET),
@@ -114,6 +120,8 @@ class Buttons:
         }
         for line in validator_lines:
             getattr(self.ui, line).setValidator(input_validator)
+
+        del validator_lines
 
 
 __all__ = [
