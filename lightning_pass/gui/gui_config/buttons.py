@@ -34,113 +34,86 @@ class Buttons:
 
     def setup_buttons(self) -> None:
         """Connect all buttons on all widgets"""
-        # home
-        self.ui.home_login_btn.clicked.connect(self.main_win.events.login_event)
-        self.ui.home_register_btn.clicked.connect(self.main_win.events.register_event)
-        self.ui.home_generate_password_btn.clicked.connect(
-            self.main_win.events.generate_pass_event,
-        )
-
-        # login
-        self.ui.log_main_btn.clicked.connect(self.main_win.events.home_event)
-        self.ui.log_forgot_pass_btn.clicked.connect(
-            self.main_win.events.forgot_password_event,
-        )
-        self.ui.log_login_btn_2.clicked.connect(self.main_win.events.login_user_event)
-
-        # register
-        self.ui.reg_main_btn.clicked.connect(self.main_win.events.home_event)
-        self.ui.reg_register_btn.clicked.connect(
-            self.main_win.events.register_user_event,
-        )
-
-        # forgot_password
-        self.ui.forgot_pass_main_menu_btn.clicked.connect(
-            self.main_win.events.home_event,
-        )
-        self.ui.forgot_pass_reset_btn.clicked.connect(
-            self.main_win.events.send_token_event,
-        )
-
-        # reset_token
-        self.ui.reset_token_main_btn.clicked.connect(self.main_win.events.home_event)
-        self.ui.reset_token_submit_btn.clicked.connect(
-            self.main_win.events.submit_reset_token_event,
-        )
-
-        # reset_password
-        self.ui.reset_pass_main_btn.clicked.connect(self.main_win.events.home_event)
-        self.ui.reset_pass_confirm_btn.clicked.connect(
-            self.main_win.events.submit_reset_password_event,
-        )
-
-        # generate_pass
-        self.ui.generate_pass_generate_btn.clicked.connect(
-            self.main_win.events.generate_pass_phase2_event,
-        )
-        self.ui.generate_pass_main_menu_btn.clicked.connect(
-            self.main_win.events.home_event,
-        )
-
-        # generate_pass_phase2
-        self.ui.generate_pass_p2_main_btn.clicked.connect(
-            self.main_win.events.home_event,
-        )
-        self.ui.generate_pass_p2_reset_btn.clicked.connect(
-            self.main_win.events.generate_pass_phase2_event,
-        )
-        self.ui.generate_pass_p2_copy_tool_btn.clicked.connect(
-            self.main_win.events.copy_password_event,
-        )
-
-        # account
-        self.ui.account_main_menu_btn.clicked.connect(self.main_win.events.home_event)
-        self.ui.account_change_pfp_btn.clicked.connect(
-            self.main_win.events.change_pfp_event,
-        )
-        self.ui.account_logout_btn.clicked.connect(self.main_win.events.logout_event)
-        self.ui.account_change_pass_btn.clicked.connect(
-            self.main_win.events.change_pass_event,
-        )
-        self.ui.account_edit_details_btn.clicked.connect(
-            self.main_win.events.edit_details_event,
-        )
-        self.ui.account_vault_btn.clicked.connect(self.main_win.events.vault_event)
-
-        # vault
-        self.ui.vault_menu_btn.clicked.connect(self.main_win.events.home_event)
-        self.ui.vault_lock_btn.clicked.connect(self.main_win.events.vault_lock_event)
+        buttons_dict = {
+            # home
+            "home_login_btn": "login_event",
+            "home_register_btn": "register_event",
+            "home_generate_password_btn": "generate_pass_event",
+            # login
+            "log_main_btn": "home_event",
+            "log_forgot_pass_btn": "forgot_password_event",
+            "log_login_btn_2": "login_user_event",
+            # register
+            "reg_main_btn": "home_event",
+            "reg_register_btn": "register_user_event",
+            # forgot password
+            "forgot_pass_main_menu_btn": "home_event",
+            "forgot_pass_reset_btn": "send_token_event",
+            # reset token
+            "reset_token_main_btn": "home_event",
+            "reset_token_submit_btn": "submit_reset_token_event",
+            # reset password
+            "reset_pass_main_btn": "home_event",
+            "reset_pass_confirm_btn": "submit_reset_password_event",
+            # generate_pass
+            "generate_pass_generate_btn": "generate_pass_phase2_event",
+            "generate_pass_main_menu_btn": "home_event",
+            # generate_pass_phase2
+            "generate_pass_p2_main_btn": "home_event",
+            "generate_pass_p2_reset_btn": "generate_pass_phase2_event",
+            "generate_pass_p2_copy_tool_btn": "copy_password_event",
+            # account
+            "account_main_menu_btn": "home_event",
+            "account_change_pfp_btn": "change_pfp_event",
+            "account_logout_btn": "logout_event",
+            "account_change_pass_btn": "change_pass_event",
+            "account_edit_details_btn": "edit_details_event",
+            "account_vault_btn": "vault_event",
+            # vault
+            "vault_menu_btn": "home_event",
+            "vault_lock_btn": "vault_lock_event",
+        }
+        for button, event in buttons_dict.items():
+            getattr(self.ui, button).clicked.connect(
+                getattr(self.main_win.events, event),
+            )
 
     def setup_menu_bar(self) -> None:
         """Connect all menu bar actions."""
-        self.ui.action_main_menu.triggered.connect(self.main_win.events.home_event)
+        menu_bar_dict = {
+            "action_main_menu": "home_event",
+            "action_generate": "generate_pass_event",
+            "action_login": "login_event",
+            "action_register": "register_event",
+            "action_profile": "account_event",
+            "action_vault": "vault_event",
+            "action_forgot_password": "forgot_password_event",
+            "action_reset_token": "reset_token_event",
+        }
+
+        for action, event in menu_bar_dict.items():
+            getattr(self.ui, action).triggered.connect(
+                getattr(self.main_win.events, event),
+            )
+
         self.ui.action_light.triggered.connect(
             lambda: self.main_win.events.toggle_stylesheet_light(LIGHT_STYLESHEET),
         )
         self.ui.action_dark.triggered.connect(
             lambda: self.main_win.events.toggle_stylesheet_dark(DARK_STYLESHEET),
         )
-        self.ui.action_generate.triggered.connect(
-            self.main_win.events.generate_pass_event,
-        )
-        self.ui.action_login.triggered.connect(self.main_win.events.login_event)
-        self.ui.action_register.triggered.connect(self.main_win.events.register_event)
-        self.ui.action_profile.triggered.connect(self.main_win.events.account_event)
-        self.ui.action_vault.triggered.connect(self.main_win.events.vault_event)
-        self.ui.action_forgot_password.triggered.connect(
-            self.main_win.events.forgot_password_event,
-        )
-        self.ui.action_reset_token.triggered.connect(
-            self.main_win.events.reset_token_event,
-        )
 
     def data_validation(self) -> None:
         """Disable whitespaces in registration input fields."""
         input_validator = QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+"))
-        self.ui.reg_username_line.setValidator(input_validator)
-        self.ui.reg_password_line.setValidator(input_validator)
-        self.ui.reg_conf_pass_line.setValidator(input_validator)
-        self.ui.reg_email_line.setValidator(input_validator)
+        validator_lines = {
+            "reg_username_line",
+            "reg_password_line",
+            "reg_conf_pass_line",
+            "reg_email_line",
+        }
+        for line in validator_lines:
+            getattr(self.ui, line).setValidator(input_validator)
 
 
 __all__ = [
