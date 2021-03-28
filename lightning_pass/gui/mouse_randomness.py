@@ -59,7 +59,7 @@ class MouseTracker(QtCore.QObject):
         tracker.position_changed.connect(on_change)
 
 
-CollectorSet = set[tuple[int, int]]
+CollectorSet = tuple[tuple[int, int]]
 
 
 class Collector:
@@ -67,7 +67,7 @@ class Collector:
 
     def __init__(self, data: CollectorSet = None) -> None:
         """Class constructor."""
-        self.randomness_set: CollectorSet = {*()}
+        self.randomness_set = CollectorSet
         if data:
             self.randomness_set = data
 
@@ -87,10 +87,10 @@ class Collector:
         :raises StopCollectingPositions: if 1000 mouse positions have been collected
 
         """
-        self.randomness_set.add((pos.x(), pos.y()))
-
-        if len(self.randomness_set) >= 1000:
+        if len(self.randomness_set) > 1000:
             raise StopCollectingPositions
+
+        self.randomness_set = (*self.randomness_set, (pos.x(), pos.y()))
 
 
 class PwdGenerator:

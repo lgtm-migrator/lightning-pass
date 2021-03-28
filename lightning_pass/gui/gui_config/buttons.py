@@ -7,7 +7,7 @@ from typing import Any
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from lightning_pass.settings import LIGHT_STYLESHEET, DARK_STYLESHEET
+from lightning_pass.settings import DARK_STYLESHEET, LIGHT_STYLESHEET
 
 
 class Buttons:

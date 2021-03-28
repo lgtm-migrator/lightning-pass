@@ -6,7 +6,7 @@ from typing import Union
 import pytest
 from pytest_mysql import factories
 
-from lightning_pass.util.credentials import Username, Password, Email
+from lightning_pass.util.credentials import Email, Password, Username
 
 
 @pytest.fixture()

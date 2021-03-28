@@ -9,6 +9,8 @@ import bcrypt
 import yagmail
 from PyQt5 import QtCore
 
+from lightning_pass.settings import EMAIL_DICT, PFP_FOLDER
+
 from .database import database_manager, enable_database_safe_mode
 from .exceptions import (
     AccountException,
@@ -19,7 +21,6 @@ from .exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
 )
-from lightning_pass.settings import EMAIL_DICT, PFP_FOLDER
 
 
 def _get_user_id(column: str, value: str) -> Union[int, bool]:

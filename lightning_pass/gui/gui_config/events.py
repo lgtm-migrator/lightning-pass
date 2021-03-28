@@ -3,24 +3,15 @@ from __future__ import annotations
 
 import functools
 import pathlib
-from typing import Callable, Optional, Any
+from typing import Any, Callable, Optional
 
 import clipboard
 import qdarkstyle
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtGui, QtWidgets
 
-import lightning_pass.gui.message_boxes as msg_box
 import lightning_pass.gui.mouse_randomness as mouse_rnd
 import lightning_pass.users.account as acc
-from lightning_pass.util.exceptions import (
-    AccountException,
-    EmailAlreadyExists,
-    InvalidEmail,
-    InvalidPassword,
-    InvalidUsername,
-    PasswordsDoNotMatch,
-    UsernameAlreadyExists,
-)
+import lightning_pass.util.exceptions as exc
 from lightning_pass.util.credentials import Email, ProfilePicture, Token
 
 
@@ -43,7 +34,7 @@ def login_required(func: Callable) -> Callable:
 
         """
         if not hasattr(self, "current_user"):
-            msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "account")
+            self.ui.message_boxes.login_required_box("account")
         else:
             return func(self)
 
@@ -76,10 +67,12 @@ def vault_unlock_required(func: Callable) -> Callable:
         try:
             vault = self.current_user.vault_unlocked
         except AttributeError:
-            msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "account")
+            self.ui.message_boxes.login_required_box("account")
         else:
             if not vault:
-                msg_box.MessageBoxes.login_required_box(self.ui.message_boxes, "TEST")
+                self.ui.input_dialogs.master_password_dialog(
+                    "Account", getattr(self.current_user, "username")
+                )
             else:
                 return func(self)
 
@@ -95,7 +88,7 @@ class Events:
         *args: Any,
         **kwargs: Any,
     ) -> None:
-        """Buttons constructor."""
+        """Construct the class."""
         super().__init__(*args, **kwargs)
         self.parent = parent
         self.main_win = parent.main_win
@@ -108,6 +101,11 @@ class Events:
 
         """
         self.ui.stacked_widget.setCurrentWidget(getattr(self.ui, widget))
+
+    def _message_box(self, message_box: str, *args: Any, **kwargs: Any) -> None:
+        """Show a chosen message box with the given positional and keyword arguments."""
+        box = getattr(self.ui.message_boxes, message_box)
+        box(*args, **kwargs)
 
     def home_event(self) -> None:
         """Switch to home widget."""
@@ -126,8 +124,8 @@ class Events:
                 self.ui.log_username_line_edit.text(),
                 self.ui.log_password_line_edit.text(),
             )
-        except AccountException:
-            msg_box.MessageBoxes.invalid_login_box(self.ui.message_boxes, "Login")
+        except exc.AccountException:
+            self._message_box("invalid_login_box", "Login")
         else:
             self.account_event()
 
@@ -137,6 +135,7 @@ class Events:
         self.ui.reg_password_line.setText("")
         self.ui.reg_conf_pass_line.setText("")
         self.ui.reg_email_line.setText("")
+
         self._set_current_widget("register_2")
 
     def register_user_event(self) -> None:
@@ -148,33 +147,25 @@ class Events:
                 self.ui.reg_conf_pass_line.text(),
                 self.ui.reg_email_line.text(),
             )
-        except InvalidUsername:
-            msg_box.MessageBoxes.invalid_username_box(self.ui.message_boxes, "Register")
-        except InvalidPassword:
-            msg_box.MessageBoxes.invalid_password_box(self.ui.message_boxes, "Register")
-        except InvalidEmail:
-            msg_box.MessageBoxes.invalid_email_box(self.ui.message_boxes, "Register")
-        except UsernameAlreadyExists:
-            msg_box.MessageBoxes.username_already_exists_box(
-                self.ui.message_boxes,
-                "Register",
-            )
-        except EmailAlreadyExists:
-            msg_box.MessageBoxes.email_already_exists_box(
-                self.ui.message_boxes,
-                "Register",
-            )
-        except PasswordsDoNotMatch:
-            msg_box.MessageBoxes.passwords_do_not_match_box(
-                self.ui.message_boxes,
-                "Register",
-            )
+        except exc.InvalidUsername:
+            self._message_box("invalid_username_box", "Register")
+        except exc.InvalidPassword:
+            self._message_box("invalid_password_box", "Register")
+        except exc.InvalidEmail:
+            self._message_box("invalid_email_box", "Register")
+        except exc.UsernameAlreadyExists:
+            self._message_box("username_already_exists_box", "Register")
+        except exc.EmailAlreadyExists:
+            self._message_box("email_already_exists_box", "Register")
+        except exc.PasswordsDoNotMatch:
+            self._message_box("passwords_do_not_match_box", "Register")
         else:
-            msg_box.MessageBoxes.account_creation_box(self.ui.message_boxes, "Register")
+            self._message_box("account_creation_box", "Register")
 
     def forgot_password_event(self) -> None:
         """Switch to forgot password widget and reset previous email."""
         self.ui.forgot_pass_email_line.setText("")
+
         self._set_current_widget("forgot_password")
 
     def send_token_event(self) -> None:
@@ -182,22 +173,18 @@ class Events:
         email = self.ui.forgot_pass_email_line.text()
         check = Email.check_email_pattern(email)
         if not check:
-            msg_box.MessageBoxes.invalid_email_box(
-                self.ui.message_boxes,
-                "Forgot Password",
-            )
+            self._message_box("invalid_email_box", "Forgot Password")
         else:
             self.ui.reset_token_submit_btn.setEnabled(False)
             Email.send_reset_email(email)
             self.ui.reset_token_submit_btn.setEnabled(True)
-            msg_box.MessageBoxes.reset_email_sent_box(
-                self.ui.message_boxes,
-                "Forgot Password",
-            )
+
+            self._message_box("reset_email_sent_box", "Forgot Password")
 
     def reset_token_event(self) -> None:
         """Switch to reset token page and reset previous values."""
         self.ui.reset_token_token_line.setText("")
+
         self._set_current_widget("reset_token")
 
     def submit_reset_token_event(self) -> None:
@@ -205,15 +192,13 @@ class Events:
         if Token.check_token_existence(self.ui.reset_token_token_line.text()):
             self.reset_password_event()
         else:
-            msg_box.MessageBoxes.invalid_token_box(
-                self.ui.message_boxes,
-                "Reset Password",
-            )
+            self._message_box("invalid_token_box", "Reset Password")
 
     def reset_password_event(self) -> None:
         """Move to reset password page."""
         self.ui.reset_pass_new_pass_line.setText("")
         self.ui.reset_pass_conf_new_line.setText("")
+
         self._set_current_widget("reset_password")
 
     def submit_reset_password_event(self) -> None:
@@ -224,23 +209,18 @@ class Events:
                 self.ui.reset_pass_new_pass_line.text(),
                 self.ui.reset_pass_conf_new_line.text(),
             )
-        except InvalidPassword:
-            msg_box.MessageBoxes.invalid_password_box(
-                self.ui.message_boxes,
-                "Reset Password",
-            )
-        except PasswordsDoNotMatch:
-            msg_box.MessageBoxes.passwords_do_not_match_box(
-                self.ui.message_boxes,
-                "Reset Password",
-            )
+        except exc.InvalidPassword:
+            self._message_box("invalid_password_box", "Reset Password")
+        except exc.PasswordsDoNotMatch:
+            self._message_box("passwords_do_not_match_box", "Reset Password")
         else:
             del self.parent.change_pass_id
-            msg_box.MessageBoxes.detail_updated_box(
-                self.ui.message_boxes,
-                "password",
+            self._message_box(
+                "detail_updated_box",
                 "Reset Password",
+                "password",
             )
+
             self.login_event()
 
     def generate_pass_event(self) -> None:
@@ -279,7 +259,7 @@ class Events:
             and not self.ui.generate_pass_lower_check.isChecked()
             and not self.ui.generate_pass_upper_check.isChecked()
         ):
-            msg_box.MessageBoxes.no_options_generate(self.ui.message_boxes, "Generator")
+            self._message_box("no_options_generate", "Generator")
         else:
             self.parent.collector.randomness_set = {*()}
             self.parent.pass_progress = 0
@@ -343,36 +323,21 @@ class Events:
         if self.current_user.username != self.ui.account_username_line.text():
             try:
                 self.current_user.username = self.ui.account_username_line.text()
-            except InvalidUsername:
-                msg_box.MessageBoxes.invalid_username_box(
-                    self.ui.message_boxes, "Account"
-                )
-            except UsernameAlreadyExists:
-                msg_box.MessageBoxes.username_already_exists_box(
-                    self.ui.message_boxes,
-                    "Account",
-                )
+            except exc.InvalidUsername:
+                self._message_box("invalid_username_box", "Account")
+            except exc.UsernameAlreadyExists:
+                self._message_box("username_already_exists_box", "Account")
             else:
-                msg_box.MessageBoxes.detail_updated_box(
-                    self.ui.message_boxes,
-                    "username",
-                    "Account",
-                )
+                self._message_box("detail_updated_box", "Account", "username")
         if self.current_user.email != self.ui.account_email_line.text():
             try:
                 self.current_user.email = self.ui.account_email_line.text()
-            except InvalidEmail:
-                msg_box.MessageBoxes.invalid_email_box(self.ui.message_boxes, "Account")
-            except EmailAlreadyExists:
-                msg_box.MessageBoxes.email_already_exists_box(
-                    self.ui.message_boxes, "Account"
-                )
+            except exc.InvalidEmail:
+                self._message_box("invalid_email_box", "Account")
+            except exc.EmailAlreadyExists:
+                self._message_box("email_already_exists_box", "Account")
             else:
-                msg_box.MessageBoxes.details_updated_box(
-                    self.ui.message_boxes,
-                    "email",
-                    "Account",
-                )
+                self._message_box("details_updated_box", "Account", "email")
 
     @vault_unlock_required
     @login_required

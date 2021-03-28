@@ -1,9 +1,16 @@
 """Module containing the MessageBoxes class used for showing various message boxes."""
 import contextlib
 import functools
-from typing import Union, Callable, Optional, Any
+from typing import Any, Callable, Optional, Union
 
-from PyQt5.QtWidgets import QMainWindow, QMessageBox, QPushButton, QWidget
+from PyQt5.QtWidgets import (
+    QInputDialog,
+    QLineEdit,
+    QMainWindow,
+    QMessageBox,
+    QPushButton,
+    QWidget,
+)
 
 
 def partial_factory(func: Callable, *args: Optional[Any], **kwargs: Optional[Any]):
@@ -121,6 +128,11 @@ class MessageBoxes(QWidget):
     def _yes_no_box(
         self, default_btn: QMessageBox.StandardButton, handler
     ) -> message_box_factory:
+        """Return a partially initialized message box with yes and no buttons.
+
+        :param handler: Event handler for click on the two yes | no buttons
+
+        """
         return partial_factory(
             self.message_box_factory,
             standard_buttons=QMessageBox.Yes | QMessageBox.No,
@@ -260,7 +272,11 @@ contain at least one special character."""
             informative_text="Would you like to move to the login page?",
         ).exec_()
 
-    def detail_updated_box(self, detail: str, parent: str) -> None:
+    def detail_updated_box(
+        self,
+        parent: str,
+        detail: str,
+    ) -> None:
         """Show message box indicating that a user details has been successfully updated.
 
         :param str detail: Specifies which detail was updated
@@ -300,6 +316,25 @@ contain at least one special character."""
             "Password can't be generate without a single parameter.",
             QMessageBox.Warning,
         ).exec_()
+
+
+class InputDialogs(QWidget):
+    def __init__(self, child: QMainWindow, parent: QMainWindow) -> None:
+        """Class constructor."""
+        super().__init__(parent)
+        self.events = parent.events
+        self.main_win = child
+        self.title = "Lightning Pass"
+
+    def master_password_dialog(self, parent: str, account_username: str) -> None:
+        password, _ = QInputDialog.getText(
+            self.main_win,
+            parent,
+            f"Master password for {account_username}:",
+            QLineEdit.Password,
+        )
+
+        print(password)
 
 
 __all__ = [

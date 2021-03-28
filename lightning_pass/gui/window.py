@@ -5,7 +5,6 @@ import sys
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from lightning_pass.settings import LOG, TRAY_ICON
 from lightning_pass.gui import message_boxes, mouse_randomness
 from lightning_pass.gui.gui_config import buttons, events
 from lightning_pass.gui.static.qt_designer.output import (
@@ -13,6 +12,7 @@ from lightning_pass.gui.static.qt_designer.output import (
     splash_screen,
     vault_widget,
 )
+from lightning_pass.settings import LOG, TRAY_ICON
 from lightning_pass.util.exceptions import StopCollectingPositions
 
 log = logging.getLogger(__name__)
@@ -98,6 +98,10 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         buttons.Buttons(self).setup_all()
 
         self.ui.message_boxes = message_boxes.MessageBoxes(
+            child=self.main_win,
+            parent=self,
+        )
+        self.ui.input_dialogs = message_boxes.InputDialogs(
             child=self.main_win,
             parent=self,
         )

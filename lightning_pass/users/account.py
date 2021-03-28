@@ -5,7 +5,6 @@ import functools
 from datetime import datetime
 from typing import Optional, Union
 
-from lightning_pass.util.exceptions import AccountDoesNotExist
 from lightning_pass.util.credentials import (
     Email,
     Password,
@@ -15,6 +14,7 @@ from lightning_pass.util.credentials import (
     get_user_item,
     set_user_item,
 )
+from lightning_pass.util.exceptions import AccountDoesNotExist
 
 
 def change_password(user_id: int, password: str, confirm_password: str) -> None:

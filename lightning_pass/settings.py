@@ -1,9 +1,10 @@
 """Module with project constants and settings."""
 from __future__ import annotations
 
-import dotenv
 import os
 from pathlib import Path
+
+import dotenv
 
 from .util import database
 
