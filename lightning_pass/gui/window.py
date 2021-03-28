@@ -105,6 +105,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.general_setup()
 
         self.collector = mouse_randomness.Collector()
+
         mouse_randomness.MouseTracker.setup_tracker(
             self.ui.generate_pass_p2_tracking_lbl,
             self.on_position_changed,
@@ -144,7 +145,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         except StopCollectingPositions:
             if not self.ui.generate_pass_p2_final_pass_line.text():
                 gen = self.events.get_generator()
-                for i in self.collector.generator():
+                for i in self.collector:
                     if gen.get_character(i) is not None:
                         break
                 else:

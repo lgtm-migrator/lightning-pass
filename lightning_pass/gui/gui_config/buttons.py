@@ -86,7 +86,10 @@ class Buttons:
         self.ui.generate_pass_p2_main_btn.clicked.connect(
             self.main_win.events.home_event,
         )
-        self.ui.generate_pass_p2_copy_btn.clicked.connect(
+        self.ui.generate_pass_p2_reset_btn.clicked.connect(
+            self.main_win.events.generate_pass_phase2_event,
+        )
+        self.ui.generate_pass_p2_copy_tool_btn.clicked.connect(
             self.main_win.events.copy_password_event,
         )
 

@@ -18,7 +18,7 @@
     <bool>true</bool>
    </property>
    <layout class="QGridLayout" name="gridLayout_9">
-    <item row="1" column="0">
+    <item row="0" column="0">
      <widget class="QStackedWidget" name="stacked_widget">
       <property name="sizePolicy">
        <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -27,7 +27,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>10</number>
+       <number>8</number>
       </property>
       <widget class="QWidget" name="loading">
        <property name="cursor">
@@ -757,7 +757,7 @@
       </widget>
       <widget class="QWidget" name="generate_pass_phase2">
        <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0" colspan="3">
+        <item row="0" column="0" colspan="4">
          <widget class="QLabel" name="generate_pass_p2_rnd_lbl">
           <property name="enabled">
            <bool>true</bool>
@@ -773,7 +773,7 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0" colspan="3">
+        <item row="1" column="0" colspan="4">
          <widget class="QLabel" name="generate_pass_p2_tracking_lbl">
           <property name="enabled">
            <bool>true</bool>
@@ -789,7 +789,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="3">
+        <item row="2" column="0" colspan="4">
          <widget class="QProgressBar" name="generate_pass_p2_prgrs_bar">
           <property name="enabled">
            <bool>true</bool>
@@ -840,8 +840,8 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QPushButton" name="generate_pass_p2_copy_btn">
+        <item row="3" column="3">
+         <widget class="QToolButton" name="generate_pass_p2_copy_tool_btn">
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -849,7 +849,26 @@
            </font>
           </property>
           <property name="text">
-           <string>Copy Password</string>
+           <string>Copy</string>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextOnly</enum>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <widget class="QPushButton" name="generate_pass_p2_reset_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Reset and generate a new password</string>
           </property>
           <property name="autoDefault">
            <bool>false</bool>
@@ -859,7 +878,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="2">
+        <item row="4" column="2" colspan="2">
          <widget class="QPushButton" name="generate_pass_p2_main_btn">
           <property name="font">
            <font>

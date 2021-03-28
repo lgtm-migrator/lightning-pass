@@ -20,7 +20,7 @@ class MouseTracker(QtCore.QObject):
     position_changed = QtCore.pyqtSignal(QtCore.QPoint)
 
     def __init__(self, widget: QtWidgets.QLabel) -> None:
-        """Class contructor."""
+        """Class constructor."""
         super().__init__(widget)
         self._widget = widget
         self.widget.setMouseTracking(True)
@@ -59,16 +59,25 @@ class MouseTracker(QtCore.QObject):
         tracker.position_changed.connect(on_change)
 
 
+CollectorSet = set[tuple[int, int]]
+
+
 class Collector:
     """This class contains functionality for recording current mouse position."""
 
-    def __init__(self) -> None:
-        """Class contructor."""
-        self.randomness_lst: list[tuple[int, int]] = []
+    def __init__(self, data: CollectorSet = None) -> None:
+        """Class constructor."""
+        self.randomness_set: CollectorSet = {*()}
+        if data:
+            self.randomness_set = data
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"Collector({self.randomness_lst})"
+        return f"Collector({self.randomness_set})"
+
+    def __iter__(self) -> Generator:
+        """Yield mouse movement tuples."""
+        yield from self.randomness_set
 
     def collect_position(self, pos: QtCore.QPoint) -> None:
         """Collect mouse position.
@@ -78,13 +87,10 @@ class Collector:
         :raises StopCollectingPositions: if 1000 mouse positions have been collected
 
         """
-        if len(self.randomness_lst) > 999:
-            raise StopCollectingPositions
-        self.randomness_lst.append((pos.x(), pos.y()))
+        self.randomness_set.add((pos.x(), pos.y()))
 
-    def generator(self) -> Generator:
-        """Yield mouse movement tuples."""
-        yield from self.randomness_lst
+        if len(self.randomness_set) >= 1000:
+            raise StopCollectingPositions
 
 
 class PwdGenerator:
@@ -163,7 +169,7 @@ class PwdGenerator:
         if (
             (char.islower() and self.lowercase)
             or (char.isupper() and self.uppercase)
-            or self.symbols
+            or (self.symbols and not char.islower() and not char.isupper())
         ):
             self.password += char
 

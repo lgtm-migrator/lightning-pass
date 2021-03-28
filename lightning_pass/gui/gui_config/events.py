@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import functools
 import pathlib
-from typing import Callable, Optional
+from typing import Callable, Optional, Any
 
 import clipboard
 import qdarkstyle
@@ -92,8 +92,8 @@ class Events:
     def __init__(
         self,
         parent: QtWidgets.QMainWindow,
-        *args: object,
-        **kwargs: object,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         """Buttons constructor."""
         super().__init__(*args, **kwargs)
@@ -237,7 +237,6 @@ class Events:
 
     def generate_pass_event(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
-        self.ui.collector = mouse_rnd.Collector()
         self.ui.generate_pass_spin_box.setValue(16)
         self.ui.generate_pass_numbers_check.setChecked(True)
         self.ui.generate_pass_symbols_check.setChecked(True)
@@ -273,7 +272,7 @@ class Events:
         ):
             msg_box.MessageBoxes.no_options_generate(self.ui.message_boxes, "Generator")
         else:
-            self.parent.collector = mouse_rnd.Collector()
+            self.parent.collector.randomness_set = {*()}
             self.parent.pass_progress = 0
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
             self.ui.generate_pass_p2_final_pass_line.setText("")

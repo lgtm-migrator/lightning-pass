@@ -455,7 +455,7 @@ class Ui_lightning_pass(object):
         font.setPointSize(11)
         self.generate_pass_p2_rnd_lbl.setFont(font)
         self.generate_pass_p2_rnd_lbl.setObjectName("generate_pass_p2_rnd_lbl")
-        self.gridLayout_6.addWidget(self.generate_pass_p2_rnd_lbl, 0, 0, 1, 3)
+        self.gridLayout_6.addWidget(self.generate_pass_p2_rnd_lbl, 0, 0, 1, 4)
         self.generate_pass_p2_tracking_lbl = QtWidgets.QLabel(self.generate_pass_phase2)
         self.generate_pass_p2_tracking_lbl.setEnabled(True)
         self.generate_pass_p2_tracking_lbl.setMouseTracking(True)
@@ -466,7 +466,7 @@ class Ui_lightning_pass(object):
         self.generate_pass_p2_tracking_lbl.setObjectName(
             "generate_pass_p2_tracking_lbl"
         )
-        self.gridLayout_6.addWidget(self.generate_pass_p2_tracking_lbl, 1, 0, 1, 3)
+        self.gridLayout_6.addWidget(self.generate_pass_p2_tracking_lbl, 1, 0, 1, 4)
         self.generate_pass_p2_prgrs_bar = QtWidgets.QProgressBar(
             self.generate_pass_phase2
         )
@@ -479,7 +479,7 @@ class Ui_lightning_pass(object):
         self.generate_pass_p2_prgrs_bar.setProperty("value", 0)
         self.generate_pass_p2_prgrs_bar.setTextVisible(True)
         self.generate_pass_p2_prgrs_bar.setObjectName("generate_pass_p2_prgrs_bar")
-        self.gridLayout_6.addWidget(self.generate_pass_p2_prgrs_bar, 2, 0, 1, 3)
+        self.gridLayout_6.addWidget(self.generate_pass_p2_prgrs_bar, 2, 0, 1, 4)
         self.generate_pass_p2_final_lbl = QtWidgets.QLabel(self.generate_pass_phase2)
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -500,17 +500,32 @@ class Ui_lightning_pass(object):
             "generate_pass_p2_final_pass_line"
         )
         self.gridLayout_6.addWidget(self.generate_pass_p2_final_pass_line, 3, 1, 1, 2)
-        self.generate_pass_p2_copy_btn = QtWidgets.QPushButton(
+        self.generate_pass_p2_copy_tool_btn = QtWidgets.QToolButton(
             self.generate_pass_phase2
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
-        self.generate_pass_p2_copy_btn.setFont(font)
-        self.generate_pass_p2_copy_btn.setAutoDefault(False)
-        self.generate_pass_p2_copy_btn.setDefault(True)
-        self.generate_pass_p2_copy_btn.setObjectName("generate_pass_p2_copy_btn")
-        self.gridLayout_6.addWidget(self.generate_pass_p2_copy_btn, 4, 0, 1, 2)
+        self.generate_pass_p2_copy_tool_btn.setFont(font)
+        self.generate_pass_p2_copy_tool_btn.setToolButtonStyle(
+            QtCore.Qt.ToolButtonTextOnly
+        )
+        self.generate_pass_p2_copy_tool_btn.setAutoRaise(True)
+        self.generate_pass_p2_copy_tool_btn.setObjectName(
+            "generate_pass_p2_copy_tool_btn"
+        )
+        self.gridLayout_6.addWidget(self.generate_pass_p2_copy_tool_btn, 3, 3, 1, 1)
+        self.generate_pass_p2_reset_btn = QtWidgets.QPushButton(
+            self.generate_pass_phase2
+        )
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.generate_pass_p2_reset_btn.setFont(font)
+        self.generate_pass_p2_reset_btn.setAutoDefault(False)
+        self.generate_pass_p2_reset_btn.setDefault(True)
+        self.generate_pass_p2_reset_btn.setObjectName("generate_pass_p2_reset_btn")
+        self.gridLayout_6.addWidget(self.generate_pass_p2_reset_btn, 4, 0, 1, 2)
         self.generate_pass_p2_main_btn = QtWidgets.QPushButton(
             self.generate_pass_phase2
         )
@@ -519,7 +534,7 @@ class Ui_lightning_pass(object):
         font.setPointSize(10)
         self.generate_pass_p2_main_btn.setFont(font)
         self.generate_pass_p2_main_btn.setObjectName("generate_pass_p2_main_btn")
-        self.gridLayout_6.addWidget(self.generate_pass_p2_main_btn, 4, 2, 1, 1)
+        self.gridLayout_6.addWidget(self.generate_pass_p2_main_btn, 4, 2, 1, 2)
         self.stacked_widget.addWidget(self.generate_pass_phase2)
         self.account = QtWidgets.QWidget()
         self.account.setObjectName("account")
@@ -835,7 +850,7 @@ class Ui_lightning_pass(object):
         self.line_4.setObjectName("line_4")
         self.gridLayout_12.addWidget(self.line_4, 4, 2, 1, 1)
         self.stacked_widget.addWidget(self.vault)
-        self.gridLayout_9.addWidget(self.stacked_widget, 1, 0, 1, 1)
+        self.gridLayout_9.addWidget(self.stacked_widget, 0, 0, 1, 1)
         lightning_pass.setCentralWidget(self.centralwidget)
         self.menu_bar = QtWidgets.QMenuBar(lightning_pass)
         self.menu_bar.setGeometry(QtCore.QRect(0, 0, 661, 26))
@@ -962,7 +977,7 @@ class Ui_lightning_pass(object):
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(10)
+        self.stacked_widget.setCurrentIndex(8)
         self.vault_stacked_widget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
@@ -1053,8 +1068,11 @@ class Ui_lightning_pass(object):
         self.generate_pass_p2_final_lbl.setText(
             _translate("lightning_pass", "Generated password:")
         )
-        self.generate_pass_p2_copy_btn.setText(
-            _translate("lightning_pass", "Copy Password")
+        self.generate_pass_p2_copy_tool_btn.setText(
+            _translate("lightning_pass", "Copy")
+        )
+        self.generate_pass_p2_reset_btn.setText(
+            _translate("lightning_pass", "Reset and generate a new password")
         )
         self.generate_pass_p2_main_btn.setText(
             _translate("lightning_pass", "Main Menu")
