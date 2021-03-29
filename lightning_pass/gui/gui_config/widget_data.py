@@ -1,13 +1,15 @@
-from typing import Any, NamedTuple, Optional, Union
-
-_c = ("clear", None)
-_s_ch = ("setChecked", True)
+import contextlib
+from typing import Any, NamedTuple, Optional
 
 
 class WidgetItem(NamedTuple):
     name: str
     method: Optional[str]
     args: Optional[Any]
+
+
+_c = ("clear", None)
+_s_ch = ("setChecked", True)
 
 
 WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
@@ -40,13 +42,15 @@ WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
 
 
 class ClearPreviousWidget:
+    """Handle clearing the previous widget by accessing the WIDGET_DATA dict."""
+
     def __init__(self, parent):
         """Context manager constructor.
 
         :param parent: The parent where the widget is located
 
         """
-        self.ui = parent.ui
+        self.parent = parent
         self.previous_index = parent.ui.stacked_widget.currentIndex()
 
     def __enter__(self):
@@ -54,14 +58,20 @@ class ClearPreviousWidget:
 
     def __exit__(self, exc_type, exc_value, exc_traceback):
         """Clear the previous widget."""
-        for widget_item in WIDGET_DATA[self.previous_index]:
-            if not widget_item:
-                break
+        widget_item: Optional[WidgetItem]
 
-            obj = getattr(self.ui, widget_item.name)
-            method = getattr(obj, widget_item.method)
+        with contextlib.suppress(KeyError):
+            for widget_item in WIDGET_DATA[self.previous_index]:
+                if not widget_item:
+                    break
 
-            if not widget_item.args:
-                method()
-            else:
-                method(widget_item.args)
+                obj = getattr(self.parent.ui, widget_item.name)
+                method = getattr(obj, widget_item.method)
+
+                try:
+                    method(widget_item.args)
+                except TypeError:
+                    method()
+
+
+__all__ = ["WidgetItem", "WIDGET_DATA", "ClearPreviousWidget"]

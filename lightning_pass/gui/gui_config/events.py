@@ -98,6 +98,8 @@ class Events:
     def _set_current_widget(self, widget: str) -> None:
         """Set a new current widget.
 
+        Clears previous widget with the ClearPreviousWidget ctx manager.
+
         :param widget: The widget to switch to
 
         """
@@ -316,6 +318,7 @@ class Events:
                 self._message_box("username_already_exists_box", "Account")
             else:
                 self._message_box("detail_updated_box", "Account", "username")
+
         if self.current_user.email != self.ui.account_email_line.text():
             try:
                 self.current_user.email = self.ui.account_email_line.text()
@@ -324,12 +327,14 @@ class Events:
             except exc.EmailAlreadyExists:
                 self._message_box("email_already_exists_box", "Account")
             else:
-                self._message_box("details_updated_box", "Account", "email")
+                self._message_box("detail_updated_box", "Account", "email")
 
     @vault_unlock_required
     @login_required
     def vault_event(self) -> None:
         """Switch to vault window."""
+        print(self.current_user.vault_existence)
+
         from lightning_pass.gui.window import VaultWidget
 
         self.ui.vault_widget = VaultWidget().widget

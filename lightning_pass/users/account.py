@@ -125,7 +125,7 @@ class Account:
         """
         return get_user_item(self.user_id, "id", result_column)
 
-    def set_value(self, result: Union[str, datetime], result_column: str) -> None:
+    def set_value(self, result: Union[int, str, datetime], result_column: str) -> None:
         """Simplify setting user values.
 
         :param str result: Value which we're inserting
@@ -235,12 +235,30 @@ class Account:
     def register_date(self) -> datetime:
         """Last login date property.
 
-        Lru caching the register date to avoid unnecessary database queries.
+        Lru caching the register date to avoid unnecessary database queries,
+            (register_date needs to be collected only once, it is not possible to change it.)
 
         :returns: register date of current user
 
         """
         return self.get_value("register_date")
+
+    @property
+    def vault_existence(self) -> bool:
+        return bool(self.get_value("vault_existence"))
+
+    @vault_existence.setter
+    def vault_existence(self, exists: bool) -> None:
+        exists = 1 if exists else 0
+        self.set_value(exists, "vault_created")
+
+    @property
+    def master_password(self) -> str:
+        return self.get_value("master_password")
+
+    @master_password.setter
+    def master_password(self, new) -> None:
+        self.set_value(new, "master_password")
 
 
 __all__ = ["Account"]
