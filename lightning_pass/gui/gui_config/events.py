@@ -13,6 +13,7 @@ import lightning_pass.gui.mouse_randomness as mouse_rnd
 import lightning_pass.users.account as acc
 import lightning_pass.util.exceptions as exc
 from lightning_pass.util.credentials import Email, ProfilePicture, Token
+from lightning_pass.gui.gui_config.widget_data import ClearPreviousWidget
 
 
 def login_required(func: Callable) -> Callable:
@@ -100,10 +101,17 @@ class Events:
         :param widget: The widget to switch to
 
         """
-        self.ui.stacked_widget.setCurrentWidget(getattr(self.ui, widget))
+        with ClearPreviousWidget(self.parent):
+            self.ui.stacked_widget.setCurrentWidget(getattr(self.ui, widget))
 
     def _message_box(self, message_box: str, *args: Any, **kwargs: Any) -> None:
-        """Show a chosen message box with the given positional and keyword arguments."""
+        """Show a chosen message box with the given positional and keyword arguments.
+
+        :param message_box: The message box type to show
+        :param args: Optional positional arguments
+        :param kwargs: Optional keyword arguments
+
+        """
         box = getattr(self.ui.message_boxes, message_box)
         box(*args, **kwargs)
 
@@ -113,8 +121,6 @@ class Events:
 
     def login_event(self) -> None:
         """Switch to login widget and reset previous values."""
-        self.ui.log_username_line_edit.setText("")
-        self.ui.log_password_line_edit.setText("")
         self._set_current_widget("login")
 
     def login_user_event(self) -> None:
@@ -131,11 +137,6 @@ class Events:
 
     def register_event(self) -> None:
         """Switch to register widget and reset previous values."""
-        self.ui.reg_username_line.setText("")
-        self.ui.reg_password_line.setText("")
-        self.ui.reg_conf_pass_line.setText("")
-        self.ui.reg_email_line.setText("")
-
         self._set_current_widget("register_2")
 
     def register_user_event(self) -> None:
@@ -164,8 +165,6 @@ class Events:
 
     def forgot_password_event(self) -> None:
         """Switch to forgot password widget and reset previous email."""
-        self.ui.forgot_pass_email_line.setText("")
-
         self._set_current_widget("forgot_password")
 
     def send_token_event(self) -> None:
@@ -183,8 +182,6 @@ class Events:
 
     def reset_token_event(self) -> None:
         """Switch to reset token page and reset previous values."""
-        self.ui.reset_token_token_line.setText("")
-
         self._set_current_widget("reset_token")
 
     def submit_reset_token_event(self) -> None:
@@ -196,9 +193,6 @@ class Events:
 
     def reset_password_event(self) -> None:
         """Move to reset password page."""
-        self.ui.reset_pass_new_pass_line.setText("")
-        self.ui.reset_pass_conf_new_line.setText("")
-
         self._set_current_widget("reset_password")
 
     def submit_reset_password_event(self) -> None:
@@ -225,12 +219,6 @@ class Events:
 
     def generate_pass_event(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
-        self.ui.generate_pass_spin_box.setValue(16)
-        self.ui.generate_pass_numbers_check.setChecked(True)
-        self.ui.generate_pass_symbols_check.setChecked(True)
-        self.ui.generate_pass_lower_check.setChecked(True)
-        self.ui.generate_pass_upper_check.setChecked(True)
-
         self._set_current_widget("generate_pass")
 
     def get_generator(self) -> mouse_rnd.PwdGenerator:
@@ -264,7 +252,6 @@ class Events:
             self.parent.collector.randomness_set = {*()}
             self.parent.pass_progress = 0
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
-            self.ui.generate_pass_p2_final_pass_line.setText("")
 
             self._set_current_widget("generate_pass_phase2")
 
