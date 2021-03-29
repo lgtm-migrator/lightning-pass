@@ -221,7 +221,7 @@ contain at least one special character."""
         ).exec_()
 
     def account_creation_box(self, parent: str) -> None:
-        """Show successful account creatio message box.
+        """Show successful account creation message box.
 
         :param str parent: Specifies which window instantiated current box
 

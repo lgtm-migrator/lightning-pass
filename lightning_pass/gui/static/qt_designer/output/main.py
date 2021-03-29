@@ -917,18 +917,18 @@ class Ui_lightning_pass(object):
         self.master_pass_menu_tool_btn.setArrowType(QtCore.Qt.DownArrow)
         self.master_pass_menu_tool_btn.setObjectName("master_pass_menu_tool_btn")
         self.gridLayout_13.addWidget(self.master_pass_menu_tool_btn, 4, 2, 1, 1)
-        self.master_Pass_conf_master_pass_line = QtWidgets.QLineEdit(
+        self.master_pass_conf_master_pass_line = QtWidgets.QLineEdit(
             self.master_password
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
-        self.master_Pass_conf_master_pass_line.setFont(font)
-        self.master_Pass_conf_master_pass_line.setEchoMode(QtWidgets.QLineEdit.Password)
-        self.master_Pass_conf_master_pass_line.setObjectName(
-            "master_Pass_conf_master_pass_line"
+        self.master_pass_conf_master_pass_line.setFont(font)
+        self.master_pass_conf_master_pass_line.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.master_pass_conf_master_pass_line.setObjectName(
+            "master_pass_conf_master_pass_line"
         )
-        self.gridLayout_13.addWidget(self.master_Pass_conf_master_pass_line, 3, 1, 1, 1)
+        self.gridLayout_13.addWidget(self.master_pass_conf_master_pass_line, 3, 1, 1, 1)
         self.master_pass_master_pass_line = QtWidgets.QLineEdit(self.master_password)
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")

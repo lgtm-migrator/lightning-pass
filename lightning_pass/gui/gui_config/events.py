@@ -362,9 +362,22 @@ class Events:
         self.current_user.vault_unlocked = False
         self.account_event()
 
+    @login_required
     def master_password_event(self) -> None:
         """Switch to master password widget."""
         self._set_current_widget("master_password")
+
+    def master_password_submit_event(self) -> None:
+        """"""
+        try:
+            self.current_user.set_master_password(
+                self.ui.master_pass_current_pass_line,
+                self.ui.master_pass_master_pass_line,
+                self.ui.master_pass_conf_master_pass_line,
+            )
+        except exc.AccountDoesNotExist:
+            self._message_box("invalid_login_box", "Master Password")
+        return
 
     def toggle_stylesheet_light(self, *args: object) -> None:
         """Change stylesheet to light mode."""

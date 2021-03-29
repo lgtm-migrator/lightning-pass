@@ -48,13 +48,13 @@ class Buttons:
             # register
             "reg_main_btn": "home_event",
             "reg_register_btn": "register_user_event",
-            # forgot password
+            # forgot_password
             "forgot_pass_main_menu_btn": "home_event",
             "forgot_pass_reset_btn": "send_token_event",
-            # reset token
+            # reset_token
             "reset_token_main_btn": "home_event",
             "reset_token_submit_btn": "submit_reset_token_event",
-            # reset password
+            # reset_password
             "reset_pass_main_btn": "home_event",
             "reset_pass_confirm_btn": "submit_reset_password_event",
             # generate_pass
@@ -74,6 +74,9 @@ class Buttons:
             # vault
             "vault_menu_btn": "home_event",
             "vault_lock_btn": "vault_lock_event",
+            # master_password
+            "master_pass_menu_tool_btn": "home_event",
+            "master_pass_save_btn": "master_password_event",
         }
         for button, event in buttons_dict.items():
             getattr(self.ui, button).clicked.connect(

@@ -2,33 +2,33 @@ import contextlib
 from typing import Any, NamedTuple, Optional
 
 
-class WidgetItem(NamedTuple):
-    name: str
-    method: Optional[str]
-    args: Optional[Any]
-
-
 _c = ("clear", None)
 _s_ch = ("setChecked", True)
+
+
+class WidgetItem(NamedTuple):
+    name: str
+    method: Optional[str] = _c[0]
+    args: Optional[Any] = _c[1]
 
 
 WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
     1: {None},
     2: {
-        WidgetItem("log_username_line_edit", *_c),
-        WidgetItem("log_password_line_edit", *_c),
+        WidgetItem("log_username_line_edit"),
+        WidgetItem("log_password_line_edit"),
     },
     3: {
-        WidgetItem("reg_username_line", *_c),
-        WidgetItem("reg_password_line", *_c),
-        WidgetItem("reg_conf_pass_line", *_c),
-        WidgetItem("reg_email_line", *_c),
+        WidgetItem("reg_username_line"),
+        WidgetItem("reg_password_line"),
+        WidgetItem("reg_conf_pass_line"),
+        WidgetItem("reg_email_line"),
     },
-    4: {WidgetItem("forgot_pass_email_line", *_c)},
-    5: {WidgetItem("reset_token_token_line", *_c)},
+    4: {WidgetItem("forgot_pass_email_line")},
+    5: {WidgetItem("reset_token_token_line")},
     6: {
-        WidgetItem("reset_pass_new_pass_line", *_c),
-        WidgetItem("reset_pass_conf_new_line", *_c),
+        WidgetItem("reset_pass_new_pass_line"),
+        WidgetItem("reset_pass_conf_new_line"),
     },
     7: {
         WidgetItem("generate_pass_spin_box", "setValue", 16),
@@ -37,7 +37,12 @@ WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
         WidgetItem("generate_pass_lower_check", *_s_ch),
         WidgetItem("generate_pass_upper_check", *_s_ch),
     },
-    8: {WidgetItem("generate_pass_p2_final_pass_line", *_c)},
+    8: {WidgetItem("generate_pass_p2_final_pass_line")},
+    11: {
+        WidgetItem("master_pass_current_pass_line"),
+        WidgetItem("master_pass_master_pass_line"),
+        WidgetItem("master_pass_conf_master_pass_line"),
+    },
 }
 
 

@@ -276,7 +276,7 @@ class Account:
         :param confirm_master_password: Second master password, used to check that the new passwords match
 
         :raises AccountDoesNotExist: if the normal password is not correct
-        :raises PasswordsDoNotMatch: if the master password do not match
+        :raises PasswordsDoNotMatch: if the master passwords do not match
         :raises InvalidPassword: if the master password doesn't meet the required pattern
 
         """
