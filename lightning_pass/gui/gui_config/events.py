@@ -35,7 +35,7 @@ def login_required(func: Callable) -> Callable:
 
         """
         if not hasattr(self, "current_user"):
-            self.ui.message_boxes.login_required_box("account")
+            self.ui.message_boxes.login_required_box("Account")
         else:
             return func(self)
 
@@ -68,7 +68,7 @@ def vault_unlock_required(func: Callable) -> Callable:
         try:
             vault = self.current_user.vault_unlocked
         except AttributeError:
-            self.ui.message_boxes.login_required_box("account")
+            self.ui.message_boxes.login_required_box("Account")
         else:
             if not vault:
                 self.ui.input_dialogs.master_password_dialog(
@@ -94,6 +94,9 @@ class Events:
         self.parent = parent
         self.main_win = parent.main_win
         self.ui = parent.ui
+
+        # temporary fix for default value in gen_pass spin box
+        self.ui.generate_pass_spin_box.setValue(16)
 
     def _set_current_widget(self, widget: str) -> None:
         """Set a new current widget.
@@ -251,6 +254,7 @@ class Events:
         ):
             self._message_box("no_options_generate", "Generator")
         else:
+            self.parent.gen = self.get_generator()
             self.parent.collector.randomness_set = {*()}
             self.parent.pass_progress = 0
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
@@ -310,6 +314,7 @@ class Events:
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
         if self.current_user.username != self.ui.account_username_line.text():
+
             try:
                 self.current_user.username = self.ui.account_username_line.text()
             except exc.InvalidUsername:
@@ -320,6 +325,7 @@ class Events:
                 self._message_box("detail_updated_box", "Account", "username")
 
         if self.current_user.email != self.ui.account_email_line.text():
+
             try:
                 self.current_user.email = self.ui.account_email_line.text()
             except exc.InvalidEmail:
@@ -355,6 +361,10 @@ class Events:
         """Lock vault."""
         self.current_user.vault_unlocked = False
         self.account_event()
+
+    def master_password_event(self) -> None:
+        """Switch to master password widget."""
+        self._set_current_widget("master_password")
 
     def toggle_stylesheet_light(self, *args: object) -> None:
         """Change stylesheet to light mode."""

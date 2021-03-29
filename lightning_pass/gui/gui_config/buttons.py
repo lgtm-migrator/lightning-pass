@@ -85,14 +85,19 @@ class Buttons:
     def setup_menu_bar(self) -> None:
         """Connect all menu bar actions."""
         menu_bar_dict = {
+            # menu_general
             "action_main_menu": "home_event",
+            # menu_password
             "action_generate": "generate_pass_event",
+            # menu_users
             "action_login": "login_event",
             "action_register": "register_event",
-            "action_profile": "account_event",
-            "action_vault": "vault_event",
             "action_forgot_password": "forgot_password_event",
             "action_reset_token": "reset_token_event",
+            # menu_account
+            "action_profile": "account_event",
+            "action_vault": "vault_event",
+            "action_master_password": "master_password_event",
         }
 
         for action, event in menu_bar_dict.items():
@@ -102,6 +107,7 @@ class Buttons:
 
         del menu_bar_dict
 
+        # menu_theme
         self.ui.action_light.triggered.connect(
             lambda: self.main_win.events.toggle_stylesheet_light(LIGHT_STYLESHEET),
         )
@@ -111,6 +117,7 @@ class Buttons:
 
     def data_validation(self) -> None:
         """Disable whitespaces in registration input fields."""
+        # TODO: add validator lines
         input_validator = QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+"))
         validator_lines = {
             "reg_username_line",

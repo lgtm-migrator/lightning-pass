@@ -27,7 +27,7 @@
        </sizepolicy>
       </property>
       <property name="currentIndex">
-       <number>8</number>
+       <number>11</number>
       </property>
       <widget class="QWidget" name="loading">
        <property name="cursor">
@@ -175,13 +175,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="log_username_line_edit">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
          <widget class="QLabel" name="log_entry_register_lbl">
           <property name="font">
@@ -192,16 +185,6 @@
           </property>
           <property name="text">
            <string>Password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="log_password_line_edit">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
           </property>
          </widget>
         </item>
@@ -247,6 +230,23 @@
           </property>
           <property name="text">
            <string>Main Menu</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="log_username_line_edit">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="log_password_line_edit">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
           </property>
          </widget>
         </item>
@@ -319,37 +319,6 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="reg_conf_pass_line">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="reg_email_line">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="reg_password_line">
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="reg_username_line">
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
         <item row="5" column="0" colspan="2">
          <widget class="QPushButton" name="reg_register_btn">
           <property name="font">
@@ -382,23 +351,41 @@
           </property>
          </widget>
         </item>
+        <item row="4" column="1">
+         <widget class="QLineEdit" name="reg_email_line">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="reg_conf_pass_line">
+          <property name="text">
+           <string/>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="reg_password_line">
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="reg_username_line">
+          <property name="text">
+           <string/>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="forgot_password">
        <layout class="QGridLayout" name="gridLayout_4">
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="forgot_pass_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Forgot Password</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="forgot_pass_email_entry_lbl">
           <property name="font">
@@ -412,8 +399,31 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="forgot_pass_email_line"/>
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="forgot_pass_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe Print</family>
+            <pointsize>26</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Forgot Password</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QPushButton" name="forgot_pass_main_menu_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Main Menu</string>
+          </property>
+         </widget>
         </item>
         <item row="2" column="0" colspan="2">
          <widget class="QPushButton" name="forgot_pass_reset_btn">
@@ -434,8 +444,34 @@
           </property>
          </widget>
         </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="forgot_pass_email_line"/>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="reset_token">
+       <layout class="QGridLayout" name="gridLayout_10">
+        <item row="2" column="0" colspan="2">
+         <widget class="QPushButton" name="reset_token_submit_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Submit Reset Token</string>
+          </property>
+          <property name="autoDefault">
+           <bool>false</bool>
+          </property>
+          <property name="default">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="2">
-         <widget class="QPushButton" name="forgot_pass_main_menu_btn">
+         <widget class="QPushButton" name="reset_token_main_btn">
           <property name="font">
            <font>
             <family>Segoe UI Light</family>
@@ -447,10 +483,6 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="reset_token">
-       <layout class="QGridLayout" name="gridLayout_10">
         <item row="0" column="0" colspan="2">
          <widget class="QLabel" name="reset_token_lbl">
           <property name="font">
@@ -487,38 +519,6 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QPushButton" name="reset_token_submit_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Submit Reset Token</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="reset_token_main_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
       <widget class="QWidget" name="reset_password">
@@ -549,13 +549,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="reset_pass_new_pass_line">
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
          <widget class="QLabel" name="reset_pass_conf_new_lbl">
           <property name="font">
@@ -566,13 +559,6 @@
           </property>
           <property name="text">
            <string>Confirm New Password</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="reset_pass_conf_new_line">
-          <property name="readOnly">
-           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -605,6 +591,20 @@
           </property>
           <property name="text">
            <string>Main Menu</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1" colspan="2">
+         <widget class="QLineEdit" name="reset_pass_new_pass_line">
+          <property name="readOnly">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1" colspan="2">
+         <widget class="QLineEdit" name="reset_pass_conf_new_line">
+          <property name="readOnly">
+           <bool>true</bool>
           </property>
          </widget>
         </item>
@@ -646,11 +646,29 @@
             <pointsize>10</pointsize>
            </font>
           </property>
+          <property name="wrapping">
+           <bool>false</bool>
+          </property>
+          <property name="buttonSymbols">
+           <enum>QAbstractSpinBox::PlusMinus</enum>
+          </property>
+          <property name="specialValueText">
+           <string/>
+          </property>
+          <property name="accelerated">
+           <bool>true</bool>
+          </property>
+          <property name="correctionMode">
+           <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+          </property>
+          <property name="showGroupSeparator" stdset="0">
+           <bool>true</bool>
+          </property>
           <property name="minimum">
-           <number>16</number>
+           <number>1</number>
           </property>
           <property name="maximum">
-           <number>64</number>
+           <number>999</number>
           </property>
          </widget>
         </item>
@@ -851,11 +869,17 @@
           <property name="text">
            <string>Copy</string>
           </property>
+          <property name="popupMode">
+           <enum>QToolButton::InstantPopup</enum>
+          </property>
           <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextOnly</enum>
+           <enum>Qt::ToolButtonTextBesideIcon</enum>
           </property>
           <property name="autoRaise">
            <bool>true</bool>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::RightArrow</enum>
           </property>
          </widget>
         </item>
@@ -1350,6 +1374,136 @@
         </item>
        </layout>
       </widget>
+      <widget class="QWidget" name="master_password">
+       <layout class="QGridLayout" name="gridLayout_13">
+        <item row="0" column="0" colspan="2">
+         <widget class="QLabel" name="master_pass_main_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe Print</family>
+            <pointsize>26</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Master Password</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="master_pass_current_pass_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Current Password:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="master_pass_master_pass_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Master Password:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="master_pass_conf_master_pass_lbl">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Confirm Master Password:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0" colspan="2">
+         <widget class="QPushButton" name="master_pass_save_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Save Master Password</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="2">
+         <widget class="QToolButton" name="master_pass_menu_tool_btn">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string>Menu</string>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextBesideIcon</enum>
+          </property>
+          <property name="autoRaise">
+           <bool>true</bool>
+          </property>
+          <property name="arrowType">
+           <enum>Qt::DownArrow</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="master_Pass_conf_master_pass_line">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLineEdit" name="master_pass_master_pass_line">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="master_pass_current_pass_line">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </item>
    </layout>
@@ -1383,19 +1537,14 @@
      <property name="title">
       <string>account</string>
      </property>
-     <widget class="QMenu" name="menuaccount">
-      <property name="title">
-       <string>account</string>
-      </property>
-      <addaction name="action_profile"/>
-      <addaction name="action_vault"/>
-     </widget>
-     <addaction name="action_login"/>
-     <addaction name="action_register"/>
-     <addaction name="menuaccount"/>
-     <addaction name="action_forgot_password"/>
-     <addaction name="action_reset_token"/>
+     <addaction name="action_profile"/>
+     <addaction name="action_vault"/>
+     <addaction name="action_master_password"/>
     </widget>
+    <addaction name="action_login"/>
+    <addaction name="action_register"/>
+    <addaction name="action_forgot_password"/>
+    <addaction name="action_reset_token"/>
     <addaction name="menu_account"/>
    </widget>
    <widget class="QMenu" name="menu_password">
@@ -1565,6 +1714,20 @@
      <family>Segoe UI Light</family>
      <pointsize>10</pointsize>
     </font>
+   </property>
+  </action>
+  <action name="action_master_password">
+   <property name="text">
+    <string>master_password</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="shortcutContext">
+    <enum>Qt::WindowShortcut</enum>
    </property>
   </action>
  </widget>

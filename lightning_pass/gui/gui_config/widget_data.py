@@ -56,10 +56,11 @@ class ClearPreviousWidget:
     def __enter__(self):
         """Do nothing on enter."""
 
-    def __exit__(self, exc_type, exc_value, exc_traceback):
+    def __exit__(self, exc_type, exc_val, exc_tb):
         """Clear the previous widget."""
         widget_item: Optional[WidgetItem]
 
+        # TODO: add all indexes into DATA_DICT
         with contextlib.suppress(KeyError):
             for widget_item in WIDGET_DATA[self.previous_index]:
                 if not widget_item:

@@ -8,25 +8,6 @@ from mysql.connector import MySQLConnection
 from mysql.connector.cursor import MySQLCursor
 
 
-def retry_if_exception(exception=Exception, ntimes=3) -> Callable:
-    def outer(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            x = ntimes
-            while x:
-                try:
-                    val = func(*args, **kwargs)
-                except exception:
-                    print(x)
-                    x -= 1
-                else:
-                    return val
-
-        return wrapper
-
-    return outer
-
-
 @contextlib.contextmanager
 def database_manager() -> Iterator[None]:
     """Manage database queries easily with context manager.
@@ -94,4 +75,18 @@ def enable_database_safe_mode(func: Callable) -> Callable:
     return wrapper
 
 
-__all__ = ["database_manager", "enable_database_safe_mode"]
+class EnableDBSafeMode:
+    def __enter__(self):
+        """Disable database safe mode on enter."""
+        with database_manager() as db:
+            sql = "SET SQL_SAFE_UPDATES = 0"
+            db.execute(sql)
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Enable safe mode again on exit."""
+        with database_manager() as db:
+            sql = "SET SQL_SAFE_UPDATES = 1"
+            db.execute(sql)
+
+
+__all__ = ["database_manager", "EnableDBSafeMode"]

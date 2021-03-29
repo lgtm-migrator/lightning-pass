@@ -11,7 +11,7 @@ from PyQt5 import QtCore
 
 from lightning_pass.settings import EMAIL_DICT, PFP_FOLDER
 
-from .database import database_manager, enable_database_safe_mode
+from .database import database_manager, EnableDBSafeMode
 from .exceptions import (
     AccountException,
     EmailAlreadyExists,
@@ -35,7 +35,6 @@ def _get_user_id(column: str, value: str) -> Union[int, bool]:
 
     """
     with database_manager() as db:
-        # f-string SQl injection not an issue
         sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
         db.execute(sql)
         result = db.fetchone()
@@ -69,7 +68,6 @@ def get_user_item(
     if result_column == "id":
         return user_id
     with database_manager() as db:
-        # f-string SQl injection not an issue
         sql = f"SELECT {result_column} FROM lightning_pass.credentials WHERE id = {user_id}"
         db.execute(sql)
         result = db.fetchone()
@@ -464,11 +462,10 @@ class Token:
     """This class holds various utils connected to token generation and checking."""
 
     @staticmethod
-    @enable_database_safe_mode
     def generate_reset_token(user_id: int) -> str:
         """Clear all tokens older than 30 minutes. Insert new user's token into database and return it.
 
-        Database safe mode is used for the first query where the search is not based on the primary key.
+        Database (un)safe mode is used for the first query where the search is not based on the primary key.
 
         :param int user_id: Used to create a reference between the user and his token.
 
@@ -476,12 +473,16 @@ class Token:
 
         """
         token = secrets.token_hex(15) + str(user_id)
-        with database_manager() as db:
-            sql = "DELETE FROM lightning_pass.tokens WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"
-            db.execute(sql)
 
+        with EnableDBSafeMode():
+            with database_manager() as db:
+                sql = "DELETE FROM lightning_pass.tokens WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"
+                db.execute(sql)
+
+        with database_manager() as db:
             sql = f"INSERT INTO lightning_pass.tokens (user_id, token) VALUES ({user_id}, '{token}')"
             db.execute(sql)
+
         return token
 
     @staticmethod

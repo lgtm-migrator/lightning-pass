@@ -79,6 +79,7 @@ class Account:
         )()
         # Exceptions: EmailAlreadyExists, Invalid email
         Email(email)()
+
         # no exceptions raised -> insert into db
         with database_manager() as db:
             sql = (
@@ -125,7 +126,9 @@ class Account:
         """
         return get_user_item(self.user_id, "id", result_column)
 
-    def set_value(self, result: Union[int, str, datetime], result_column: str) -> None:
+    def set_value(
+        self, result: Union[int, str, bytes, datetime], result_column: str
+    ) -> None:
         """Simplify setting user values.
 
         :param str result: Value which we're inserting
@@ -236,7 +239,7 @@ class Account:
         """Last login date property.
 
         Lru caching the register date to avoid unnecessary database queries,
-            (register_date needs to be collected only once, it is not possible to change it.)
+        (register_date needs to be collected only once, it is not possible to change it.)
 
         :returns: register date of current user
 
@@ -245,20 +248,47 @@ class Account:
 
     @property
     def vault_existence(self) -> bool:
+        """Return boolean value indicating the vault_existence."""
         return bool(self.get_value("vault_existence"))
 
     @vault_existence.setter
     def vault_existence(self, exists: bool) -> None:
+        """Change the vault existence value.
+
+        :param exists: Bool, turned into a tinyint due to mysql
+
+        """
         exists = 1 if exists else 0
         self.set_value(exists, "vault_created")
 
     @property
     def master_password(self) -> str:
+        """Return current master password."""
         return self.get_value("master_password")
 
-    @master_password.setter
-    def master_password(self, new) -> None:
-        self.set_value(new, "master_password")
+    def set_master_password(
+        self, password, master_password: str, confirm_master_password: str
+    ) -> None:
+        """Set a new master password.
+
+        :param password: Current normal password, used to check account ownership
+        :param master_password: New master password
+        :param confirm_master_password: Second master password, used to check that the new passwords match
+
+        :raises AccountDoesNotExist: if the normal password is not correct
+        :raises PasswordsDoNotMatch: if the master password do not match
+        :raises InvalidPassword: if the master password doesn't meet the required pattern
+
+        """
+        if not Password.authenticate_password(password, self.password):
+            raise AccountDoesNotExist
+
+        # Exceptions: PasswordDoNotMatch, InvalidPassword
+        Password(
+            master_password,
+            confirm_master_password,
+        )()
+        self.set_value(Password.hash_password(master_password), "master_password")
 
 
 __all__ = ["Account"]
