@@ -9,11 +9,9 @@ import bcrypt
 import yagmail
 from PyQt5 import QtCore
 
+import lightning_pass.util.database as database
 from lightning_pass.settings import EMAIL_DICT, PFP_FOLDER
-
-from .database import database_manager, EnableDBSafeMode
-from .exceptions import (
-    AccountException,
+from lightning_pass.util.exceptions import (
     EmailAlreadyExists,
     InvalidEmail,
     InvalidPassword,
@@ -31,17 +29,15 @@ def _get_user_id(column: str, value: str) -> Union[int, bool]:
 
     :returns: user id on success
 
-    :raises AccountException: if no result was found
-
     """
-    with database_manager() as db:
+    with database.database_manager() as db:
         sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
         db.execute(sql)
         result = db.fetchone()
     try:
         return result[0]
-    except TypeError as e:
-        raise AccountException from e
+    except TypeError:
+        return False
 
 
 def get_user_item(
@@ -55,26 +51,25 @@ def get_user_item(
     :param str identifier_column: Database column of the given user value
     :param str result_column: Column of the wanted value
 
-    :returns: user id on success, False upon failure
-
-    :raises AccountException: if no result was found
+    :returns: user item on success, False upon failure
 
     """
-    # Exception: AccountException
     user_id = _get_user_id(
         identifier_column,
         user_identifier,
     )
+    if not user_id:
+        return False
     if result_column == "id":
         return user_id
-    with database_manager() as db:
+    with database.database_manager() as db:
         sql = f"SELECT {result_column} FROM lightning_pass.credentials WHERE id = {user_id}"
         db.execute(sql)
         result = db.fetchone()
     try:
         return result[0]
-    except TypeError as e:
-        raise AccountException from e
+    except TypeError:
+        return False
 
 
 def set_user_item(
@@ -93,7 +88,7 @@ def set_user_item(
     """
     if identifier_column != "id":
         user_identifier = _get_user_id(identifier_column, user_identifier)
-    with database_manager() as db:
+    with database.database_manager() as db:
         sql = f"UPDATE lightning_pass.credentials SET {result_column} = '{result}' WHERE id = {user_identifier}"
         db.execute(sql)
 
@@ -127,7 +122,7 @@ def _check_item_existence(
     else:
         sql = f"SELECT EXISTS(SELECT 1 FROM lightning_pass.{table} WHERE {item_column} = '{item}')"
 
-    with database_manager() as db:
+    with database.database_manager() as db:
         db.execute(sql)
         result = db.fetchone()[0]
 
@@ -474,12 +469,12 @@ class Token:
         """
         token = secrets.token_hex(15) + str(user_id)
 
-        with EnableDBSafeMode():
-            with database_manager() as db:
+        with database.EnableDBSafeMode():
+            with database.database_manager() as db:
                 sql = "DELETE FROM lightning_pass.tokens WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"
                 db.execute(sql)
 
-        with database_manager() as db:
+        with database.database_manager() as db:
             sql = f"INSERT INTO lightning_pass.tokens (user_id, token) VALUES ({user_id}, '{token}')"
             db.execute(sql)
 
@@ -497,7 +492,7 @@ class Token:
 
         """
         if _check_item_existence(token, "token", "tokens", should_exist=True):
-            with database_manager() as db:
+            with database.database_manager() as db:
                 sql = f"DELETE FROM lightning_pass.tokens WHERE token = '{token}'"
                 db.execute(sql)
             return True
@@ -509,7 +504,6 @@ __all__ = [
     "Password",
     "ProfilePicture",
     "Username",
-    "database_manager",
     "get_user_item",
     "set_user_item",
 ]

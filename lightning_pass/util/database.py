@@ -75,7 +75,9 @@ def enable_database_safe_mode(func: Callable) -> Callable:
     return wrapper
 
 
-class EnableDBSafeMode:
+class EnableDBSafeMode(contextlib.ContextDecorator):
+    """Context manager and a decorator to temporarily enable database safe mode."""
+
     def __enter__(self):
         """Disable database safe mode on enter."""
         with database_manager() as db:

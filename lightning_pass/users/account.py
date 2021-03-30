@@ -5,15 +5,8 @@ import functools
 from datetime import datetime
 from typing import Optional, Union
 
-from lightning_pass.util.credentials import (
-    Email,
-    Password,
-    ProfilePicture,
-    Username,
-    database_manager,
-    get_user_item,
-    set_user_item,
-)
+import lightning_pass.util.database as database
+import lightning_pass.util.credentials as credentials
 from lightning_pass.util.exceptions import AccountDoesNotExist
 
 
@@ -25,8 +18,13 @@ def change_password(user_id: int, password: str, confirm_password: str) -> None:
 
     """
     # Exceptions: InvalidPassword, PasswordsDoNotMatch
-    Password(password, confirm_password).__call__()
-    set_user_item(user_id, "id", Password.hash_password(password), "password")
+    credentials.Password(password, confirm_password).__call__()
+    credentials.set_user_item(
+        user_id,
+        "id",
+        credentials.Password.hash_password(password),
+        "password",
+    )
 
 
 class Account:
@@ -71,25 +69,25 @@ class Account:
 
         """
         # Exceptions: UsernameAlreadyExists, InvalidUsername
-        Username(username)(should_exist=False)
+        credentials.Username(username)(should_exist=False)
         # Exceptions: PasswordDoNotMatch, InvalidPassword
-        Password(
+        credentials.Password(
             password,
             confirm_password,
         )()
         # Exceptions: EmailAlreadyExists, Invalid email
-        Email(email)()
+        credentials.Email(email)()
 
         # no exceptions raised -> insert into db
-        with database_manager() as db:
+        with database.database_manager() as db:
             sql = (
                 "INSERT INTO lightning_pass.credentials (username, password, email)"
                 "     VALUES (%s, %s, %s)"
             )
-            values = (username, Password.hash_password(password), email)
+            values = (username, credentials.Password.hash_password(password), email)
             db.execute(sql, values)
 
-        return cls(get_user_item(username, "username", "id"))
+        return cls(credentials.get_user_item(username, "username", "id"))
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
@@ -107,12 +105,12 @@ class Account:
 
         """
         # Exception: AccountDoesNotExist
-        Username.check_username_existence(username, should_exist=True)
-        stored_password = get_user_item(username, "username", "password")
-        if not Password.authenticate_password(password, stored_password):
+        credentials.Username.check_username_existence(username, should_exist=True)
+        stored_password = credentials.get_user_item(username, "username", "password")
+        if not credentials.Password.authenticate_password(password, stored_password):
             raise AccountDoesNotExist
 
-        account = cls(get_user_item(username, "username", "id"))
+        account = cls(credentials.get_user_item(username, "username", "id"))
         account.update_last_login_date()
         return account
 
@@ -124,7 +122,7 @@ class Account:
         :returns: the result value
 
         """
-        return get_user_item(self.user_id, "id", result_column)
+        return credentials.get_user_item(self.user_id, "id", result_column)
 
     def set_value(
         self, result: Union[int, str, bytes, datetime], result_column: str
@@ -135,7 +133,7 @@ class Account:
         :param str result_column: Column where to insert the value
 
         """
-        set_user_item(self.user_id, "id", result, result_column)
+        credentials.set_user_item(self.user_id, "id", result, result_column)
 
     @property
     def username(self) -> str:
@@ -157,7 +155,7 @@ class Account:
 
         """
         # Exceptions: UsernameAlreadyExists, InvalidUsername
-        Username(value)(should_exist=False)
+        credentials.Username(value)(should_exist=False)
         self.set_value(value, "username")
 
     @property
@@ -189,7 +187,7 @@ class Account:
 
         """
         # Exceptions: EmailAlreadyExists, InvalidEmail
-        Email(value)()
+        credentials.Email(value)()
         self.set_value(value, "email")
 
     @property
@@ -217,7 +215,9 @@ class Account:
         :returns: path to user's profile picture
 
         """
-        return str(ProfilePicture.get_profile_picture_path(self.profile_picture))
+        return str(
+            credentials.ProfilePicture.get_profile_picture_path(self.profile_picture)
+        )
 
     @property
     def last_login_date(self) -> datetime:
@@ -230,7 +230,7 @@ class Account:
 
     def update_last_login_date(self) -> None:
         """Set last login date."""
-        with database_manager() as db:
+        with database.database_manager() as db:
             sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = {self.user_id}"
             db.execute(sql)
 
@@ -280,15 +280,17 @@ class Account:
         :raises InvalidPassword: if the master password doesn't meet the required pattern
 
         """
-        if not Password.authenticate_password(password, self.password):
+        if not credentials.Password.authenticate_password(password, self.password):
             raise AccountDoesNotExist
 
         # Exceptions: PasswordDoNotMatch, InvalidPassword
-        Password(
+        credentials.Password(
             master_password,
             confirm_master_password,
         )()
-        self.set_value(Password.hash_password(master_password), "master_password")
+        self.set_value(
+            credentials.Password.hash_password(master_password), "master_password"
+        )
 
 
 __all__ = ["Account"]

@@ -1,83 +1,19 @@
 """Module containing the Events class used for event handling."""
 from __future__ import annotations
 
-import functools
 import pathlib
-from typing import Any, Callable, Optional
+from typing import Any
 
 import clipboard
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
 
+import lightning_pass.gui.gui_config.event_decorators as decorators
 import lightning_pass.gui.mouse_randomness as mouse_rnd
 import lightning_pass.users.account as acc
 import lightning_pass.util.exceptions as exc
 from lightning_pass.util.credentials import Email, ProfilePicture, Token
 from lightning_pass.gui.gui_config.widget_data import ClearPreviousWidget
-
-
-def login_required(func: Callable) -> Callable:
-    """Decorate to ensure that a user has to be logged in to access a specific event.
-
-    :param func: Function to decorate
-
-    :return: the decorated function
-
-    """
-
-    @functools.wraps(func)
-    def wrapper(self: Events, *args, **kwargs) -> Optional[Callable]:
-        """Check the "current_user" attribute.
-
-        :param self: Class instance to give access to its attributes
-
-        :return: executed function or None and show a message box indicating need log in
-
-        """
-        if not hasattr(self, "current_user"):
-            self.ui.message_boxes.login_required_box("Account")
-        else:
-            return func(self)
-
-    return wrapper
-
-
-def vault_unlock_required(func: Callable) -> Callable:
-    """Decorate to ensure that a vault is unlocked to access a specific event.
-
-    :param func: Function to decorate
-
-    :return: the decorated function
-
-    """
-
-    @functools.wraps(func)
-    def wrapper(self: Events, *args, **kwargs) -> Optional[Callable]:
-        """Check the vault_unlocked attribute of the current user.
-
-        If current user does not exist show normal login required box.
-        If vault is not unlocked show box indicating need to unlock it.
-
-        :param self: Class instance to give access to its attributes
-        :param args: Optional positional arguments
-        :param kwargs: Optional keyword arguments
-
-        :return: executed function or None and show a message box indicating need log in
-
-        """
-        try:
-            vault = self.current_user.vault_unlocked
-        except AttributeError:
-            self.ui.message_boxes.login_required_box("Account")
-        else:
-            if not vault:
-                self.ui.input_dialogs.master_password_dialog(
-                    "Account", getattr(self.current_user, "username")
-                )
-            else:
-                return func(self)
-
-    return wrapper
 
 
 class Events:
@@ -166,7 +102,7 @@ class Events:
         except exc.PasswordsDoNotMatch:
             self._message_box("passwords_do_not_match_box", "Register")
         else:
-            self._message_box("account_creation_box", "Register")
+            self._message_box("account_creation_box")
 
     def forgot_password_event(self) -> None:
         """Switch to forgot password widget and reset previous email."""
@@ -252,7 +188,7 @@ class Events:
             and not self.ui.generate_pass_lower_check.isChecked()
             and not self.ui.generate_pass_upper_check.isChecked()
         ):
-            self._message_box("no_options_generate", "Generator")
+            self._message_box("no_options_generate_box", "Generator")
         else:
             self.parent.gen = self.get_generator()
             self.parent.collector.randomness_set = {*()}
@@ -265,7 +201,7 @@ class Events:
         """Copy generated password into clipboard."""
         clipboard.copy(self.ui.generate_pass_p2_final_pass_line.text())
 
-    @login_required
+    @decorators.login_required
     def account_event(self) -> None:
         """Switch to account widget and reset previous values.
 
@@ -284,7 +220,7 @@ class Events:
 
         self._set_current_widget("account")
 
-    @login_required
+    @decorators.login_required
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
         fname, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -299,18 +235,18 @@ class Events:
             )
         self.account_event()
 
-    @login_required
+    @decorators.login_required
     def logout_event(self) -> None:
         """Logout current user."""
         del self.current_user
         self.home_event()
 
-    @login_required
+    @decorators.login_required
     def change_pass_event(self) -> None:
         """Change password for current user."""
         ...
 
-    @login_required
+    @decorators.login_required
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
         if self.current_user.username != self.ui.account_username_line.text():
@@ -335,8 +271,9 @@ class Events:
             else:
                 self._message_box("detail_updated_box", "Account", "email")
 
-    @vault_unlock_required
-    @login_required
+    @decorators.vault_unlock_required
+    @decorators.master_password_required
+    @decorators.login_required
     def vault_event(self) -> None:
         """Switch to vault window."""
         print(self.current_user.vault_existence)
@@ -357,16 +294,20 @@ class Events:
 
         self._set_current_widget("vault")
 
+    @decorators.vault_unlock_required
+    @decorators.master_password_required
+    @decorators.login_required
     def vault_lock_event(self) -> None:
         """Lock vault."""
         self.current_user.vault_unlocked = False
         self.account_event()
 
-    @login_required
+    @decorators.login_required
     def master_password_event(self) -> None:
         """Switch to master password widget."""
         self._set_current_widget("master_password")
 
+    @decorators.login_required
     def master_password_submit_event(self) -> None:
         """"""
         try:
@@ -377,6 +318,7 @@ class Events:
             )
         except exc.AccountDoesNotExist:
             self._message_box("invalid_login_box", "Master Password")
+        # TODO: finish
         return
 
     def toggle_stylesheet_light(self, *args: object) -> None:
@@ -395,5 +337,4 @@ class Events:
 
 __all__ = [
     "Events",
-    "login_required",
 ]

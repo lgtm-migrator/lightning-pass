@@ -63,7 +63,7 @@ class MessageBoxes(QWidget):
         self,
         parent: str,
         text: str,
-        icon: QMessageBox.Icon,
+        icon: QMessageBox.Icon = QMessageBox.Warning,
         informative_text: str = None,
         standard_buttons: Union[
             QMessageBox.StandardButtons,
@@ -76,7 +76,7 @@ class MessageBoxes(QWidget):
 
         :param parent: Specifies which window instantiated the new message box
         :param text: Main text to be displayed on the message box
-        :param icon: Message box icon type
+        :param icon: Message box icon type, defaults to QMessageBox.Warning
         :param informative_text: Additional text, defaults to None
         :param standard_buttons: Extra buttons to be shown on the message box, defaults to None
         :param default_button: Default button, defaults to None
@@ -125,14 +125,15 @@ class MessageBoxes(QWidget):
             QMessageBox.Warning,
         )
 
-    def _yes_no_box(
-        self, default_btn: QMessageBox.StandardButton, handler
-    ) -> message_box_factory:
+    def _yes_no_box(self, handler, default_btn: str = "No") -> message_box_factory:
         """Return a partially initialized message box with yes and no buttons.
 
+        :param default_btn: Which button should me the default one, defaults to "No"
         :param handler: Event handler for click on the two yes | no buttons
 
         """
+        default_btn = getattr(QMessageBox, default_btn)
+
         return partial_factory(
             self.message_box_factory,
             standard_buttons=QMessageBox.Yes | QMessageBox.No,
@@ -147,7 +148,7 @@ class MessageBoxes(QWidget):
 
         """
         box = self._invalid_item_box(item="username", parent=parent)
-        box(informative_text="Username be at least 5 characters long.").exec_()
+        box(informative_text="Username be at least 5 characters long.").exec()
 
     def invalid_password_box(self, parent: str) -> None:
         """Show invalid password message box.
@@ -163,7 +164,7 @@ contain at least 1 capital letter,
 contain at least 1 number and
 contain at least one special character."""
             )
-        ).exec_()
+        ).exec()
 
     def invalid_email_box(self, parent: str) -> None:
         """Show invalid email message box.
@@ -171,7 +172,7 @@ contain at least one special character."""
         :param str parent: Specifies which window instantiated current box
 
         """
-        self._invalid_item_box(item="email", parent=parent)().exec_()
+        self._invalid_item_box(item="email", parent=parent)().exec()
 
     def invalid_token_box(self, parent: str) -> None:
         """Show invalid token message box.
@@ -183,13 +184,12 @@ contain at least one special character."""
             {"&Yes": self.events.forgot_password_event}
         )
 
-        box = self._yes_no_box(QMessageBox.Yes, event_handler)
+        box = self._yes_no_box(event_handler, "Yes")
         box(
             parent=parent,
             text="This token is invalid",
-            icon=QMessageBox.Warning,
             informative_text="Would you like to generate a token?",
-        ).exec_()
+        ).exec()
 
     def username_already_exists_box(self, parent: str) -> None:
         """Show username already exists message box.
@@ -197,7 +197,7 @@ contain at least one special character."""
         :param str parent: Specifies which window instantiated current box
 
         """
-        self._item_already_exists_box(item="username", parent=parent)().exec_()
+        self._item_already_exists_box(item="username", parent=parent)().exec()
 
     def email_already_exists_box(self, parent: str) -> None:
         """Show email already exists message box.
@@ -205,7 +205,7 @@ contain at least one special character."""
         :param str parent: Specifies which window instantiated current box
 
         """
-        self._item_already_exists_box(item="email", parent=parent)().exec_()
+        self._item_already_exists_box(item="email", parent=parent)().exec()
 
     def passwords_do_not_match_box(self, parent: str) -> None:
         """Show passwords do not match message box.
@@ -214,29 +214,28 @@ contain at least one special character."""
 
         """
         self.message_box_factory(
-            parent,
-            "Passwords don't match.",
-            QMessageBox.Warning,
+            parent=parent,
+            text="Passwords don't match.",
             informative_text="Please try again.",
-        ).exec_()
+        ).exec()
 
-    def account_creation_box(self, parent: str) -> None:
+    def account_creation_box(self, parent: Optional[str] = "Register") -> None:
         """Show successful account creation message box.
 
-        :param str parent: Specifies which window instantiated current box
+        :param str parent: Specifies which window instantiated current box, defaults to "Register"
 
         """
         event_handler = event_handler_factory(
             {"&Yes": self.events.login_event, "&No": self.events.register_event},
         )
 
-        box = self._yes_no_box(QMessageBox.Yes, event_handler)
+        box = self._yes_no_box(event_handler, "Yes")
         box(
             parent=parent,
             text="Account successfully created.",
             icon=QMessageBox.Question,
             informative_text="Would you like to move to the login page?",
-        ).exec_()
+        ).exec()
 
     def invalid_login_box(self, parent: str) -> None:
         """Show invalid login message box.
@@ -248,13 +247,12 @@ contain at least one special character."""
             {"&Yes": self.events.forgot_password_event}
         )
 
-        box = self._yes_no_box(QMessageBox.Yes, event_handler)
+        box = self._yes_no_box(event_handler, "Yes")
         box(
             parent=parent,
             text="Invalid login details.",
-            icon=QMessageBox.Warning,
             informative_text="Forgot password?",
-        ).exec_()
+        ).exec()
 
     def login_required_box(self, parent: str) -> None:
         """Show message box indicating that password can't be generated with current case type option.
@@ -264,13 +262,12 @@ contain at least one special character."""
         """
         event_handler = event_handler_factory({"&Yes": self.events.login_event})
 
-        box = self._yes_no_box(QMessageBox.No, event_handler)
+        box = self._yes_no_box(event_handler, "No")
         box(
             parent=parent,
             text="Please log in to access that page.",
-            icon=QMessageBox.Warning,
             informative_text="Would you like to move to the login page?",
-        ).exec_()
+        ).exec()
 
     def detail_updated_box(
         self,
@@ -287,7 +284,7 @@ contain at least one special character."""
             parent,
             f"Your {detail} has been successfully updated!",
             QMessageBox.Question,
-        ).exec_()
+        ).exec()
 
     def reset_email_sent_box(self, parent: str) -> None:
         """Show message box indicating that a reset email has been sent.
@@ -297,25 +294,66 @@ contain at least one special character."""
         """
         event_handler = event_handler_factory({"&Yes": self.events.reset_token_event})
 
-        box = self._yes_no_box(QMessageBox.Yes, event_handler)
+        box = self._yes_no_box(event_handler, "Yes")
         box(
             parent=parent,
             text="The reset email has been sent.",
             icon=QMessageBox.Question,
             informative_text="Would you like to move to the token page now?",
-        ).exec_()
+        ).exec()
 
-    def no_options_generate(self, parent: str) -> None:
+    def no_options_generate_box(self, parent: str) -> None:
         """Show a message box indicating that password can't be generated without a single option.
 
         :param str parent: Specifies which window instantiated current box
 
         """
         self.message_box_factory(
-            parent,
-            "Password can't be generate without a single parameter.",
-            QMessageBox.Warning,
-        ).exec_()
+            parent=parent,
+            text="Password can't be generate without a single parameter.",
+        ).exec()
+
+    def master_password_required_box(
+        self,
+        parent: Optional[str] = "Master Password",
+    ) -> None:
+        """Show message box indicating that the current user needs to setup master password to proceed.
+
+        :param parent: The window which instantiated the current box, defaults to "Master Password"
+
+        """
+        event_handler = event_handler_factory(
+            {"&Yes": self.events.master_password_event}
+        )
+
+        box = self._yes_no_box(event_handler, "No")
+        box(
+            parent=parent,
+            text="Please log in to access that page.",
+            informative_text="Would you like to move to the master password page?",
+        ).exec()
+
+    def vault_unlock_required_box(self, parent: Optional[str] = "Vault") -> None:
+        """Show a message box indicating that the current user needs unlock the master vault to proceed.
+
+        :param parent: Specifies which window instantiated the current box
+
+        """
+        event_handler = event_handler_factory(
+            {
+                "&Yes": self.input_dialogs.master_password_dialog(
+                    parent=parent,
+                    account_username=self.main_win.current_user.username,
+                ),
+            },
+        )
+
+        box = self._yes_no_box(event_handler, "Yes")
+        box(
+            parent=parent,
+            text="Please unlock your vault to access that page.",
+            informative_text="Would you like to unlock it?",
+        ).exec()
 
 
 class InputDialogs(QWidget):
@@ -327,6 +365,12 @@ class InputDialogs(QWidget):
         self.title = "Lightning Pass"
 
     def master_password_dialog(self, parent: str, account_username: str) -> None:
+        """Show a dialog asking user to enter their master password.
+
+        :param parent: The window which instantiated the current dialog
+        :param account_username: The username of the current user
+
+        """
         password, _ = QInputDialog.getText(
             self.main_win,
             parent,

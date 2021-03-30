@@ -5,23 +5,22 @@ import sys
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from lightning_pass.gui import message_boxes, mouse_randomness
-from lightning_pass.gui.gui_config import buttons, events
-from lightning_pass.gui.static.qt_designer.output import (
-    main,
-    splash_screen,
-    vault_widget,
-)
+import lightning_pass.gui as gui
+import lightning_pass.gui.gui_config as gui_config
+import lightning_pass.gui.static.qt_designer.output as output
 from lightning_pass.settings import LOG, TRAY_ICON
 from lightning_pass.util.exceptions import StopCollectingPositions
 
-log = logging.getLogger(__name__)
-formatter = logging.Formatter("%(asctime)s: %(name)s: %(levelname)s: %(message)s")
-fh = logging.FileHandler(LOG)
-fh.setFormatter(formatter)
-log.addHandler(fh)
 
-log.error("Ran out of mouse positions during password generation.")
+def logger():
+    log = logging.getLogger(__name__)
+    fh = logging.FileHandler(LOG)
+    fh.setFormatter(
+        logging.Formatter("%(asctime)s: %(name)s: %(levelname)s: %(message)s"),
+    )
+    log.addHandler(fh)
+
+    log.error("Ran out of mouse positions during password generation.")
 
 
 def run() -> None:
@@ -60,7 +59,7 @@ class SplashScreen(QtWidgets.QWidget):
         self.widget.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
         self.widget.setWindowFlag(QtCore.Qt.FramelessWindowHint)
 
-        self.ui = splash_screen.Ui_loading_widget()
+        self.ui = output.splash_screen.Ui_loading_widget()
         self.ui.setupUi(self.widget)
 
         self.widget.show()
@@ -90,27 +89,27 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
         self.main_win = QtWidgets.QMainWindow()
 
-        self.ui = main.Ui_lightning_pass()
+        self.ui = output.main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
-        self.events = events.Events(self)
+        self.events = gui.events.Events(self)
 
-        buttons.Buttons(self).setup_all()
+        gui_config.buttons.Buttons(self).setup_all()
 
-        self.ui.message_boxes = message_boxes.MessageBoxes(
+        self.ui.message_boxes = gui.message_boxes.MessageBoxes(
             child=self.main_win,
             parent=self,
         )
-        self.ui.input_dialogs = message_boxes.InputDialogs(
+        self.ui.input_dialogs = gui.message_boxes.InputDialogs(
             child=self.main_win,
             parent=self,
         )
 
         self.general_setup()
 
-        self.collector = mouse_randomness.Collector()
+        self.collector = gui.mouse_randomness.Collector()
 
-        mouse_randomness.MouseTracker.setup_tracker(
+        gui.mouse_randomness.MouseTracker.setup_tracker(
             self.ui.generate_pass_p2_tracking_lbl,
             self.on_position_changed,
         )
@@ -165,7 +164,7 @@ class VaultWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.widget = QtWidgets.QWidget()
-        self.ui = vault_widget.Ui_vault_widget()
+        self.ui = output.vault_widget.Ui_vault_widget()
         self.ui.setupUi(self.widget)
 
 
