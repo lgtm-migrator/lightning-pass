@@ -76,7 +76,7 @@ class Buttons:
             "vault_lock_btn": "vault_lock_event",
             # master_password
             "master_pass_menu_tool_btn": "home_event",
-            "master_pass_save_btn": "master_password_event",
+            "master_pass_save_btn": "master_password_submit_event",
         }
         for button, event in buttons_dict.items():
             getattr(self.ui, button).clicked.connect(

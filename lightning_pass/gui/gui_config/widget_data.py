@@ -1,7 +1,6 @@
 import contextlib
 from typing import Any, NamedTuple, Optional
 
-
 _c = ("clear", None)
 _s_ch = ("setChecked", True)
 

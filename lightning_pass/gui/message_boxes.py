@@ -150,16 +150,19 @@ class MessageBoxes(QWidget):
         box = self._invalid_item_box(item="username", parent=parent)
         box(informative_text="Username be at least 5 characters long.").exec()
 
-    def invalid_password_box(self, parent: str) -> None:
+    def invalid_password_box(self, parent: str, item: str = "password") -> None:
         """Show invalid password message box.
 
-        :param str parent: Specifies which window instantiated current box
+        :param parent: Specifies which window instantiated current box
+        :param item: Optional argument to change the invalid item
+            (should be connected to password due to informative text), defaults to "password"
 
         """
-        box = self._invalid_item_box(item="password", parent=parent)
+        box = self._invalid_item_box(item=item, parent=parent)
+        item = item[0].upper() + item[1::1]
         box(
             informative_text=(
-                """Password must be at least 8 characters long,
+                f"""{item} must be at least 8 characters long,
 contain at least 1 capital letter,
 contain at least 1 number and
 contain at least one special character."""
@@ -329,7 +332,7 @@ contain at least one special character."""
         box = self._yes_no_box(event_handler, "No")
         box(
             parent=parent,
-            text="Please log in to access that page.",
+            text="Your account does not have a master password set up.",
             informative_text="Would you like to move to the master password page?",
         ).exec()
 
@@ -341,7 +344,7 @@ contain at least one special character."""
         """
         event_handler = event_handler_factory(
             {
-                "&Yes": self.input_dialogs.master_password_dialog(
+                "&Yes": self.main_win.ui.input_dialogs.master_password_dialog(
                     parent=parent,
                     account_username=self.main_win.current_user.username,
                 ),

@@ -77,7 +77,7 @@ def set_user_item(
     identifier_column: str,
     result: Union[int, str, bytes, datetime],
     result_column: str,
-) -> None:
+) -> bool:
     """Set new user item.
 
     :param user_identifier: Defines a value connected to the user
@@ -88,9 +88,15 @@ def set_user_item(
     """
     if identifier_column != "id":
         user_identifier = _get_user_id(identifier_column, user_identifier)
-    with database.database_manager() as db:
-        sql = f"UPDATE lightning_pass.credentials SET {result_column} = '{result}' WHERE id = {user_identifier}"
-        db.execute(sql)
+    if user_identifier:
+        with database.database_manager() as db:
+            sql = f"""UPDATE lightning_pass.credentials
+                         SET {result_column} = '{result}'
+                       WHERE id = {user_identifier}"""
+            db.execute(sql, result)
+        return True
+    else:
+        return False
 
 
 def _check_item_existence(
@@ -105,7 +111,7 @@ def _check_item_existence(
 
     :param str item: The item by which to check the column
     :param str item_column: The column where the given time should exist
-    :param str table: Specify the database where the item should exist, defaults to 'credentials'
+    :param str table: Specify the database where the item should exist, defaults to "credentials"
     :param bool should_exist: Define how to approach the existence checking, defaults to False.
         1) False - Item can not exist to pass the check
         2) True - Item has to exist to pass the check
@@ -469,10 +475,9 @@ class Token:
         """
         token = secrets.token_hex(15) + str(user_id)
 
-        with database.EnableDBSafeMode():
-            with database.database_manager() as db:
-                sql = "DELETE FROM lightning_pass.tokens WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"
-                db.execute(sql)
+        with database.EnableDBSafeMode(), database.database_manager() as db:
+            sql = "DELETE FROM lightning_pass.tokens WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"
+            db.execute(sql)
 
         with database.database_manager() as db:
             sql = f"INSERT INTO lightning_pass.tokens (user_id, token) VALUES ({user_id}, '{token}')"

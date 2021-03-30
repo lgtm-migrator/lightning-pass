@@ -5,9 +5,13 @@ import sys
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import lightning_pass.gui as gui
-import lightning_pass.gui.gui_config as gui_config
-import lightning_pass.gui.static.qt_designer.output as output
+from lightning_pass.gui import events, message_boxes, mouse_randomness
+from lightning_pass.gui.gui_config import buttons
+from lightning_pass.gui.static.qt_designer.output import (
+    main,
+    splash_screen,
+    vault_widget,
+)
 from lightning_pass.settings import LOG, TRAY_ICON
 from lightning_pass.util.exceptions import StopCollectingPositions
 
@@ -20,7 +24,7 @@ def logger():
     )
     log.addHandler(fh)
 
-    log.error("Ran out of mouse positions during password generation.")
+    return log
 
 
 def run() -> None:
@@ -43,7 +47,7 @@ def run() -> None:
     tray_icon.setContextMenu(menu)
 
     main_window.show()
-    app.exec_()
+    app.exec()
 
 
 class SplashScreen(QtWidgets.QWidget):
@@ -59,7 +63,7 @@ class SplashScreen(QtWidgets.QWidget):
         self.widget.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
         self.widget.setWindowFlag(QtCore.Qt.FramelessWindowHint)
 
-        self.ui = output.splash_screen.Ui_loading_widget()
+        self.ui = splash_screen.Ui_loading_widget()
         self.ui.setupUi(self.widget)
 
         self.widget.show()
@@ -89,27 +93,27 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
         self.main_win = QtWidgets.QMainWindow()
 
-        self.ui = output.main.Ui_lightning_pass()
+        self.ui = main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
-        self.events = gui.events.Events(self)
+        self.events = events.Events(self)
 
-        gui_config.buttons.Buttons(self).setup_all()
+        buttons.Buttons(self).setup_all()
 
-        self.ui.message_boxes = gui.message_boxes.MessageBoxes(
+        self.ui.message_boxes = message_boxes.MessageBoxes(
             child=self.main_win,
             parent=self,
         )
-        self.ui.input_dialogs = gui.message_boxes.InputDialogs(
+        self.ui.input_dialogs = message_boxes.InputDialogs(
             child=self.main_win,
             parent=self,
         )
 
         self.general_setup()
 
-        self.collector = gui.mouse_randomness.Collector()
+        self.collector = mouse_randomness.Collector()
 
-        gui.mouse_randomness.MouseTracker.setup_tracker(
+        mouse_randomness.MouseTracker.setup_tracker(
             self.ui.generate_pass_p2_tracking_lbl,
             self.on_position_changed,
         )
@@ -151,7 +155,9 @@ class LightningPassWindow(QtWidgets.QMainWindow):
                     if self.gen.get_character(i) is not None:
                         break
                 else:
-                    log.error("Ran out of mouse positions during password generation.")
+                    logger().log.error(
+                        "Ran out of mouse positions during password generation.",
+                    )
 
                 self.ui.generate_pass_p2_final_pass_line.setText(self.gen.password)
         else:
@@ -164,7 +170,7 @@ class VaultWidget(QtWidgets.QWidget):
     def __init__(self):
         super().__init__()
         self.widget = QtWidgets.QWidget()
-        self.ui = output.vault_widget.Ui_vault_widget()
+        self.ui = vault_widget.Ui_vault_widget()
         self.ui.setupUi(self.widget)
 
 

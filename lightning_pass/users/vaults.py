@@ -1,6 +1,7 @@
 """Vault."""
-from .account import Account
 from lightning_pass.util.database import database_manager
+
+from .account import Account
 
 
 class Vault(Account):
@@ -45,3 +46,6 @@ class Vault(Account):
             db.execute(sql, val)
 
         return cls(user_id, vault_index=...)
+
+
+__all__ = ["Vault"]

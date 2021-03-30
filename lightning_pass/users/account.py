@@ -5,9 +5,9 @@ import functools
 from datetime import datetime
 from typing import Optional, Union
 
-import lightning_pass.util.database as database
 import lightning_pass.util.credentials as credentials
-from lightning_pass.util.exceptions import AccountDoesNotExist
+import lightning_pass.util.database as database
+from lightning_pass.util.exceptions import AccountDoesNotExist, InvalidPassword
 
 
 def change_password(user_id: int, password: str, confirm_password: str) -> None:
@@ -104,9 +104,14 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        # Exception: AccountDoesNotExist
-        credentials.Username.check_username_existence(username, should_exist=True)
+        if not credentials.Username.check_username_existence(
+            username,
+            should_exist=True,
+        ):
+            raise AccountDoesNotExist
+
         stored_password = credentials.get_user_item(username, "username", "password")
+
         if not credentials.Password.authenticate_password(password, stored_password):
             raise AccountDoesNotExist
 

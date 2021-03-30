@@ -1249,3 +1249,6 @@ class Ui_lightning_pass(object):
         self.action_master_password.setText(
             _translate("lightning_pass", "master_password")
         )
+
+
+__all__ = ["Ui_lightning_pass"]

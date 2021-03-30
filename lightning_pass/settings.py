@@ -108,3 +108,18 @@ with database.database_manager() as db:
     db.execute(CREDENTIALS_SQL)
     db.execute(TOKENS_SQL)
     db.execute(VAULTS_SQL)
+
+
+__all__ = [
+    "CREDENTIALS_SQL",
+    "DARK_STYLESHEET",
+    "DB_DICT",
+    "LIGHT_STYLESHEET",
+    "LOG",
+    "PFP_FOLDER",
+    "TOKENS_SQL",
+    "TRAY_ICON",
+    "VAULTS_SQL",
+    "parent_folder",
+    "static_folder",
+]

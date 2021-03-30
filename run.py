@@ -1,6 +1,6 @@
 """Run app."""
 
-from lightning_pass.gui.window import run
+import lightning_pass.gui.window as window
 
 if __name__ == "__main__":
-    run()
+    window.run()

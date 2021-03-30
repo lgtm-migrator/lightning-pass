@@ -1,8 +1,9 @@
 """Module with decorators to decorate events with extra functionality."""
 import functools
-from typing import Optional, Callable
+from typing import Callable, Optional, TYPE_CHECKING
 
-from lightning_pass.gui.events import Events
+if TYPE_CHECKING:
+    from lightning_pass.gui.events import Events
 
 
 def login_required(func: Callable) -> Callable:
@@ -15,7 +16,7 @@ def login_required(func: Callable) -> Callable:
     """
 
     @functools.wraps(func)
-    def wrapper(self: Events) -> Optional[Callable]:
+    def wrapper(self: "Events") -> Optional[Callable]:
         """Check the "current_user" attribute.
 
         :param self: Class instance to give access to its attributes
@@ -41,7 +42,7 @@ def master_password_required(func: Callable) -> Callable:
     """
 
     @functools.wraps(func)
-    def wrapper(self: Events) -> Optional[Callable]:
+    def wrapper(self: "Events") -> Optional[Callable]:
         """Check if current user has a master password setup."""
         if not self.current_user.master_password:
             self.ui.message_boxes.master_password_required_box()
@@ -61,7 +62,7 @@ def vault_unlock_required(func: Callable) -> Callable:
     """
 
     @functools.wraps(func)
-    def wrapper(self: Events) -> Optional[Callable]:
+    def wrapper(self: "Events") -> Optional[Callable]:
         """Check the vault_unlocked attribute of the current user.
 
         If current user does not exist show normal login required box.
@@ -78,3 +79,6 @@ def vault_unlock_required(func: Callable) -> Callable:
             return func(self)
 
     return wrapper
+
+
+__all__ = ["login_required", "master_password_required", "vault_unlock_required"]
