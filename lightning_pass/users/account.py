@@ -7,7 +7,7 @@ from typing import Optional, Union
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
-from lightning_pass.util.exceptions import AccountDoesNotExist, InvalidPassword
+from lightning_pass.util.exceptions import AccountDoesNotExist
 
 
 def change_password(user_id: int, password: str, confirm_password: str) -> None:

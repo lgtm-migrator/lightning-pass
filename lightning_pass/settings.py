@@ -58,10 +58,10 @@ def _copy(self: Path, target: Path) -> None:
 Path.copy = _copy  # type: ignore
 
 
-CREDENTIALS_SQL = """CREATE TABLE IF NOT EXISTS `credentials`  (
+CREDENTIALS_DDL = """CREATE TABLE `credentials` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `password` char(60) NOT NULL,
   `email` varchar(255) NOT NULL,
   `profile_picture` varchar(255) NOT NULL DEFAULT 'default.png',
   `last_login_date` timestamp NULL DEFAULT NULL,
@@ -72,10 +72,10 @@ CREDENTIALS_SQL = """CREATE TABLE IF NOT EXISTS `credentials`  (
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
          """
 
-TOKENS_SQL = """CREATE TABLE IF NOT EXISTS `tokens` (
+TOKENS_DDL = """CREATE TABLE `tokens` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `token` varchar(255) NOT NULL,
@@ -85,41 +85,41 @@ TOKENS_SQL = """CREATE TABLE IF NOT EXISTS `tokens` (
   UNIQUE KEY `user_id_UNIQUE` (`user_id`),
   UNIQUE KEY `token_UNIQUE` (`token`),
   KEY `id_idx` (`user_id`),
-  CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+  CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
          """
 
-VAULTS_SQL = """CREATE TABLE IF NOT EXISTS `vaults` (
+VAULTS_DDL = """CREATE TABLE `vaults` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `platform_name` varchar(255) NOT NULL,
   `website` varchar(512) NOT NULL,
   `username` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  `password` char(60) NOT NULL,
   `vault_index` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
-  CONSTRAINT `id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`)
+  CONSTRAINT `id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """
 
 with database.database_manager() as db:
-    db.execute(CREDENTIALS_SQL)
-    db.execute(TOKENS_SQL)
-    db.execute(VAULTS_SQL)
+    db.execute(CREDENTIALS_DDL)
+    db.execute(TOKENS_DDL)
+    db.execute(VAULTS_DDL)
 
 
 __all__ = [
-    "CREDENTIALS_SQL",
+    "CREDENTIALS_DDL",
     "DARK_STYLESHEET",
     "DB_DICT",
     "LIGHT_STYLESHEET",
     "LOG",
     "PFP_FOLDER",
-    "TOKENS_SQL",
+    "TOKENS_DDL",
     "TRAY_ICON",
-    "VAULTS_SQL",
+    "VAULTS_DDL",
     "parent_folder",
     "static_folder",
 ]
