@@ -39,8 +39,8 @@ def login_required(page_to_access: Optional[str] = None) -> Callable:
                 return func(self)
             else:
                 self.ui.message_boxes.login_required_box(
-                    parent="Account",
-                    page=page_to_access,
+                    "Account",
+                    page_to_access,
                 )
 
         return wrapper

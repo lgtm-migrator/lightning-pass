@@ -110,9 +110,10 @@ class Account:
         ):
             raise AccountDoesNotExist
 
-        stored_password = credentials.get_user_item(username, "username", "password")
-
-        if not credentials.Password.authenticate_password(password, stored_password):
+        if not credentials.Password.authenticate_password(
+            password,
+            credentials.get_user_item(username, "username", "password"),
+        ):
             raise AccountDoesNotExist
 
         account = cls(credentials.get_user_item(username, "username", "id"))

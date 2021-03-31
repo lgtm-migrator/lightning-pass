@@ -382,6 +382,22 @@ contain at least one special character."""
             informative_text="Would you like to unlock it?",
         ).exec()
 
+    def vault_unlocked_box(self, parent_lbl: Optional[str] = "Vault"):
+        """Show a message box indicating that the vault of the current user has been unlocked.
+
+        :param parent_lbl: Specifies which window instantiated the current box, defaults to "Vault"
+
+        """
+        event_handler = event_handler_factory({"&Yes": self.events.vault_event})
+
+        box = self._yes_no_box(event_handler, "Yes")
+        box(
+            parent_lbl,
+            text="Your vault has been unlocked.",
+            icon=QMessageBox.Question,
+            informative_text="Would you like to move to the vault page?",
+        ).exec()
+
 
 class InputDialogs(QWidget):
     def __init__(self, child: QMainWindow, parent: QMainWindow) -> None:

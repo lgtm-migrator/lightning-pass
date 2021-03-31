@@ -121,14 +121,15 @@ class Events:
         """Send token and switch to token page."""
         email = self.ui.forgot_pass_email_line.text()
         check = credentials.Email.check_email_pattern(email)
-        if not check:
-            self._message_box("invalid_email_box", "Forgot Password")
-        else:
+
+        if check:
             self.ui.reset_token_submit_btn.setEnabled(False)
             credentials.Email.send_reset_email(email)
             self.ui.reset_token_submit_btn.setEnabled(True)
 
             self._message_box("reset_email_sent_box", "Forgot Password")
+        else:
+            self._message_box("invalid_email_box", "Forgot Password")
 
     def reset_token_event(self) -> None:
         """Switch to reset token page and reset previous values."""
@@ -214,12 +215,7 @@ class Events:
 
     @decorators.login_required("account")
     def account_event(self) -> None:
-        """Switch to account widget and reset previous values.
-
-        Raises log in required error if an user tries to access the page without being logged in.
-
-        """
-        self.current_user = account.Account(self.current_user.user_id)
+        """Switch to account widget and set current user values."""
         self.ui.account_username_line.setText(self.current_user.username)
         self.ui.account_email_line.setText(self.current_user.email)
         self.ui.account_last_log_date.setText(
@@ -240,10 +236,12 @@ class Events:
             str(pathlib.Path.home()),
             "Image files (*.jpg *.png)",
         )
+
         if fname:
             self.current_user.profile_picture = credentials.ProfilePicture.save_picture(
                 pathlib.Path(fname),
             )
+
         self.account_event()
 
     @decorators.login_required()
@@ -261,7 +259,6 @@ class Events:
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
         if self.current_user.username != self.ui.account_username_line.text():
-
             try:
                 self.current_user.username = self.ui.account_username_line.text()
             except InvalidUsername:
@@ -272,7 +269,6 @@ class Events:
                 self._message_box("detail_updated_box", "Account", "username")
 
         if self.current_user.email != self.ui.account_email_line.text():
-
             try:
                 self.current_user.email = self.ui.account_email_line.text()
             except InvalidEmail:
@@ -336,13 +332,15 @@ class Events:
             "Vault",
             self.current_user.username,
         )
+
         if password and credentials.Password.authenticate_password(
             password, self.current_user.master_password
         ):
             self.current_user.vault_unlocked = True
-            self.vault_event()
+            self._message_box("vault_unlocked_box")
         else:
             self.current_user.vault_unlocked = False
+            self._message_box("invalid_login_box", "Vault")
 
     @decorators.login_required("vault")
     @decorators.master_password_required("vault")
@@ -377,7 +375,6 @@ class Events:
 
     def toggle_stylesheet_light(self, *args: Any) -> None:
         """Change stylesheet to light mode."""
-        self.current_user.vault_unlocked = True
         if args:
             ...
         self.main_win.setStyleSheet("")
