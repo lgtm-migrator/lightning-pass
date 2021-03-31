@@ -58,7 +58,7 @@ def _copy(self: Path, target: Path) -> None:
 Path.copy = _copy  # type: ignore
 
 
-CREDENTIALS_DDL = """CREATE TABLE `credentials` (
+CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `password` char(60) NOT NULL,
@@ -72,10 +72,10 @@ CREDENTIALS_DDL = """CREATE TABLE `credentials` (
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=57 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
          """
 
-TOKENS_DDL = """CREATE TABLE `tokens` (
+TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `token` varchar(255) NOT NULL,
@@ -86,10 +86,10 @@ TOKENS_DDL = """CREATE TABLE `tokens` (
   UNIQUE KEY `token_UNIQUE` (`token`),
   KEY `id_idx` (`user_id`),
   CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
          """
 
-VAULTS_DDL = """CREATE TABLE `vaults` (
+VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `platform_name` varchar(255) NOT NULL,

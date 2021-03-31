@@ -212,7 +212,7 @@ class Events:
         """Copy generated password into clipboard."""
         clipboard.copy(self.ui.generate_pass_p2_final_pass_line.text())
 
-    @decorators.login_required
+    @decorators.login_required("account")
     def account_event(self) -> None:
         """Switch to account widget and reset previous values.
 
@@ -231,12 +231,12 @@ class Events:
 
         self._set_current_widget("account")
 
-    @decorators.login_required
+    @decorators.login_required()
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
         fname, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.parent,
-            "Lightning Pass - Open your new profile picture",
+            "Lightning Pass - Choose your new profile picture",
             str(pathlib.Path.home()),
             "Image files (*.jpg *.png)",
         )
@@ -246,18 +246,18 @@ class Events:
             )
         self.account_event()
 
-    @decorators.login_required
+    @decorators.login_required()
     def logout_event(self) -> None:
         """Logout current user."""
         del self.current_user
         self.home_event()
 
-    @decorators.login_required
+    @decorators.login_required()
     def change_pass_event(self) -> None:
         """Change password for current user."""
         ...
 
-    @decorators.login_required
+    @decorators.login_required()
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
         if self.current_user.username != self.ui.account_username_line.text():
@@ -282,47 +282,27 @@ class Events:
             else:
                 self._message_box("detail_updated_box", "Account", detail="email")
 
-    @decorators.login_required
-    @decorators.master_password_required
-    @decorators.vault_unlock_required
-    def vault_event(self) -> None:
-        """Switch to vault window."""
-        print(self.current_user.vault_existence)
-
-        from lightning_pass.gui.window import VaultWidget
-
-        self.ui.vault_widget = VaultWidget().widget
-
-        self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget)
-        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget)
-
-        self.ui.vault_username_lbl.setText(
-            f"Current user: {self.current_user.username}",
-        )
-        self.ui.vault_date_lbl.setText(
-            f"Last unlock date: {str(self.current_user.register_date)}",
-        )
-
-        self._set_current_widget("vault")
-
-    @decorators.login_required
-    @decorators.master_password_required
-    @decorators.vault_unlock_required
-    def vault_lock_event(self) -> None:
-        """Lock vault."""
-        self.current_user.vault_unlocked = False
-        self.account_event()
-
-    @decorators.login_required
+    @decorators.login_required("master password")
     def master_password_event(self) -> None:
         """Switch to master password widget."""
         self._set_current_widget("master_password")
 
-    @decorators.login_required
+    @decorators.login_required()
     def master_password_submit_event(self) -> None:
-        """"""
+        """Try to change or add a master password to a user account.
+
+        :raises AccountDoesNotExist: If the normal password doesn't match
+        :raises InvalidPassword: If the master password doesn't match the password pattern
+            password pattern:
+                1) must be at least 8 characters long
+                2) must contain at least 1 capital letter
+                3) must contain at least 1 number
+                4) must contain at least 1 special character
+        :raises PasswordsDoNotMatch: If the 2 master passwords do not match
+
+        """
         try:
-            self.current_user.set_master_password(
+            self.current_user.master_password = (
                 self.ui.master_pass_current_pass_line.text(),
                 self.ui.master_pass_master_pass_line.text(),
                 self.ui.master_pass_conf_master_pass_line.text(),
@@ -344,14 +324,65 @@ class Events:
                 detail="master password",
             )
 
-    def toggle_stylesheet_light(self, *args: object) -> None:
+    @decorators.login_required()
+    @decorators.master_password_required()
+    def master_password_dialog_event(self) -> None:
+        """Show an input dialog asking the user to enter their current master password.
+
+        Either locks or unlocks the vault depending on the result
+
+        """
+        password = self.parent.ui.input_dialogs.master_password_dialog(
+            "Vault",
+            self.current_user.username,
+        )
+        if password and credentials.Password.authenticate_password(
+            password, self.current_user.master_password
+        ):
+            self.current_user.vault_unlocked = True
+            self.vault_event()
+        else:
+            self.current_user.vault_unlocked = False
+
+    @decorators.login_required("vault")
+    @decorators.master_password_required("vault")
+    @decorators.vault_unlock_required("vault")
+    def vault_event(self) -> None:
+        """Switch to vault window."""
+        print(self.current_user.vault_existence)
+
+        from lightning_pass.gui.window import VaultWidget
+
+        self.ui.vault_widget = VaultWidget().widget
+
+        self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget)
+        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget)
+
+        self.ui.vault_username_lbl.setText(
+            f"Current user: {self.current_user.username}",
+        )
+        self.ui.vault_date_lbl.setText(
+            f"Last unlock date: {str(self.current_user.register_date)}",
+        )
+
+        self._set_current_widget("vault")
+
+    @decorators.login_required()
+    @decorators.master_password_required()
+    @decorators.vault_unlock_required()
+    def vault_lock_event(self) -> None:
+        """Lock vault."""
+        self.current_user.vault_unlocked = False
+        self.account_event()
+
+    def toggle_stylesheet_light(self, *args: Any) -> None:
         """Change stylesheet to light mode."""
         self.current_user.vault_unlocked = True
         if args:
             ...
         self.main_win.setStyleSheet("")
 
-    def toggle_stylesheet_dark(self, *args: object) -> None:
+    def toggle_stylesheet_dark(self, *args: Any) -> None:
         """Change stylesheet to dark mode."""
         if args:
             ...

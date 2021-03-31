@@ -31,8 +31,10 @@ def _get_user_id(column: str, value: str) -> Union[int, bool]:
 
     """
     with database.database_manager() as db:
-        sql = f"SELECT id FROM lightning_pass.credentials WHERE {column} = '{value}'"
-        db.execute(sql)
+        # not using f-string due to SQL injection
+        sql = "SELECT id FROM lightning_pass.credentials WHERE %s = %s" % (column, "%s")
+        # expecting a sequence thus val has to be a tuple (created by the trailing comma)
+        db.execute(sql, (value,))
         result = db.fetchone()
     try:
         return result[0]
@@ -63,8 +65,13 @@ def get_user_item(
     if result_column == "id":
         return user_id
     with database.database_manager() as db:
-        sql = f"SELECT {result_column} FROM lightning_pass.credentials WHERE id = {user_id}"
-        db.execute(sql)
+        # not using f-string due to SQL injection
+        sql = "SELECT %s FROM lightning_pass.credentials WHERE id = %s" % (
+            result_column,
+            "%s",
+        )
+        # expecting a sequence thus val has to be a tuple (created by the trailing comma)
+        db.execute(sql, (user_id,))
         result = db.fetchone()
     try:
         return result[0]
@@ -90,10 +97,13 @@ def set_user_item(
         user_identifier = _get_user_id(identifier_column, user_identifier)
     if user_identifier:
         with database.database_manager() as db:
-            sql = f"""UPDATE lightning_pass.credentials
-                         SET {result_column} = '{result}'
-                       WHERE id = {user_identifier}"""
-            db.execute(sql, result)
+            # not using f-string due to SQL injection
+            sql = "UPDATE lightning_pass.credentials SET %s = %s WHERE id = %s" % (
+                result_column,
+                "%s",
+                "%s",
+            )
+            db.execute(sql, (result, user_identifier))
         return True
     else:
         return False
@@ -122,14 +132,28 @@ def _check_item_existence(
 
     """
     if second_key is not None and second_key_column is not None:
-        sql = f"""SELECT EXISTS(SELECT 1 FROM lightning_pass.{table}
-                   WHERE {item_column} = '{item}')
-                     AND {second_key_column} = {second_key}"""
+        # not using f-string due to SQL injection
+        sql = """SELECT EXISTS(SELECT 1 FROM %s
+                  WHERE %s = %s)
+                    AND %s = %s""" % (
+            table,
+            item_column,
+            "%s",
+            second_key_column,
+            "%s",
+        )
+        val = (item, second_key)
     else:
-        sql = f"SELECT EXISTS(SELECT 1 FROM lightning_pass.{table} WHERE {item_column} = '{item}')"
+        # not using f-string due to SQL injection
+        sql = "SELECT EXISTS(SELECT 1 FROM %s WHERE %s = %s)" % (
+            table,
+            item_column,
+            "%s",
+        )
+        val = (item,)
 
     with database.database_manager() as db:
-        db.execute(sql)
+        db.execute(sql, val)
         result = db.fetchone()[0]
 
     if (not result and should_exist) or (result and not should_exist):
@@ -480,8 +504,12 @@ class Token:
             db.execute(sql)
 
         with database.database_manager() as db:
-            sql = f"INSERT INTO lightning_pass.tokens (user_id, token) VALUES ({user_id}, '{token}')"
-            db.execute(sql)
+            # not using f-string due to SQL injection
+            sql = (
+                "INSERT INTO lightning_pass.tokens (user_id, token) VALUES (%s, %s)"
+                % ("%s", "%s")
+            )
+            db.execute(sql, (user_id, token))
 
         return token
 
@@ -498,8 +526,10 @@ class Token:
         """
         if _check_item_existence(token, "token", "tokens", should_exist=True):
             with database.database_manager() as db:
-                sql = f"DELETE FROM lightning_pass.tokens WHERE token = '{token}'"
-                db.execute(sql)
+                # not using f-string due to SQL injection
+                sql = "DELETE FROM lightning_pass.tokens WHERE token = %s" % ("%s",)
+                # query expecting a sequence thus val has to be a tuple (created by the trailing comma)
+                db.execute(sql, (token,))
             return True
         return False
 

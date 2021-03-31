@@ -84,8 +84,8 @@ class Account:
                 "INSERT INTO lightning_pass.credentials (username, password, email)"
                 "     VALUES (%s, %s, %s)"
             )
-            values = (username, credentials.Password.hash_password(password), email)
-            db.execute(sql, values)
+            val = (username, credentials.Password.hash_password(password), email)
+            db.execute(sql, val)
 
         return cls(credentials.get_user_item(username, "username", "id"))
 
@@ -236,8 +236,13 @@ class Account:
     def update_last_login_date(self) -> None:
         """Set last login date."""
         with database.database_manager() as db:
-            sql = f"UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = {self.user_id}"
-            db.execute(sql)
+            # not using f-string due to SQL injection
+            sql = (
+                "UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = %s"
+                % ("%s",)
+            )
+            # expecting a sequence thus val has to be a tuple (created by the trailing comma)
+            db.execute(sql, (self.user_id,))
 
     @functools.cached_property
     def register_date(self) -> datetime:
@@ -271,30 +276,34 @@ class Account:
         """Return current master password."""
         return self.get_value("master_password")
 
-    def set_master_password(
-        self, password, master_password: str, confirm_master_password: str
-    ) -> None:
+    @master_password.setter
+    def master_password(self, password_information: tuple[str, str, str]) -> None:
         """Set a new master password.
 
-        :param password: Current normal password, used to check account ownership
-        :param master_password: New master password
-        :param confirm_master_password: Second master password, used to check that the new passwords match
+        :param password_information:
+            index 0: Current normal password, used to check account ownership
+            index 1: New master password
+            index 2: Second master password, used to check that the new passwords match
 
         :raises AccountDoesNotExist: if the normal password is not correct
         :raises PasswordsDoNotMatch: if the master passwords do not match
         :raises InvalidPassword: if the master password doesn't meet the required pattern
 
         """
-        if not credentials.Password.authenticate_password(password, self.password):
+        if not credentials.Password.authenticate_password(
+            password_information[0], self.password
+        ):
             raise AccountDoesNotExist
 
-        # Exceptions: PasswordDoNotMatch, InvalidPassword
+        # Exceptions: InvalidPassword, PasswordsDoNotMatch
         credentials.Password(
-            master_password,
-            confirm_master_password,
+            password_information[1],
+            password_information[2],
         )()
+
         self.set_value(
-            credentials.Password.hash_password(master_password), "master_password"
+            credentials.Password.hash_password(password_information[1]),
+            "master_password",
         )
 
 

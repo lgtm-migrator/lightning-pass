@@ -119,17 +119,23 @@ class Buttons:
         )
 
     def data_validation(self) -> None:
-        """Disable whitespaces in registration input fields."""
-        # TODO: add validator lines
-        input_validator = QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+"))
+        """Disable whitespaces in some input fields."""
         validator_lines = {
             "reg_username_line",
             "reg_password_line",
             "reg_conf_pass_line",
             "reg_email_line",
+            "reset_pass_new_pass_line",
+            "reset_pass_conf_new_line",
+            "account_username_line",
+            "account_email_line",
+            "master_pass_master_pass_line",
+            "master_pass_conf_master_pass_line",
         }
         for line in validator_lines:
-            getattr(self.ui, line).setValidator(input_validator)
+            getattr(self.ui, line).setValidator(
+                QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+")),
+            )
 
         del validator_lines
 

@@ -26,6 +26,12 @@
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
+      <property name="font">
+       <font>
+        <family>Segoe UI Light</family>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
       <property name="currentIndex">
        <number>11</number>
       </property>
@@ -596,6 +602,12 @@
         </item>
         <item row="1" column="1" colspan="2">
          <widget class="QLineEdit" name="reset_pass_new_pass_line">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -603,6 +615,12 @@
         </item>
         <item row="2" column="1" colspan="2">
          <widget class="QLineEdit" name="reset_pass_conf_new_line">
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="readOnly">
            <bool>true</bool>
           </property>
@@ -1011,6 +1029,12 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
+          </property>
           <property name="readOnly">
            <bool>false</bool>
           </property>
@@ -1149,6 +1173,12 @@
             <width>0</width>
             <height>32</height>
            </size>
+          </property>
+          <property name="font">
+           <font>
+            <family>Segoe UI Light</family>
+            <pointsize>10</pointsize>
+           </font>
           </property>
           <property name="readOnly">
            <bool>false</bool>
