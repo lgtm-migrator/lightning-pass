@@ -2,7 +2,7 @@
 
 
 class AccountException(Exception):
-    """Base exception for all errors connected to account management."""
+    """Base exception for all exceptions connected to account management."""
 
 
 class InvalidUsername(AccountException):
@@ -39,6 +39,14 @@ class AccountDoesNotExist(AccountException):
 
 class StopCollectingPositions(AccountException):
     """Raised when all needed mouse positions are collected."""
+
+
+class VaultException(Exception):
+    """Base exception for all exceptions connected to vault management."""
+
+
+class InvalidURL(VaultException):
+    """Raised when an url doesn't match the url pattern."""
 
 
 __all__ = [

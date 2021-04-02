@@ -21,15 +21,21 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0" colspan="5">
-    <widget class="QLabel" name="vault_platform_lbl">
+    <widget class="QLineEdit" name="vault_platform_line">
      <property name="font">
       <font>
        <family>Segoe Print</family>
-       <pointsize>12</pointsize>
+       <pointsize>26</pointsize>
       </font>
      </property>
      <property name="text">
-      <string>__Platform_name__</string>
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string>Platform name</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -55,12 +61,21 @@
       </font>
      </property>
      <property name="text">
-      <string>__www.platform_website.com__</string>
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string>Enter URL for your platform.</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
    <item row="1" column="4">
     <widget class="QToolButton" name="vault_open_web_tool_btn">
+     <property name="statusTip">
+      <string>Launch website</string>
+     </property>
      <property name="text">
       <string>...</string>
      </property>
@@ -97,32 +112,38 @@
       </font>
      </property>
      <property name="text">
-      <string>__username__</string>
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string>Enter account username.</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>false</bool>
      </property>
     </widget>
    </item>
    <item row="2" column="4">
-    <widget class="QToolButton" name="toolButton">
+    <widget class="QToolButton" name="vault_copy_username_tool_btn">
      <property name="cursor">
       <cursorShape>ArrowCursor</cursorShape>
      </property>
      <property name="toolTip">
-      <string>TOOLTIP</string>
+      <string>Copy username</string>
      </property>
      <property name="toolTipDuration">
       <number>5</number>
      </property>
      <property name="statusTip">
-      <string>STATUSTIP</string>
+      <string>Copy username</string>
      </property>
      <property name="whatsThis">
-      <string>WHATSTHIS</string>
+      <string>Copy username</string>
      </property>
      <property name="accessibleName">
-      <string>ACCESSIBLENAME</string>
+      <string/>
      </property>
      <property name="accessibleDescription">
-      <string>ACCDESC</string>
+      <string/>
      </property>
      <property name="text">
       <string>...</string>
@@ -163,12 +184,18 @@
       </font>
      </property>
      <property name="text">
-      <string>__username@email.com__</string>
+      <string/>
+     </property>
+     <property name="placeholderText">
+      <string>Enter account email.</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
    <item row="3" column="4">
-    <widget class="QToolButton" name="toolButton_2">
+    <widget class="QToolButton" name="vault_copy_email_tool_btn">
      <property name="cursor">
       <cursorShape>ArrowCursor</cursorShape>
      </property>
@@ -217,12 +244,21 @@
       </font>
      </property>
      <property name="text">
-      <string>__password__</string>
+      <string/>
+     </property>
+     <property name="echoMode">
+      <enum>QLineEdit::Password</enum>
+     </property>
+     <property name="placeholderText">
+      <string>Enter account password.</string>
+     </property>
+     <property name="clearButtonEnabled">
+      <bool>true</bool>
      </property>
     </widget>
    </item>
    <item row="4" column="4">
-    <widget class="QToolButton" name="toolButton_3">
+    <widget class="QToolButton" name="vault_copy_password_tool_btn">
      <property name="toolTip">
       <string>Copy password</string>
      </property>
@@ -247,7 +283,7 @@
     </widget>
    </item>
    <item row="5" column="0">
-    <widget class="QToolButton" name="vault_back_tool_btn">
+    <widget class="QToolButton" name="vault_backward_tool_btn">
      <property name="text">
       <string>...</string>
      </property>
@@ -270,7 +306,7 @@
       </font>
      </property>
      <property name="text">
-      <string> _0</string>
+      <string> 0</string>
      </property>
     </widget>
    </item>
@@ -288,7 +324,7 @@
     </widget>
    </item>
    <item row="5" column="3">
-    <widget class="QPushButton" name="vaut_update_btn">
+    <widget class="QPushButton" name="vault_update_btn">
      <property name="font">
       <font>
        <family>Segoe UI Light</family>

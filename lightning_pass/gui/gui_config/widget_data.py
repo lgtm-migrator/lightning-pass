@@ -37,6 +37,13 @@ WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
         WidgetItem("generate_pass_upper_check", *_s_ch),
     },
     8: {WidgetItem("generate_pass_p2_final_pass_line")},
+    9: {
+        WidgetItem("account_username_line"),
+        WidgetItem("account_email_line"),
+        WidgetItem("account_last_log_date"),
+        WidgetItem("account_pfp_pixmap_lbl"),
+    },
+    10: {None},
     11: {
         WidgetItem("master_pass_current_pass_line"),
         WidgetItem("master_pass_master_pass_line"),
@@ -55,7 +62,7 @@ class ClearPreviousWidget:
 
         """
         self.parent = parent
-        self.previous_index = parent.ui.stacked_widget.currentIndex()
+        self.previous_index = parent.current_index
 
     def __enter__(self):
         """Do nothing on enter."""
@@ -64,19 +71,17 @@ class ClearPreviousWidget:
         """Clear the previous widget."""
         widget_item: Optional[WidgetItem]
 
-        # TODO: add all indexes into DATA_DICT
-        with contextlib.suppress(KeyError):
-            for widget_item in WIDGET_DATA[self.previous_index]:
-                if not widget_item:
-                    break
+        for widget_item in WIDGET_DATA[self.previous_index]:
+            if not widget_item:
+                break
 
-                obj = getattr(self.parent.ui, widget_item.name)
-                method = getattr(obj, widget_item.method)
+            obj = getattr(self.parent.ui, widget_item.name)
+            method = getattr(obj, widget_item.method)
 
-                try:
-                    method(widget_item.args)
-                except TypeError:
-                    method()
+            try:
+                method(widget_item.args)
+            except TypeError:
+                method()
 
 
 __all__ = ["WidgetItem", "WIDGET_DATA", "ClearPreviousWidget"]

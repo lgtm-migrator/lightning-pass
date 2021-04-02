@@ -1,51 +1,88 @@
-"""Vault."""
+"""Module containing the Vault class."""
+from __future__ import annotations
+
+import copy
+from typing import Optional, NamedTuple
+
+from lightning_pass.util.exceptions import InvalidURL, InvalidEmail, VaultException
 from lightning_pass.util.database import database_manager
+from lightning_pass.util import credentials
 
-from .account import Account
+
+class Vault(NamedTuple):
+    user_id: int
+    platform_name: str
+    website: str
+    username: str
+    email: str
+    password: bytes
+    vault_index: int
 
 
-class Vault(Account):
-    def __init__(self, user_id, vault_index):
-        super().__init__(user_id)
-        self.user_id = user_id
-        self.vault_index = vault_index
+def new_vault(
+    user_id: int,
+    platform_name: str,
+    website: str,
+    username: str,
+    email: str,
+    password: str,
+    vault_index: int,
+) -> Optional[Vault]:
+    # copy locals object to store given arguments
+    args = copy.copy(locals())
 
-    @staticmethod
-    def validate_url(url):
-        import validators
+    if not credentials.validate_url(website):
+        raise InvalidURL
 
-        return validators.url(url)
+    if not credentials.Email.check_email_pattern(email):
+        raise InvalidEmail
 
-    @classmethod
-    def new_vault(
-        cls,
-        user_id: int,
-        platform_name: str,
-        website: str,
-        username: str,
-        email: str,
-        password: str,
+    if (
+        not user_id
+        or not platform_name
+        or not website
+        or not username
+        or not email
+        or not password
     ):
-        print(cls.validate_url(website))
+        raise VaultException
 
-        with database_manager() as db:
-            sql = """
-            INSERT INTO lightning_pass.vaults (        
-            user_id,
-            platform_name,
-            website,
-            username,
-            email,
-            password,
-            vault_index
-            )
-                 VALUES (%d, %s, %s, %s, %s, %s, %s)
-            """
-            val = (user_id, platform_name, website, username, email, password, ...)
+    # no exceptions raised -> insert into db
+    with database_manager() as db:
+        sql = """
+        INSERT INTO lightning_pass.vaults (        
+        user_id,
+        platform_name,
+        website,
+        username,
+        email,
+        password,
+        vault_index
+        )
+             VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """ % (
+            "%s",
+            "%s",
+            "%s",
+            "%s",
+            "%s",
+            "%s",
+            "%s",
+        )
+        db.execute(
+            sql,
+            (
+                user_id,
+                platform_name,
+                website,
+                username,
+                email,
+                credentials.Password.hash_password(password),
+                vault_index,
+            ),
+        )
 
-            db.execute(sql, val)
-
-        return cls(user_id, vault_index=...)
+    return Vault(*args.values())
 
 
 __all__ = ["Vault"]

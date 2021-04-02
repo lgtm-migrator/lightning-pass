@@ -1,11 +1,14 @@
 """Module containing various functions connected to credentials used throughout the whole project."""
 import re
 import secrets
+import urllib.parse as urlparse
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
 
+
 import bcrypt
+import validator_collection
 import yagmail
 from PyQt5 import QtCore
 
@@ -154,9 +157,9 @@ def _check_item_existence(
 
     with database.database_manager() as db:
         db.execute(sql, val)
-        result = db.fetchone()[0]
+        result = db.fetchone()
 
-    if (not result and should_exist) or (result and not should_exist):
+    if (not result[0] and should_exist) or (result[0] and not should_exist):
         return False
     return True
 
@@ -404,11 +407,9 @@ class Email:
         :returns: boolean value depending on the pattern check
 
         """
-        regex_email = r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]{2,4}$"
-        try:
-            return bool(re.search(regex_email, email))
-        except TypeError:
-            return False
+        from validator_collection import checkers
+
+        return checkers.is_email(email)
 
     @staticmethod
     def check_email_existence(email: str, should_exist: Optional[bool] = False) -> bool:
@@ -532,6 +533,22 @@ class Token:
                 db.execute(sql, (token,))
             return True
         return False
+
+
+def validate_url(url: str) -> bool:
+    """Check whether a url is valid.
+
+    :param url: The url to evaluate
+
+    """
+    parsed_url = urlparse.urlparse(url)
+
+    if not bool(parsed_url.scheme):
+        parsed_url = parsed_url._replace(**{"scheme": "http"})
+
+    return validator_collection.checkers.is_url(
+        parsed_url.geturl().replace("///", "//"),
+    )
 
 
 __all__ = [

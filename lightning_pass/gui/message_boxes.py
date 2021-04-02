@@ -3,7 +3,6 @@ import contextlib
 import functools
 from typing import Any, Callable, Optional, Union
 
-from PyQt5 import QtGui
 from PyQt5.QtWidgets import (
     QInputDialog,
     QLineEdit,
@@ -12,8 +11,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QWidget,
 )
-
-from lightning_pass.util.credentials import Password
 
 
 def partial_factory(func: Callable, *args: Optional[Any], **kwargs: Optional[Any]):
@@ -67,7 +64,9 @@ class MessageBoxes(QWidget):
         self,
         parent_lbl: str,
         text: str,
-        icon: QMessageBox.Icon = QMessageBox.Warning,
+        icon: Optional[QMessageBox.Icon] = QMessageBox.Warning,
+        # rest must be passed in as a keyword arguments
+        *,
         informative_text: str = None,
         standard_buttons: Union[
             QMessageBox.StandardButtons,
@@ -90,13 +89,14 @@ class MessageBoxes(QWidget):
 
         """
         box = QMessageBox(self.main_win)
+
         box.setWindowTitle(f"{self.title} - {parent_lbl}")
         box.setText(text)
-        box.setIcon(icon)
-        box.setInformativeText(informative_text)
 
-        # supress TypeError if this information is missing
+        # suppress TypeError if this information is missing
         with contextlib.suppress(TypeError):
+            box.setIcon(icon)
+            box.setInformativeText(informative_text)
             box.setStandardButtons(standard_buttons)
             box.setDefaultButton(default_button)
             box.buttonClicked.connect(event_handler)
@@ -195,9 +195,17 @@ contain at least one special character."""
         box = self._yes_no_box(event_handler, "Yes")
         box(
             parent_lbl,
-            text="This token is invalid",
+            "This token is invalid",
             informative_text="Would you like to generate a token?",
         ).exec()
+
+    def invalid_url_box(self, parent_lbl: Optional[str] = "Vault") -> None:
+        """Show invalid url message box.
+
+        :param parent_lbl: Specifies which window instantiated the current box, defaults to "Vault"
+
+        """
+        self._invalid_item_box("website URL", parent_lbl)().exec()
 
     def username_already_exists_box(self, parent_lbl: str) -> None:
         """Show username already exists message box.
@@ -223,25 +231,29 @@ contain at least one special character."""
         """
         self.message_box_factory(
             parent_lbl,
-            text="Passwords don't match.",
+            "Passwords don't match.",
             informative_text="Please try again.",
         ).exec()
 
-    def account_creation_box(self, parent_lbl: Optional[str] = "Register") -> None:
-        """Show successful account creation message box.
+    def login_required_box(self, parent_lbl: str, page: Optional[str] = None) -> None:
+        """Show message box indicating that password can't be generated with current case type option.
 
-        :param str parent_lbl: Specifies which window instantiated current box, defaults to "Register"
+        :param parent_lbl: Specifies which window instantiated current box
+        :param page: The page which the user tried to access, defaults to None
 
         """
-        event_handler = event_handler_factory(
-            {"&Yes": self.events.login_event, "&No": self.events.register_event},
+        event_handler = event_handler_factory({"&Yes": self.events.login_event})
+
+        text = (
+            f"Please log in to access the {page} page."
+            if page
+            else "Please log in to access that page."
         )
 
-        box = self._yes_no_box(event_handler, "Yes")
+        box = self._yes_no_box(event_handler, "No")
         box(
             parent_lbl,
-            text="Account successfully created.",
-            icon=QMessageBox.Question,
+            text,
             informative_text="Would you like to move to the login page?",
         ).exec()
 
@@ -258,30 +270,49 @@ contain at least one special character."""
         box = self._yes_no_box(event_handler, "Yes")
         box(
             parent_lbl,
-            text="Could not authenticate an account with the given credentials.",
+            "Could not authenticate an account with the given credentials.",
             informative_text="Forgot password?",
         ).exec()
 
-    def login_required_box(self, parent_lbl: str, page: Optional[str] = None) -> None:
-        """Show message box indicating that password can't be generated with current case type option.
+    def invalid_vault_box(self, parent_lbl: Optional[str] = "Vault") -> None:
+        """Show a message box indicating the vault details are not correct.
 
-        :param parent_lbl: Specifies which window instantiated current box
-        :param page: The page which the user tried to access, defaults to None
+        :param parent_lbl: Specifies which window instantiated the current box, defaults to "Vault"
 
         """
-        event_handler = event_handler_factory({"&Yes": self.events.login_event})
+        self.message_box_factory(
+            parent_lbl,
+            "The vault details can't contain empty fields.",
+        ).exec()
 
-        text = (
-            f"Please log in to access the {page} page."
-            if page
-            else f"Please log in to access that page."
+    def account_creation_box(self, parent_lbl: Optional[str] = "Register") -> None:
+        """Show successful account creation message box.
+
+        :param str parent_lbl: Specifies which window instantiated current box, defaults to "Register"
+
+        """
+        event_handler = event_handler_factory(
+            {"&Yes": self.events.login_event, "&No": self.events.register_event},
         )
 
-        box = self._yes_no_box(event_handler, "No")
+        box = self._yes_no_box(event_handler, "Yes")
         box(
             parent_lbl,
-            text,
+            "Account successfully created.",
+            QMessageBox.Question,
             informative_text="Would you like to move to the login page?",
+        ).exec()
+
+    def vault_creation_box(self, parent_lbl: Optional[str] = "Vault") -> None:
+        """Show a message box indicating that a new vault page has been created.
+
+        :param parent_lbl: Specifies which windows instantiated the current box
+
+        """
+        self.message_box_factory(
+            parent_lbl,
+            "New vault page created.",
+            None,
         ).exec()
 
     def detail_updated_box(
@@ -297,8 +328,8 @@ contain at least one special character."""
         """
         self.message_box_factory(
             parent_lbl,
-            text=f"Your {detail} has been successfully updated!",
-            icon=QMessageBox.Question,
+            f"Your {detail} has been successfully updated!",
+            QMessageBox.Question,
         ).exec()
 
     def reset_email_sent_box(self, parent_lbl: str) -> None:
@@ -312,8 +343,8 @@ contain at least one special character."""
         box = self._yes_no_box(event_handler, "Yes")
         box(
             parent_lbl,
-            text="The reset email has been sent.",
-            icon=QMessageBox.Question,
+            "The reset email has been sent.",
+            QMessageBox.Question,
             informative_text="Would you like to move to the token page now?",
         ).exec()
 
@@ -325,7 +356,7 @@ contain at least one special character."""
         """
         self.message_box_factory(
             parent_lbl,
-            text="Password can't be generate without a single parameter.",
+            "Password can't be generate without a single parameter.",
         ).exec()
 
     def master_password_required_box(
@@ -344,7 +375,7 @@ contain at least one special character."""
         text = (
             f"You need to set up a master password to access the {page} page."
             if page
-            else f"You need to set up a master password to proceed."
+            else "You need to set up a master password to proceed."
         )
 
         box = self._yes_no_box(event_handler, "No")
@@ -393,8 +424,8 @@ contain at least one special character."""
         box = self._yes_no_box(event_handler, "Yes")
         box(
             parent_lbl,
-            text="Your vault has been unlocked.",
-            icon=QMessageBox.Question,
+            "Your vault has been unlocked.",
+            QMessageBox.Question,
             informative_text="Would you like to move to the vault page?",
         ).exec()
 

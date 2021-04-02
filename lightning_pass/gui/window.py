@@ -29,7 +29,7 @@ def logger():
 
 def run() -> None:
     """Show main window with everything set up."""
-    SplashScreen()
+    # SplashScreen()
     app = QtWidgets.QApplication(sys.argv)
     main_window = LightningPassWindow()
 
@@ -39,13 +39,13 @@ def run() -> None:
         app,
     )
     tray_icon.setToolTip("Lightning Pass")
-    tray_icon.show()
     # inherit main window to follow current style sheet
     menu = QtWidgets.QMenu(main_window.main_win)
     quit_action = menu.addAction("Exit Lightning Pass")
     quit_action.triggered.connect(quit)
     tray_icon.setContextMenu(menu)
 
+    tray_icon.show()
     main_window.show()
     app.exec()
 
@@ -122,6 +122,10 @@ class LightningPassWindow(QtWidgets.QMainWindow):
     def __repr__(self) -> str:
         """Provide information about this class."""
         return "LightningPassWindow()"
+
+    @property
+    def current_index(self) -> int:
+        return self.ui.stacked_widget.currentIndex()
 
     def show(self) -> None:
         """Show main window."""

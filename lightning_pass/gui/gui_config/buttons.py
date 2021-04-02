@@ -72,18 +72,18 @@ class Buttons:
             "account_edit_details_btn": "edit_details_event",
             "account_vault_btn": "vault_event",
             # vault
+            "vault_add_page_btn": "add_vault_page_event",
+            "vault_remove_page_btn": "remove_vault_page_event",
             "vault_menu_btn": "home_event",
             "vault_lock_btn": "vault_lock_event",
             # master_password
-            "master_pass_menu_tool_btn": "home_event",
+            "master_pass_menu_btn": "home_event",
             "master_pass_save_btn": "master_password_submit_event",
         }
         for button, event in buttons_dict.items():
             getattr(self.ui, button).clicked.connect(
                 getattr(self.main_win.events, event),
             )
-
-        del buttons_dict
 
     def setup_menu_bar(self) -> None:
         """Connect all menu bar actions."""
@@ -107,8 +107,6 @@ class Buttons:
             getattr(self.ui, action).triggered.connect(
                 getattr(self.main_win.events, event),
             )
-
-        del menu_bar_dict
 
         # menu_theme
         self.ui.action_light.triggered.connect(
@@ -136,8 +134,6 @@ class Buttons:
             getattr(self.ui, line).setValidator(
                 QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+")),
             )
-
-        del validator_lines
 
 
 __all__ = [

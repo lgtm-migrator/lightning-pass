@@ -10,8 +10,10 @@ from PyQt5 import QtGui, QtWidgets
 
 import lightning_pass.gui.mouse_randomness as mouse_randomness
 import lightning_pass.users.account as account
+import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
 import lightning_pass.gui.gui_config.event_decorators as decorators
+import lightning_pass.gui.window as window
 from lightning_pass.gui.gui_config.widget_data import ClearPreviousWidget
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
@@ -22,6 +24,8 @@ from lightning_pass.util.exceptions import (
     InvalidUsername,
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
+    InvalidURL,
+    VaultException,
 )
 
 
@@ -219,7 +223,7 @@ class Events:
         self.ui.account_username_line.setText(self.current_user.username)
         self.ui.account_email_line.setText(self.current_user.email)
         self.ui.account_last_log_date.setText(
-            f"Last login was {self.current_user.last_login_date}.",
+            f"Last login date: {self.current_user.last_login_date}.",
         )
         self.ui.account_pfp_pixmap_lbl.setPixmap(
             QtGui.QPixmap(self.current_user.profile_picture_path),
@@ -227,7 +231,6 @@ class Events:
 
         self._set_current_widget("account")
 
-    @decorators.login_required()
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
         fname, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -244,9 +247,9 @@ class Events:
 
         self.account_event()
 
-    @decorators.login_required()
     def logout_event(self) -> None:
         """Logout current user."""
+        self.current_user.update_last_login_date()
         del self.current_user
         self.home_event()
 
@@ -255,7 +258,6 @@ class Events:
         """Change password for current user."""
         ...
 
-    @decorators.login_required()
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
         if self.current_user.username != self.ui.account_username_line.text():
@@ -283,7 +285,6 @@ class Events:
         """Switch to master password widget."""
         self._set_current_widget("master_password")
 
-    @decorators.login_required()
     def master_password_submit_event(self) -> None:
         """Try to change or add a master password to a user account.
 
@@ -347,15 +348,6 @@ class Events:
     @decorators.vault_unlock_required("vault")
     def vault_event(self) -> None:
         """Switch to vault window."""
-        print(self.current_user.vault_existence)
-
-        from lightning_pass.gui.window import VaultWidget
-
-        self.ui.vault_widget = VaultWidget().widget
-
-        self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget)
-        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget)
-
         self.ui.vault_username_lbl.setText(
             f"Current user: {self.current_user.username}",
         )
@@ -365,13 +357,50 @@ class Events:
 
         self._set_current_widget("vault")
 
-    @decorators.login_required()
-    @decorators.master_password_required()
-    @decorators.vault_unlock_required()
     def vault_lock_event(self) -> None:
         """Lock vault."""
         self.current_user.vault_unlocked = False
         self.account_event()
+
+    def add_vault_page_event(self) -> None:
+        """Add a new vault page."""
+        self.ui.vault_widget = window.VaultWidget()
+
+        self.ui.vault_widget.ui.vault_update_btn.clicked.connect(
+            self.update_vault_login_event,
+        )
+
+        self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget.widget)
+        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget.widget)
+
+    def remove_vault_page_event(self) -> None:
+        """Remove the current vault page."""
+        ...
+
+    def switch_vault_page_event(self) -> None:
+        """"""
+        ...
+
+    def update_vault_login_event(self) -> None:
+        """Add a new vault tied to the current user."""
+        try:
+            self.current_user.current_vault = vaults.new_vault(
+                self.current_user.user_id,
+                self.ui.vault_widget.ui.vault_platform_line.text(),
+                self.ui.vault_widget.ui.vault_web_line.text(),
+                self.ui.vault_widget.ui.vault_username_line.text(),
+                self.ui.vault_widget.ui.vault_email_line.text(),
+                self.ui.vault_widget.ui.vault_password_line.text(),
+                self.ui.vault_widget.ui.vault_page_lbl.text(),
+            )
+        except InvalidURL:
+            self._message_box("invalid_url_box", "Vault")
+        except InvalidEmail:
+            self._message_box("invalid_email_box", "Vault")
+        except VaultException:
+            self._message_box("invalid_vault_box", "Vault")
+        else:
+            self._message_box("vault_creation_box", "Vault")
 
     def toggle_stylesheet_light(self, *args: Any) -> None:
         """Change stylesheet to light mode."""

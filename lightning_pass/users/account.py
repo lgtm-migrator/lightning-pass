@@ -8,6 +8,7 @@ from typing import Optional, Union
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
 from lightning_pass.util.exceptions import AccountDoesNotExist
+from lightning_pass.users.vaults import Vault
 
 
 def change_password(user_id: int, password: str, confirm_password: str) -> None:
@@ -29,6 +30,8 @@ def change_password(user_id: int, password: str, confirm_password: str) -> None:
 
 class Account:
     """This class holds information about the currently logged in user."""
+
+    last_login_date: datetime
 
     def __init__(self, user_id: Optional[int] = None) -> None:
         """Construct the class.
@@ -93,7 +96,7 @@ class Account:
     def login(cls, username: str, password: str) -> Account:
         """Secondary constructor for log in.
 
-        Updates last_login_date if log in is successful.
+        Stores old last login date and updates new last login date
 
         :param str username: User's username
         :param str password: User's password
@@ -117,7 +120,9 @@ class Account:
             raise AccountDoesNotExist
 
         account = cls(credentials.get_user_item(username, "username", "id"))
+        account.last_login_date = account._last_login_date
         account.update_last_login_date()
+
         return account
 
     def get_value(self, result_column: str) -> Union[str, datetime]:
@@ -226,7 +231,7 @@ class Account:
         )
 
     @property
-    def last_login_date(self) -> datetime:
+    def _last_login_date(self) -> datetime:
         """Last login date property.
 
         :returns: last time the current account was accessed
@@ -256,21 +261,6 @@ class Account:
 
         """
         return self.get_value("register_date")
-
-    @property
-    def vault_existence(self) -> bool:
-        """Return boolean value indicating the vault_existence."""
-        return bool(self.get_value("vault_existence"))
-
-    @vault_existence.setter
-    def vault_existence(self, exists: bool) -> None:
-        """Change the vault existence value.
-
-        :param exists: Bool, turned into a tinyint due to mysql
-
-        """
-        exists = 1 if exists else 0
-        self.set_value(exists, "vault_created")
 
     @property
     def master_password(self) -> str:
@@ -306,6 +296,18 @@ class Account:
             credentials.Password.hash_password(password_information[1]),
             "master_password",
         )
+
+    @property
+    def vault_pages(self) -> list[Optional[Vault]]:
+        """Return all registered vault pages tied to the current account."""
+        with database.database_manager() as db:
+            # not using f-string due to SQL injection
+            sql = "SELECT * from lightning_pass.vaults WHERE user_id = %s" % ("%s",)
+            # expecting a sequence thus val has to be a tuple (created by the trailing comma)
+            db.execute(sql, (self.user_id,))
+            result = db.fetchall()
+
+        return [Vault(*vault[1:]) for vault in result if vault]
 
 
 __all__ = ["Account"]
