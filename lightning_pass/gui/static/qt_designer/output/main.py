@@ -837,11 +837,15 @@ class Ui_lightning_pass(object):
         self.vault_username_lbl.setObjectName("vault_username_lbl")
         self.gridLayout_12.addWidget(self.vault_username_lbl, 1, 0, 1, 2)
         self.vault_stacked_widget = QtWidgets.QStackedWidget(self.vault)
+        self.vault_stacked_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.vault_stacked_widget.setFrameShadow(QtWidgets.QFrame.Plain)
         self.vault_stacked_widget.setObjectName("vault_stacked_widget")
         self.vault_dummy_page1 = QtWidgets.QWidget()
+        self.vault_dummy_page1.setEnabled(False)
         self.vault_dummy_page1.setObjectName("vault_dummy_page1")
         self.vault_stacked_widget.addWidget(self.vault_dummy_page1)
         self.vault_dummy_page2 = QtWidgets.QWidget()
+        self.vault_dummy_page2.setEnabled(True)
         self.vault_dummy_page2.setObjectName("vault_dummy_page2")
         self.vault_stacked_widget.addWidget(self.vault_dummy_page2)
         self.gridLayout_12.addWidget(self.vault_stacked_widget, 0, 3, 6, 1)
@@ -1112,8 +1116,8 @@ class Ui_lightning_pass(object):
         self.menu_bar.addAction(self.menu_users.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(3)
-        self.vault_stacked_widget.setCurrentIndex(0)
+        self.stacked_widget.setCurrentIndex(10)
+        self.vault_stacked_widget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
     def retranslateUi(self, lightning_pass):

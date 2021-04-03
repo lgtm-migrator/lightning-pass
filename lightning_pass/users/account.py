@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import Optional, Union
+from typing import Optional, Union, Generator
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
@@ -54,7 +54,7 @@ class Account:
         confirm_password: str,
         email: str,
     ) -> Account:
-        """Secondary constructor for registering.
+        """Secondary class constructor for registering.
 
         :param str username: User's username
         :param str password: User's password
@@ -94,7 +94,7 @@ class Account:
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
-        """Secondary constructor for log in.
+        """Secondary class constructor for log in.
 
         Stores old last login date and updates new last login date
 
@@ -298,8 +298,8 @@ class Account:
         )
 
     @property
-    def vault_pages(self) -> list[Optional[Vault]]:
-        """Return all registered vault pages tied to the current account."""
+    def vault_pages(self) -> Generator:
+        """Yield registered vault pages tied to the current account."""
         with database.database_manager() as db:
             # not using f-string due to SQL injection
             sql = "SELECT * from lightning_pass.vaults WHERE user_id = %s" % ("%s",)
@@ -307,7 +307,8 @@ class Account:
             db.execute(sql, (self.user_id,))
             result = db.fetchall()
 
-        return [Vault(*vault[1:]) for vault in result if vault]
+        # list slice first element -> database primary key
+        yield from (Vault(*vault[1:]) for vault in result if vault)
 
 
 __all__ = ["Account"]

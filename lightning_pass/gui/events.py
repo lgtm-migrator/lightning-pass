@@ -1,6 +1,7 @@
 """Module containing the Events class used for event handling."""
 from __future__ import annotations
 
+import contextlib
 import pathlib
 from typing import Any
 
@@ -14,7 +15,10 @@ import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
 import lightning_pass.gui.gui_config.event_decorators as decorators
 import lightning_pass.gui.window as window
-from lightning_pass.gui.gui_config.widget_data import ClearPreviousWidget
+from lightning_pass.gui.gui_config.widget_data import (
+    ClearPreviousWidget,
+    VAULT_WIDGET_DATA,
+)
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
     AccountException,
@@ -44,9 +48,6 @@ class Events:
         self.main_win = parent.main_win
         self.ui = parent.ui
 
-        # temporary fix for default value in gen_pass spin box
-        self.ui.generate_pass_spin_box.setValue(16)
-
     def _set_current_widget(self, widget: str) -> None:
         """Set a new current widget.
 
@@ -68,6 +69,37 @@ class Events:
         """
         box = getattr(self.ui.message_boxes, message_box)
         box(*args, **kwargs)
+
+    def _setup_vault_page(self, page: vaults.Vault):
+        """Set up and connect a new vault page
+
+        :param page: Vault object containing the data which should be shown on the current page
+
+        """
+        self.ui.vault_widget = window.VaultWidget()
+        self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget.widget)
+
+        for data in VAULT_WIDGET_DATA:
+            obj = getattr(self.ui.vault_widget.ui, data.name)
+            method = getattr(obj, data.method)
+
+            with contextlib.suppress(TypeError):
+                args = getattr(page, data.args)
+
+            try:
+                method(str(args))
+            except TypeError:
+                method()
+
+        self.ui.vault_widget.ui.vault_update_btn.clicked.connect(
+            self.update_vault_login_event,
+        )
+        self.ui.vault_widget.ui.vault_forward_tool_btn.clicked.connect(
+            lambda: self.change_vault_page_event(1),
+        )
+        self.ui.vault_widget.ui.vault_backward_tool_btn.clicked.connect(
+            lambda: self.change_vault_page_event(-1),
+        )
 
     def home_event(self) -> None:
         """Switch to home widget."""
@@ -348,6 +380,12 @@ class Events:
     @decorators.vault_unlock_required("vault")
     def vault_event(self) -> None:
         """Switch to vault window."""
+        for page in self.current_user.vault_pages:
+            self._setup_vault_page(page)
+
+        # set the current page to the last vault
+        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget.widget)
+
         self.ui.vault_username_lbl.setText(
             f"Current user: {self.current_user.username}",
         )
@@ -357,8 +395,21 @@ class Events:
 
         self._set_current_widget("vault")
 
+    def change_vault_page_event(self, index_change: int) -> None:
+        """Handle changes on the vault window.
+
+        :param index_change: Integer indicating how should the widget index be changed
+
+        """
+        new_index = self.ui.vault_stacked_widget.currentIndex() + index_change
+
+        if new_index <= 1 or new_index > sum(1 for _ in self.current_user.vault_pages):
+            return
+
+        self.ui.vault_stacked_widget.setCurrentIndex(new_index)
+
     def vault_lock_event(self) -> None:
-        """Lock vault."""
+        """Lock the vault."""
         self.current_user.vault_unlocked = False
         self.account_event()
 

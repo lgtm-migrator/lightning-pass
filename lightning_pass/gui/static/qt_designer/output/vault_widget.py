@@ -222,3 +222,6 @@ class Ui_vault_widget(object):
         self.vault_page_lbl.setText(_translate("vault_widget", " 0"))
         self.vault_forward_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_update_btn.setText(_translate("vault_widget", "Update"))
+
+
+__all__ = ["Ui_vault_widget"]

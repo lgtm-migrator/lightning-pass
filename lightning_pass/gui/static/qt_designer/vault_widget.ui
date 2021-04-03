@@ -74,7 +74,7 @@
    <item row="1" column="4">
     <widget class="QToolButton" name="vault_open_web_tool_btn">
      <property name="statusTip">
-      <string>Launch website</string>
+      <string>Launch the website.</string>
      </property>
      <property name="text">
       <string>...</string>
@@ -118,7 +118,7 @@
       <string>Enter account username.</string>
      </property>
      <property name="clearButtonEnabled">
-      <bool>false</bool>
+      <bool>true</bool>
      </property>
     </widget>
    </item>
@@ -134,7 +134,7 @@
       <number>5</number>
      </property>
      <property name="statusTip">
-      <string>Copy username</string>
+      <string>Copy the username.</string>
      </property>
      <property name="whatsThis">
       <string>Copy username</string>
@@ -206,7 +206,7 @@
       <number>5</number>
      </property>
      <property name="statusTip">
-      <string>Copy email</string>
+      <string>Copy the email.</string>
      </property>
      <property name="whatsThis">
       <string>Copy email</string>
@@ -266,7 +266,7 @@
       <number>5</number>
      </property>
      <property name="statusTip">
-      <string>Copy password</string>
+      <string>Copy the password.</string>
      </property>
      <property name="whatsThis">
       <string>Copy password</string>

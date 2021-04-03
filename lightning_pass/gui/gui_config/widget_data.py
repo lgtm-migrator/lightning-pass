@@ -1,4 +1,3 @@
-import contextlib
 from typing import Any, NamedTuple, Optional
 
 _c = ("clear", None)
@@ -7,8 +6,8 @@ _s_ch = ("setChecked", True)
 
 class WidgetItem(NamedTuple):
     name: str
-    method: Optional[str] = _c[0]
-    args: Optional[Any] = _c[1]
+    method: Optional[str] = _c[0]  # "clear"
+    args: Optional[Any] = _c[1]  # None
 
 
 WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
@@ -31,6 +30,7 @@ WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
     },
     7: {
         WidgetItem("generate_pass_spin_box", "setValue", 16),
+        # _s_ch = ("setChecked", True)
         WidgetItem("generate_pass_numbers_check", *_s_ch),
         WidgetItem("generate_pass_symbols_check", *_s_ch),
         WidgetItem("generate_pass_lower_check", *_s_ch),
@@ -49,6 +49,15 @@ WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
         WidgetItem("master_pass_master_pass_line"),
         WidgetItem("master_pass_conf_master_pass_line"),
     },
+}
+
+VAULT_WIDGET_DATA: set[WidgetItem] = {
+    WidgetItem("vault_platform_line", "setText", "platform_name"),
+    WidgetItem("vault_web_line", "setText", "website"),
+    WidgetItem("vault_username_line", "setText", "username"),
+    WidgetItem("vault_email_line", "setText", "email"),
+    WidgetItem("vault_password_line"),
+    WidgetItem("vault_page_lbl", "setText", "vault_index"),
 }
 
 

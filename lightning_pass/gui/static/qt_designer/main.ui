@@ -33,7 +33,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>3</number>
+       <number>10</number>
       </property>
       <widget class="QWidget" name="loading">
        <property name="cursor">
@@ -1387,11 +1387,25 @@
         </item>
         <item row="0" column="3" rowspan="6">
          <widget class="QStackedWidget" name="vault_stacked_widget">
-          <property name="currentIndex">
-           <number>0</number>
+          <property name="frameShape">
+           <enum>QFrame::NoFrame</enum>
           </property>
-          <widget class="QWidget" name="vault_dummy_page1"/>
-          <widget class="QWidget" name="vault_dummy_page2"/>
+          <property name="frameShadow">
+           <enum>QFrame::Plain</enum>
+          </property>
+          <property name="currentIndex">
+           <number>1</number>
+          </property>
+          <widget class="QWidget" name="vault_dummy_page1">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+          <widget class="QWidget" name="vault_dummy_page2">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+          </widget>
          </widget>
         </item>
         <item row="4" column="0" colspan="2">

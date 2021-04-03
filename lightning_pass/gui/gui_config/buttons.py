@@ -80,6 +80,7 @@ class Buttons:
             "master_pass_menu_btn": "home_event",
             "master_pass_save_btn": "master_password_submit_event",
         }
+
         for button, event in buttons_dict.items():
             getattr(self.ui, button).clicked.connect(
                 getattr(self.main_win.events, event),
@@ -130,6 +131,7 @@ class Buttons:
             "master_pass_master_pass_line",
             "master_pass_conf_master_pass_line",
         }
+
         for line in validator_lines:
             getattr(self.ui, line).setValidator(
                 QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+")),
