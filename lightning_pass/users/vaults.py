@@ -1,8 +1,7 @@
 """Module containing the Vault class."""
 from __future__ import annotations
 
-import copy
-from typing import Optional, NamedTuple
+from typing import NamedTuple, Union
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
@@ -15,55 +14,83 @@ class Vault(NamedTuple):
     website: str
     username: str
     email: str
-    password: bytes
+    password: Union[str, bytes]
     vault_index: int
 
 
-def new_vault(
-    user_id: int,
-    platform_name: str,
-    website: str,
-    username: str,
-    email: str,
-    password: str,
-    vault_index: int,
-) -> Optional[Vault]:
+def update_vault(vault: Vault) -> None:
+    if not credentials.validate_url(Vault.website):
+        raise InvalidURL
+
+    if not credentials.Email.check_email_pattern(Vault.email):
+        raise InvalidEmail
+
+    if (
+        not Vault.user_id
+        or not Vault.platform_name
+        or not Vault.website
+        or not Vault.username
+        or not Vault.email
+        or not Vault.password
+    ):
+        raise VaultException
+
+    if credentials.check_item_existence(str(Vault.user_id), "user_id", "vaults", True):
+        _update_vault(vault)
+    else:
+        _new_vault(vault)
+
+
+def delete_vault(vault: Vault) -> None:
+    """"""
+
+
+def _update_vault(vault: Vault) -> None:
+    """Update an already existing vault
+
+    :param vault: The ``Vault`` object containing all of the new vault data
+
+    """
+    with database.database_manager() as db:
+        sql = """UPDATE lightning_pass.vaults SET
+        platform_name = %s,
+        website = %s,
+        username = %s,
+        email = %s,
+        password = %s
+        WHERE user_id = %s
+        AND vault_index = %s
+        """ % (
+            "%s",
+            "%s",
+            "%s",
+            "%s",
+            "%s",
+            "%s",
+            "%s",
+        )
+        db.execute(
+            sql,
+            (
+                vault.platform_name,
+                vault.email,
+                vault.username,
+                vault.email,
+                vault.password,
+            ),
+        )
+
+
+def _new_vault(vault: Vault) -> None:
     """Insert a new page into the database
 
-    :param user_id: Tie the new vault to the user with the given id
-    :param platform_name: The name of the platform, eg. StackOverflow, Gitlab,...
-    :param website: The website link to the chosen platform
-    :param username: The username used to sign into the platform
-    :param email: The email used to sign in into the platform
-    :param password: The password used to sign in into the platform
-    :param vault_index: Indicates which vault page is being created/edited
-
-    :returns: ``Vault`` instantiated with the mew values, if everything goes correctly
+    :param vault: The ``Vault`` object containing all of the vault data
 
     :raises InvalidURL: if the submitted URL is not an URL
     :raises InvalidEmail: if the submitted email is not an email
     :raises VaultException: if some vault page data is missing
 
     """
-    # copy locals object to store given arguments
-    args = copy.copy(locals())
-
-    if not credentials.validate_url(website):
-        raise InvalidURL
-
-    if not credentials.Email.check_email_pattern(email):
-        raise InvalidEmail
-
-    if (
-        not user_id
-        or not platform_name
-        or not website
-        or not username
-        or not email
-        or not password
-    ):
-        raise VaultException
-
     # no exceptions raised -> insert into db
     with database.database_manager() as db:
         sql = """
@@ -89,17 +116,15 @@ def new_vault(
         db.execute(
             sql,
             (
-                user_id,
-                platform_name,
-                website,
-                username,
-                email,
-                credentials.Password.hash_password(password),
-                vault_index,
+                vault.user_id,
+                vault.platform_name,
+                vault.website,
+                vault.username,
+                vault.email,
+                credentials.Password.hash_password(vault.password),
+                vault.vault_index,
             ),
         )
-
-    return Vault(*args.values())
 
 
 __all__ = ["Vault"]

@@ -112,7 +112,7 @@ def set_user_item(
         return False
 
 
-def _check_item_existence(
+def check_item_existence(
     item: str,
     item_column: str,
     table: str = "credentials",
@@ -153,6 +153,7 @@ def _check_item_existence(
             item_column,
             "%s",
         )
+        # expecting a sequence thus create a tuple with the trailing comma
         val = (item,)
 
     with database.database_manager() as db:
@@ -237,7 +238,7 @@ class Username:
         :returns: True or False depending on the result
 
         """
-        return _check_item_existence(username, "username", should_exist=should_exist)
+        return check_item_existence(username, "username", should_exist=should_exist)
 
 
 class Password:
@@ -421,7 +422,7 @@ class Email:
         :returns: True or False depending on the existence check
 
         """
-        return _check_item_existence(email, "email", should_exist=should_exist)
+        return check_item_existence(email, "email", should_exist=should_exist)
 
     @classmethod
     def send_reset_email(cls, email: str) -> None:
@@ -525,7 +526,7 @@ class Token:
         :returns: True if everything went correctly, False if token is invalid
 
         """
-        if _check_item_existence(token, "token", "tokens", should_exist=True):
+        if check_item_existence(token, "token", "tokens", should_exist=True):
             with database.database_manager() as db:
                 # not using f-string due to SQL injection
                 sql = "DELETE FROM lightning_pass.tokens WHERE token = %s" % ("%s",)

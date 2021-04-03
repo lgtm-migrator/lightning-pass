@@ -310,5 +310,10 @@ class Account:
         # list slice first element -> database primary key
         yield from (Vault(*vault[1:]) for vault in result if vault)
 
+    @property
+    def vault_pages_int(self) -> int:
+        """Return an integer with the amount of vault pages a user has registered."""
+        return sum(1 for _ in self.vault_pages)
+
 
 __all__ = ["Account"]

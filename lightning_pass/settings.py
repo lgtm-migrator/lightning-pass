@@ -1,4 +1,4 @@
-"""Module with project constants and settings."""
+"""Module with project constants and DDLs for database."""
 from __future__ import annotations
 
 import os
@@ -6,7 +6,7 @@ from pathlib import Path
 
 import dotenv
 
-from .util import database
+from lightning_pass.util import database
 
 
 def parent_folder() -> Path:
@@ -26,7 +26,7 @@ DB_DICT = {
     "password": os.getenv("DB_PASS"),
     "database": os.getenv("DB_DB"),
 }
-EMAIL_DICT: dict = {
+EMAIL_DICT = {
     "email": os.getenv("EMAIL_USER"),
     "password": os.getenv("EMAIL_PASS"),
 }
@@ -58,7 +58,7 @@ def _copy(self: Path, target: Path) -> None:
 Path.copy = _copy  # type: ignore
 
 
-CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
+_CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `password` char(60) NOT NULL,
@@ -75,7 +75,7 @@ CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
          """
 
-TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
+_TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `token` varchar(255) NOT NULL,
@@ -89,7 +89,7 @@ TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
          """
 
-VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
+_VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `platform_name` varchar(255) NOT NULL,
@@ -105,21 +105,18 @@ VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
 """
 
 with database.database_manager() as db:
-    db.execute(CREDENTIALS_DDL)
-    db.execute(TOKENS_DDL)
-    db.execute(VAULTS_DDL)
+    db.execute(_CREDENTIALS_DDL)
+    db.execute(_TOKENS_DDL)
+    db.execute(_VAULTS_DDL)
 
 
 __all__ = [
-    "CREDENTIALS_DDL",
     "DARK_STYLESHEET",
     "DB_DICT",
     "LIGHT_STYLESHEET",
     "LOG",
     "PFP_FOLDER",
-    "TOKENS_DDL",
     "TRAY_ICON",
-    "VAULTS_DDL",
     "parent_folder",
     "static_folder",
 ]

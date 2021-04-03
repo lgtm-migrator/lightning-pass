@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import Any
+from typing import Any, Optional, TYPE_CHECKING
 
 import clipboard
 import qdarkstyle
@@ -31,6 +31,9 @@ from lightning_pass.util.exceptions import (
     InvalidURL,
     VaultException,
 )
+
+if TYPE_CHECKING:
+    from lightning_pass.users.vaults import Vault
 
 
 class Events:
@@ -70,26 +73,27 @@ class Events:
         box = getattr(self.ui.message_boxes, message_box)
         box(*args, **kwargs)
 
-    def _setup_vault_page(self, page: vaults.Vault):
+    def _setup_vault_page(self, page: Optional[Vault] = None):
         """Set up and connect a new vault page
 
-        :param page: Vault object containing the data which should be shown on the current page
+        :param page: Vault object containing the data which should be shown on the current page, defaults to None
 
         """
         self.ui.vault_widget = window.VaultWidget()
         self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget.widget)
 
-        for data in VAULT_WIDGET_DATA:
-            obj = getattr(self.ui.vault_widget.ui, data.name)
-            method = getattr(obj, data.method)
+        if page:
+            for data in VAULT_WIDGET_DATA:
+                obj = getattr(self.ui.vault_widget.ui, data.name)
+                method = getattr(obj, data.method)
 
-            with contextlib.suppress(TypeError):
-                args = getattr(page, data.args)
+                with contextlib.suppress(TypeError):
+                    args = getattr(page, data.args)
 
-            try:
-                method(str(args))
-            except TypeError:
-                method()
+                try:
+                    method(str(args))
+                except (TypeError, UnboundLocalError):
+                    method()
 
         self.ui.vault_widget.ui.vault_update_btn.clicked.connect(
             self.update_vault_login_event,
@@ -100,6 +104,8 @@ class Events:
         self.ui.vault_widget.ui.vault_backward_tool_btn.clicked.connect(
             lambda: self.change_vault_page_event(-1),
         )
+
+        self.ui.vault_stacked_widget.setCurrentIndex(2)
 
     def home_event(self) -> None:
         """Switch to home widget."""
@@ -155,10 +161,9 @@ class Events:
 
     def send_token_event(self) -> None:
         """Send token and switch to token page."""
-        email = self.ui.forgot_pass_email_line.text()
-        check = credentials.Email.check_email_pattern(email)
-
-        if check:
+        if credentials.Email.check_email_pattern(
+            email := self.ui.forgot_pass_email_line.text(),
+        ):
             self.ui.reset_token_submit_btn.setEnabled(False)
             credentials.Email.send_reset_email(email)
             self.ui.reset_token_submit_btn.setEnabled(True)
@@ -282,6 +287,7 @@ class Events:
     def logout_event(self) -> None:
         """Logout current user."""
         self.current_user.update_last_login_date()
+        # unlink current_user reference
         del self.current_user
         self.home_event()
 
@@ -292,9 +298,9 @@ class Events:
 
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
-        if self.current_user.username != self.ui.account_username_line.text():
+        if self.current_user.username != (i := self.ui.account_username_line.text()):
             try:
-                self.current_user.username = self.ui.account_username_line.text()
+                self.current_user.username = i
             except InvalidUsername:
                 self._message_box("invalid_username_box", "Account")
             except UsernameAlreadyExists:
@@ -302,9 +308,9 @@ class Events:
             else:
                 self._message_box("detail_updated_box", "Account", "username")
 
-        if self.current_user.email != self.ui.account_email_line.text():
+        if self.current_user.email != (i := self.ui.account_email_line.text()):
             try:
-                self.current_user.email = self.ui.account_email_line.text()
+                self.current_user.email = i
             except InvalidEmail:
                 self._message_box("invalid_email_box", "Account")
             except EmailAlreadyExists:
@@ -383,9 +389,6 @@ class Events:
         for page in self.current_user.vault_pages:
             self._setup_vault_page(page)
 
-        # set the current page to the last vault
-        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget.widget)
-
         self.ui.vault_username_lbl.setText(
             f"Current user: {self.current_user.username}",
         )
@@ -395,63 +398,58 @@ class Events:
 
         self._set_current_widget("vault")
 
-    def change_vault_page_event(self, index_change: int) -> None:
-        """Handle changes on the vault window.
+    def add_vault_page_event(self) -> None:
+        """Add a new vault page."""
+        if (
+            pages := self.current_user.vault_pages_int
+        ) <= self.ui.vault_stacked_widget.currentIndex():
+            self._setup_vault_page()
+            self.ui.vault_widget.ui.vault_page_lbl.setText(str(pages + 1))
 
-        :param index_change: Integer indicating how should the widget index be changed
-
-        """
-        new_index = self.ui.vault_stacked_widget.currentIndex() + index_change
-
-        if new_index <= 1 or new_index > sum(1 for _ in self.current_user.vault_pages):
-            return
-
-        self.ui.vault_stacked_widget.setCurrentIndex(new_index)
+    def remove_vault_page_event(self) -> None:
+        """Remove the current vault page."""
+        vaults.delete_vault(...)
 
     def vault_lock_event(self) -> None:
         """Lock the vault."""
         self.current_user.vault_unlocked = False
         self.account_event()
 
-    def add_vault_page_event(self) -> None:
-        """Add a new vault page."""
-        self.ui.vault_widget = window.VaultWidget()
+    def change_vault_page_event(self, index_change: int) -> None:
+        """Handle changes on the vault window.
 
-        self.ui.vault_widget.ui.vault_update_btn.clicked.connect(
-            self.update_vault_login_event,
-        )
+        :param index_change: Integer indicating how should the widget index be changed
 
-        self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget.widget)
-        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget.widget)
-
-    def remove_vault_page_event(self) -> None:
-        """Remove the current vault page."""
-        ...
-
-    def switch_vault_page_event(self) -> None:
-        """"""
-        ...
+        """
+        if (
+            new_index := self.ui.vault_stacked_widget.currentIndex() + index_change
+        ) > 2 or new_index < self.current_user.vault_pages_int + 1:
+            # did not reach border, switch to new page
+            self.ui.vault_stacked_widget.setCurrentIndex(new_index)
 
     def update_vault_login_event(self) -> None:
         """Add a new vault tied to the current user."""
-        try:
-            self.current_user.current_vault = vaults.new_vault(
+        if self.current_user.vault_pages != (
+            vault := vaults.Vault(
                 self.current_user.user_id,
                 self.ui.vault_widget.ui.vault_platform_line.text(),
                 self.ui.vault_widget.ui.vault_web_line.text(),
                 self.ui.vault_widget.ui.vault_username_line.text(),
                 self.ui.vault_widget.ui.vault_email_line.text(),
                 self.ui.vault_widget.ui.vault_password_line.text(),
-                self.ui.vault_widget.ui.vault_page_lbl.text(),
-            )
-        except InvalidURL:
-            self._message_box("invalid_url_box", "Vault")
-        except InvalidEmail:
-            self._message_box("invalid_email_box", "Vault")
-        except VaultException:
-            self._message_box("invalid_vault_box", "Vault")
-        else:
-            self._message_box("vault_creation_box", "Vault")
+                int(self.ui.vault_widget.ui.vault_page_lbl.text()),
+            ),
+        ):
+            try:
+                vaults.update_vault(vault)
+            except InvalidURL:
+                self._message_box("invalid_url_box", "Vault")
+            except InvalidEmail:
+                self._message_box("invalid_email_box", "Vault")
+            except VaultException:
+                self._message_box("invalid_vault_box", "Vault")
+            else:
+                self._message_box("vault_creation_box", "Vault")
 
     def toggle_stylesheet_light(self, *args: Any) -> None:
         """Change stylesheet to light mode."""

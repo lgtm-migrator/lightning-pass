@@ -1679,25 +1679,10 @@
     <property name="title">
      <string>users</string>
     </property>
-    <widget class="QMenu" name="menu_account">
-     <property name="font">
-      <font>
-       <family>Segoe UI Light</family>
-       <pointsize>10</pointsize>
-      </font>
-     </property>
-     <property name="title">
-      <string>account</string>
-     </property>
-     <addaction name="action_profile"/>
-     <addaction name="action_vault"/>
-     <addaction name="action_master_password"/>
-    </widget>
     <addaction name="action_login"/>
     <addaction name="action_register"/>
     <addaction name="action_forgot_password"/>
     <addaction name="action_reset_token"/>
-    <addaction name="menu_account"/>
    </widget>
    <widget class="QMenu" name="menu_password">
     <property name="title">
@@ -1731,9 +1716,18 @@
     <addaction name="action_main_menu"/>
     <addaction name="menu_theme"/>
    </widget>
+   <widget class="QMenu" name="menu_account_2">
+    <property name="title">
+     <string>account</string>
+    </property>
+    <addaction name="action_profile"/>
+    <addaction name="action_master_password"/>
+    <addaction name="action_vault"/>
+   </widget>
    <addaction name="menu_general"/>
    <addaction name="menu_password"/>
    <addaction name="menu_users"/>
+   <addaction name="menu_account_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionlogin">
@@ -1760,7 +1754,7 @@
   </action>
   <action name="action_generate">
    <property name="text">
-    <string>generate</string>
+    <string>generator</string>
    </property>
    <property name="font">
     <font>
