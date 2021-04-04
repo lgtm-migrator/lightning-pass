@@ -303,7 +303,7 @@ contain at least one special character."""
             informative_text="Would you like to move to the login page?",
         ).exec()
 
-    def vault_creation_box(self, parent_lbl: Optional[str] = "Vault") -> None:
+    def vault_updated_box(self, parent_lbl: Optional[str] = "Vault") -> None:
         """Show a message box indicating that a new vault page has been created.
 
         :param parent_lbl: Specifies which windows instantiated the current box
@@ -311,7 +311,7 @@ contain at least one special character."""
         """
         self.message_box_factory(
             parent_lbl,
-            "New vault page created.",
+            "Vault page created/updated.",
             None,
         ).exec()
 
@@ -427,6 +427,21 @@ contain at least one special character."""
             "Your vault has been unlocked.",
             QMessageBox.Question,
             informative_text="Would you like to move to the vault page?",
+        ).exec()
+
+    def vault_page_deleted_box(
+        self, platform: str, parent_lbl: Optional[str] = "Vault"
+    ):
+        """Show a message box indicating that the current vault page has been deleted.
+
+        :param platform: The platform of the deleted page
+        :param parent_lbl: Specifies which window instantiated the current box, defaults to "Vault"
+
+        """
+        self.message_box_factory(
+            parent_lbl,
+            f"Vault page for {platform} deleted.",
+            None,
         ).exec()
 
 

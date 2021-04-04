@@ -35,7 +35,12 @@ def _get_user_id(column: str, value: str) -> Union[int, bool]:
     """
     with database.database_manager() as db:
         # not using f-string due to SQL injection
-        sql = "SELECT id FROM lightning_pass.credentials WHERE %s = %s" % (column, "%s")
+        sql = """SELECT id
+                   FROM lightning_pass.credentials
+                  WHERE %s = %s""" % (
+            column,
+            "%s",
+        )
         # expecting a sequence thus val has to be a tuple (created by the trailing comma)
         db.execute(sql, (value,))
         result = db.fetchone()
@@ -69,7 +74,9 @@ def get_user_item(
         return user_id
     with database.database_manager() as db:
         # not using f-string due to SQL injection
-        sql = "SELECT %s FROM lightning_pass.credentials WHERE id = %s" % (
+        sql = """SELECT %s
+                   FROM lightning_pass.credentials
+                  WHERE id = %s""" % (
             result_column,
             "%s",
         )
@@ -101,7 +108,9 @@ def set_user_item(
     if user_identifier:
         with database.database_manager() as db:
             # not using f-string due to SQL injection
-            sql = "UPDATE lightning_pass.credentials SET %s = %s WHERE id = %s" % (
+            sql = """UPDATE lightning_pass.credentials
+                        SET %s = %s
+                      WHERE id = %s""" % (
                 result_column,
                 "%s",
                 "%s",
@@ -136,10 +145,11 @@ def check_item_existence(
     """
     if second_key is not None and second_key_column is not None:
         # not using f-string due to SQL injection
-        sql = """SELECT EXISTS(SELECT 1 FROM %s
-                  WHERE %s = %s
-                    AND %s = %s
-                    )""" % (
+        sql = """SELECT EXISTS(SELECT 1
+                                 FROM %s
+                                WHERE %s = %s
+                                  AND %s = %s
+                                )""" % (
             table,
             item_column,
             "%s",
@@ -149,7 +159,10 @@ def check_item_existence(
         val = (item, second_key)
     else:
         # not using f-string due to SQL injection
-        sql = "SELECT EXISTS(SELECT 1 FROM %s WHERE %s = %s)" % (
+        sql = """SELECT EXISTS(SELECT 1
+                                 FROM %s
+                                WHERE %s = %s
+                                )""" % (
             table,
             item_column,
             "%s",
@@ -409,9 +422,7 @@ class Email:
         :returns: boolean value depending on the pattern check
 
         """
-        from validator_collection import checkers
-
-        return checkers.is_email(email)
+        return validator_collection.checkers.is_email(email)
 
     @staticmethod
     def check_email_existence(email: str, should_exist: Optional[bool] = False) -> bool:
@@ -503,14 +514,16 @@ class Token:
         token = secrets.token_hex(15) + str(user_id)
 
         with database.EnableDBSafeMode(), database.database_manager() as db:
-            sql = "DELETE FROM lightning_pass.tokens WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"
+            sql = """DELETE FROM lightning_pass.tokens
+                           WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"""
             db.execute(sql)
 
         with database.database_manager() as db:
             # not using f-string due to SQL injection
-            sql = (
-                "INSERT INTO lightning_pass.tokens (user_id, token) VALUES (%s, %s)"
-                % ("%s", "%s")
+            sql = """INSERT INTO lightning_pass.tokens (user_id, token)
+                          VALUES (%s, %s)""" % (
+                "%s",
+                "%s",
             )
             db.execute(sql, (user_id, token))
 
@@ -530,7 +543,10 @@ class Token:
         if check_item_existence(token, "token", "tokens", should_exist=True):
             with database.database_manager() as db:
                 # not using f-string due to SQL injection
-                sql = "DELETE FROM lightning_pass.tokens WHERE token = %s" % ("%s",)
+                sql = """DELETE FROM lightning_pass.tokens
+                               WHERE token = %s""" % (
+                    "%s",
+                )
                 # query expecting a sequence thus val has to be a tuple (created by the trailing comma)
                 db.execute(sql, (token,))
             return True

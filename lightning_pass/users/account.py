@@ -243,9 +243,10 @@ class Account:
         """Set last login date."""
         with database.database_manager() as db:
             # not using f-string due to SQL injection
-            sql = (
-                "UPDATE lightning_pass.credentials SET last_login_date = CURRENT_TIMESTAMP() WHERE id = %s"
-                % ("%s",)
+            sql = """UPDATE lightning_pass.credentials
+                        SET last_login_date = CURRENT_TIMESTAMP()
+                      WHERE id = %s""" % (
+                "%s",
             )
             # expecting a sequence thus val has to be a tuple (created by the trailing comma)
             db.execute(sql, (self.user_id,))
@@ -302,7 +303,11 @@ class Account:
         """Yield registered vault pages tied to the current account."""
         with database.database_manager() as db:
             # not using f-string due to SQL injection
-            sql = "SELECT * from lightning_pass.vaults WHERE user_id = %s" % ("%s",)
+            sql = """SELECT *
+                       FROM lightning_pass.vaults
+                      WHERE user_id = %s""" % (
+                "%s",
+            )
             # expecting a sequence thus val has to be a tuple (created by the trailing comma)
             db.execute(sql, (self.user_id,))
             result = db.fetchall()
