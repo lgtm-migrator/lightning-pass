@@ -19,23 +19,30 @@ class Vault(NamedTuple):
 
 
 def update_vault(vault: Vault) -> None:
-    if not credentials.validate_url(Vault.website):
+    if not credentials.validate_url(vault.website):
         raise InvalidURL
 
-    if not credentials.Email.check_email_pattern(Vault.email):
+    if not credentials.Email.check_email_pattern(vault.email):
         raise InvalidEmail
 
     if (
-        not Vault.user_id
-        or not Vault.platform_name
-        or not Vault.website
-        or not Vault.username
-        or not Vault.email
-        or not Vault.password
+        not vault.user_id
+        or not vault.platform_name
+        or not vault.website
+        or not vault.username
+        or not vault.email
+        or not vault.password
     ):
         raise VaultException
 
-    if credentials.check_item_existence(str(Vault.user_id), "user_id", "vaults", True):
+    if credentials.check_item_existence(
+        str(vault.user_id),
+        "user_id",
+        "vaults",
+        should_exist=True,
+        second_key=vault.vault_index,
+        second_key_column="vault_index",
+    ):
         _update_vault(vault)
     else:
         _new_vault(vault)
@@ -48,7 +55,7 @@ def delete_vault(vault: Vault) -> None:
 def _update_vault(vault: Vault) -> None:
     """Update an already existing vault
 
-    :param vault: The ``Vault`` object containing all of the new vault data
+    :param vault: The ``Vault`` object containing all of the updated vault data
 
     """
     with database.database_manager() as db:
@@ -76,7 +83,9 @@ def _update_vault(vault: Vault) -> None:
                 vault.email,
                 vault.username,
                 vault.email,
-                vault.password,
+                credentials.Password.hash_password(vault.password),
+                vault.user_id,
+                vault.vault_index,
             ),
         )
 

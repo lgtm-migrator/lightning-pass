@@ -33,7 +33,7 @@
        </font>
       </property>
       <property name="currentIndex">
-       <number>10</number>
+       <number>6</number>
       </property>
       <widget class="QWidget" name="loading">
        <property name="cursor">
@@ -660,8 +660,11 @@
             <pointsize>10</pointsize>
            </font>
           </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
           <property name="readOnly">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="placeholderText">
            <string>Enter your new password.</string>
@@ -679,11 +682,14 @@
             <pointsize>10</pointsize>
            </font>
           </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
           <property name="dragEnabled">
            <bool>false</bool>
           </property>
           <property name="readOnly">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="placeholderText">
            <string>Enter your new password again.</string>
@@ -1394,7 +1400,7 @@
            <enum>QFrame::Plain</enum>
           </property>
           <property name="currentIndex">
-           <number>1</number>
+           <number>0</number>
           </property>
           <widget class="QWidget" name="vault_dummy_page1">
            <property name="enabled">
@@ -1403,7 +1409,7 @@
           </widget>
           <widget class="QWidget" name="vault_dummy_page2">
            <property name="enabled">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </widget>

@@ -137,8 +137,9 @@ def check_item_existence(
     if second_key is not None and second_key_column is not None:
         # not using f-string due to SQL injection
         sql = """SELECT EXISTS(SELECT 1 FROM %s
-                  WHERE %s = %s)
-                    AND %s = %s""" % (
+                  WHERE %s = %s
+                    AND %s = %s
+                    )""" % (
             table,
             item_column,
             "%s",
