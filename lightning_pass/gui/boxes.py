@@ -1,7 +1,11 @@
-"""Module containing the MessageBoxes class used for showing various message boxes."""
+"""Module containing the MessageBoxes and InputDialogs classes
+
+Used for showing information to the user.
+
+"""
 import contextlib
 import functools
-from typing import Any, Callable, Optional, Union
+from typing import Callable, Optional, Union, Sequence
 
 from PyQt5.QtWidgets import (
     QInputDialog,
@@ -13,7 +17,7 @@ from PyQt5.QtWidgets import (
 )
 
 
-def partial_factory(func: Callable, *args: Optional[Any], **kwargs: Optional[Any]):
+def partial_factory(func: Callable, *args: Optional[any], **kwargs: Optional[any]):
     """Return a new partial function.
 
     :param func: The function which will be made partial
@@ -90,15 +94,21 @@ class MessageBoxes(QWidget):
         """
         box = QMessageBox(self.main_win)
 
-        box.setWindowTitle(f"{self.title} - {parent_lbl}")
-        box.setText(text)
+        operations = {
+            "setWindowTitle": f"{self.title} - {parent_lbl}",
+            "setText": text,
+            "setIcon": icon,
+            "setInformativeText": informative_text,
+            "setStandardButtons": standard_buttons,
+            "setDefaultButton": default_button,
+        }
 
-        # suppress TypeError if this information is missing
-        with contextlib.suppress(TypeError):
-            box.setIcon(icon)
-            box.setInformativeText(informative_text)
-            box.setStandardButtons(standard_buttons)
-            box.setDefaultButton(default_button)
+        for func, val in operations.items():
+            # suppress TypeError if this information is missing
+            with contextlib.suppress(TypeError):
+                getattr(box, func)(val)
+
+        if event_handler:
             box.buttonClicked.connect(event_handler)
 
         return box
@@ -303,18 +313,6 @@ contain at least one special character."""
             informative_text="Would you like to move to the login page?",
         ).exec()
 
-    def vault_updated_box(self, parent_lbl: Optional[str] = "Vault") -> None:
-        """Show a message box indicating that a new vault page has been created.
-
-        :param parent_lbl: Specifies which windows instantiated the current box
-
-        """
-        self.message_box_factory(
-            parent_lbl,
-            "Vault page created/updated.",
-            None,
-        ).exec()
-
     def detail_updated_box(
         self,
         parent_lbl: str,
@@ -329,7 +327,7 @@ contain at least one special character."""
         self.message_box_factory(
             parent_lbl,
             f"Your {detail} has been successfully updated!",
-            QMessageBox.Question,
+            None,
         ).exec()
 
     def reset_email_sent_box(self, parent_lbl: str) -> None:
@@ -430,7 +428,9 @@ contain at least one special character."""
         ).exec()
 
     def vault_page_deleted_box(
-        self, platform: str, parent_lbl: Optional[str] = "Vault"
+        self,
+        parent_lbl: str,
+        platform: str,
     ):
         """Show a message box indicating that the current vault page has been deleted.
 
@@ -442,6 +442,53 @@ contain at least one special character."""
             parent_lbl,
             f"Vault page for {platform} deleted.",
             None,
+        ).exec()
+
+    def vault_created_box(self, parent_lbl: str, platform: str) -> None:
+        """Show a message box indicating that a new vault page has been created.
+
+        :param parent_lbl: Specifies which windows instantiated the current box
+        :param platform: The platform affected by this change
+
+        """
+        self.message_box_factory(
+            parent_lbl,
+            f"Vault page for {platform} created.",
+            None,
+        ).exec()
+
+    def vault_updated_box(
+        self,
+        parent_lbl: str,
+        platform: str,
+        updated_values: list[str],
+    ) -> None:
+        """Show a message box indicating that a new vault page has been updated.
+
+        :param parent_lbl: Specifies which windows instantiated the current box
+        :param platform: The platform affected by this change
+        :param updated_values: A ``list`` containing the values that have been updated
+
+        """
+        try:
+            # capitalize first character of the first element
+            updated_values[0] = updated_values[0][0].upper() + updated_values[0][1:]
+        except IndexError:
+            # first element/character did not exist, return without showing anything
+            return
+
+        informative = (
+            f"""{', '.join(updated_values[:-1])} and {updated_values[-1]}
+have been successfully updated."""
+            if len(updated_values) > 1
+            else f"{updated_values[0]} has been successfully updated."
+        )
+
+        self.message_box_factory(
+            parent_lbl,
+            f"Vault page for {platform} updated.",
+            None,
+            informative_text=informative,
         ).exec()
 
 

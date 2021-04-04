@@ -3,7 +3,7 @@ __all__ = [
     "gui_config",
     "static",
     "events",
-    "message_boxes",
+    "boxes.py",
     "mouse_randomness",
     "window",
 ]

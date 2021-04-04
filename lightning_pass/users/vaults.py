@@ -18,6 +18,38 @@ class Vault(NamedTuple):
     vault_index: int
 
 
+def get_vault(user_id: int, vault_index: int) -> Union[Vault, bool]:
+    """Return a ``Vault`` tied to the given arguments.
+
+    :param user_id: The user_id connected to the wanted ``Vault``
+    :param vault_index: The index of the wanted ``Vault``
+
+    """
+    with database.database_manager() as db:
+        sql = """SELECT *
+                   FROM lightning_pass.vaults
+                  WHERE user_id = %s
+                    AND vault_index = %s""" % (
+            "%s",
+            "%s",
+        )
+        db.execute(sql, (user_id, vault_index))
+        result = db.fetchone()
+
+    try:
+        return Vault(
+            user_id,
+            result[2],
+            result[3],
+            result[4],
+            result[5],
+            ...,
+            result[7],
+        )
+    except TypeError:
+        return False
+
+
 def update_vault(vault: Vault) -> None:
     """Update or create a new vault.
 

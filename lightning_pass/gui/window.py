@@ -5,7 +5,7 @@ import sys
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from lightning_pass.gui import events, message_boxes, mouse_randomness
+from lightning_pass.gui import events, boxes, mouse_randomness
 from lightning_pass.gui.gui_config import buttons
 from lightning_pass.gui.static.qt_designer.output import (
     main,
@@ -100,11 +100,11 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
         buttons.Buttons(self).setup_all()
 
-        self.ui.message_boxes = message_boxes.MessageBoxes(
+        self.ui.message_boxes = boxes.MessageBoxes(
             child=self.main_win,
             parent=self,
         )
-        self.ui.input_dialogs = message_boxes.InputDialogs(
+        self.ui.input_dialogs = boxes.InputDialogs(
             child=self.main_win,
             parent=self,
         )

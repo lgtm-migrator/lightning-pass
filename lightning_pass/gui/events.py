@@ -120,6 +120,25 @@ class Events:
         self.ui.gridLayout_12.addWidget(self.ui.vault_stacked_widget, 0, 3, 6, 1)
 
     @property
+    def _vault_widget_vault(self) -> Vault:
+        """Return ``Vault object`` instantiated with the current vault widget values.
+
+        Finds the new values by accessing the children objects of the current widget.
+        The indexes point to the ``line_edit`` objects containing the string values.
+
+        """
+        children_objects = self.ui.vault_stacked_widget.currentWidget().children()
+        return vaults.Vault(
+            self.current_user.user_id,
+            children_objects[1].text(),
+            children_objects[3].text(),
+            children_objects[6].text(),
+            children_objects[9].text(),
+            children_objects[12].text(),
+            children_objects[15].text(),
+        )
+
+    @property
     def vault_stacked_widget_index(self) -> int:
         """Return the current ``vault_stacked_widget`` index."""
         return self.ui.vault_stacked_widget.currentIndex()
@@ -446,11 +465,11 @@ class Events:
             self.vault_stacked_widget_index - 1,
         )
 
+        platform = self._vault_widget_vault.platform_name
         self.vault_event()
         self._message_box(
             "vault_page_deleted_box",
-            # refer to update_vault_login_event function for explanation
-            self.ui.vault_stacked_widget.currentWidget().children()[1].text(),
+            platform,
             "Vault",
         )
 
@@ -472,23 +491,27 @@ class Events:
     def update_vault_page_event(self) -> None:
         """Add a new vault tied to the current user.
 
-        Finds the new values by list slicing the current vault_widget object.
-        The indices are the indexes of the line_edit objects returned by the children() attribute,
-        stored in the memory.
+        Checks if the vault previously existed and stores it.
+        Used later to choose correct message box.
 
         """
-        children_objects = self.ui.vault_stacked_widget.currentWidget().children()
+        exists = vaults.get_vault(
+            self.current_user.user_id,
+            self._vault_widget_vault.vault_index,
+        )
 
         try:
             vaults.update_vault(
-                vaults.Vault(
-                    self.current_user.user_id,
-                    platform_name=children_objects[1].text(),
-                    website=children_objects[3].text(),
-                    username=children_objects[6].text(),
-                    email=children_objects[9].text(),
-                    password=children_objects[12].text(),
-                    vault_index=int(children_objects[15].text()),
+                (
+                    new_vault := vaults.Vault(
+                        self.current_user.user_id,
+                        self._vault_widget_vault.platform_name,
+                        self._vault_widget_vault.website,
+                        self._vault_widget_vault.username,
+                        self._vault_widget_vault.email,
+                        self._vault_widget_vault.password,
+                        int(self._vault_widget_vault.vault_index),
+                    )
                 ),
             )
         except InvalidURL:
@@ -499,7 +522,24 @@ class Events:
             self._message_box("invalid_vault_box", "Vault")
         else:
             self.ui.vault_widget.ui.vault_password_line.clear()
-            self._message_box("vault_updated_box", "Vault")
+
+            if exists:
+                self._message_box(
+                    "vault_updated_box",
+                    "Vault",
+                    self._vault_widget_vault.platform_name,
+                    [
+                        key
+                        for key, val in zip(exists._fields, exists)
+                        if not getattr(new_vault, str(key)) == val
+                    ],
+                )
+            else:
+                self._message_box(
+                    "vault_created_box",
+                    "Vault",
+                    self._vault_widget_vault.platform_name,
+                )
 
     def toggle_stylesheet_light(self, *args: any) -> None:
         """Change stylesheet to light mode."""
