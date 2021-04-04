@@ -1,4 +1,4 @@
-from typing import Any, NamedTuple, Optional
+from typing import NamedTuple, Optional
 
 _c = ("clear", None)
 _s_ch = ("setChecked", True)
@@ -7,7 +7,7 @@ _s_ch = ("setChecked", True)
 class WidgetItem(NamedTuple):
     name: str
     method: Optional[str] = _c[0]  # "clear"
-    args: Optional[Any] = _c[1]  # None
+    args: Optional[any] = _c[1]  # None
 
 
 WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {

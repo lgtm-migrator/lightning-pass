@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import Any, Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING
 
 import clipboard
 import qdarkstyle
@@ -42,8 +42,8 @@ class Events:
     def __init__(
         self,
         parent: QtWidgets.QMainWindow,
-        *args: Any,
-        **kwargs: Any,
+        *args: any,
+        **kwargs: any,
     ) -> None:
         """Construct the class."""
         super().__init__(*args, **kwargs)
@@ -62,7 +62,7 @@ class Events:
         with ClearPreviousWidget(self.parent):
             self.ui.stacked_widget.setCurrentWidget(getattr(self.ui, widget))
 
-    def _message_box(self, message_box: str, *args: Any, **kwargs: Any) -> None:
+    def _message_box(self, message_box: str, *args: any, **kwargs: any) -> None:
         """Show a chosen message box with the given positional and keyword arguments.
 
         :param message_box: The message box type to show
@@ -106,6 +106,18 @@ class Events:
         )
 
         self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget.widget)
+
+    def _rebuild_vault_stacked_widget(self):
+        """Rebuild ``self.ui.vault_stacked_widget``."""
+        self.ui.vault_stacked_widget = QtWidgets.QStackedWidget(self.ui.vault)
+        self.ui.vault_stacked_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.ui.vault_stacked_widget.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.ui.vault_stacked_widget.setObjectName("vault_stacked_widget")
+        self.ui.vault_dummy_page1 = QtWidgets.QWidget()
+        self.ui.vault_dummy_page1.setEnabled(False)
+        self.ui.vault_dummy_page1.setObjectName("vault_dummy_page1")
+        self.ui.vault_stacked_widget.addWidget(self.ui.vault_dummy_page1)
+        self.ui.gridLayout_12.addWidget(self.ui.vault_stacked_widget, 0, 3, 6, 1)
 
     def home_event(self) -> None:
         """Switch to home widget."""
@@ -386,11 +398,7 @@ class Events:
     @decorators.vault_unlock_required("vault")
     def vault_event(self) -> None:
         """Switch to vault window."""
-        for i in range(self.ui.vault_stacked_widget.count()):
-            print(i)
-            self.ui.vault_stacked_widget.removeWidget(
-                self.ui.vault_stacked_widget.widget(i),
-            )
+        self._rebuild_vault_stacked_widget()
 
         for page in self.current_user.vault_pages:
             self._setup_vault_page(page)
@@ -467,13 +475,13 @@ class Events:
             self.ui.vault_widget.ui.vault_password_line.clear()
             self._message_box("vault_creation_box", "Vault")
 
-    def toggle_stylesheet_light(self, *args: Any) -> None:
+    def toggle_stylesheet_light(self, *args: any) -> None:
         """Change stylesheet to light mode."""
         if args:
             ...
         self.main_win.setStyleSheet("")
 
-    def toggle_stylesheet_dark(self, *args: Any) -> None:
+    def toggle_stylesheet_dark(self, *args: any) -> None:
         """Change stylesheet to dark mode."""
         if args:
             ...
