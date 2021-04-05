@@ -1,11 +1,13 @@
 """Module containing various utils connected to database management."""
 import contextlib
 import functools
-from typing import Callable, Iterator
+from typing import TYPE_CHECKING, Callable, Iterator
 
-import mysql
-from mysql.connector import MySQLConnection
-from mysql.connector.cursor import MySQLCursor
+import mysql.connector
+
+if TYPE_CHECKING:
+    from mysql.connector import MySQLConnection
+    from mysql.connector.cursor import MySQLCursor
 
 
 @contextlib.contextmanager
@@ -13,7 +15,7 @@ def database_manager() -> Iterator[None]:
     """Manage database queries easily with context manager.
 
     Automatically yields the database connection on __enter__ and closes the
-        connection on __exit__.
+    connection on __exit__.
 
     :returns: database connection cursor
 

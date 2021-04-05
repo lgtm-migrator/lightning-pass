@@ -3,12 +3,12 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import Optional, Union, Generator
+from typing import Generator
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
-from lightning_pass.util.exceptions import AccountDoesNotExist
 from lightning_pass.users.vaults import Vault
+from lightning_pass.util.exceptions import AccountDoesNotExist
 
 
 def change_password(user_id: int, password: str, confirm_password: str) -> None:
@@ -32,8 +32,9 @@ class Account:
     """This class holds information about the currently logged in user."""
 
     last_login_date: datetime
+    last_vault_unlock_date: datetime
 
-    def __init__(self, user_id: Optional[int] = None) -> None:
+    def __init__(self, user_id: int | None = None) -> None:
         """Construct the class.
 
         :param int user_id: User's id, defaults to None
@@ -44,7 +45,7 @@ class Account:
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"Account({self.user_id})"
+        return f"{self.__class__.__name__}({self.user_id})"
 
     @classmethod
     def register(
@@ -83,10 +84,8 @@ class Account:
 
         # no exceptions raised -> insert into db
         with database.database_manager() as db:
-            sql = (
-                "INSERT INTO lightning_pass.credentials (username, password, email)"
-                "     VALUES (%s, %s, %s)"
-            )
+            sql = """INSERT INTO lightning_pass.credentials (username, password, email)
+                          VALUES (%s, %s, %s)"""
             val = (username, credentials.Password.hash_password(password), email)
             db.execute(sql, val)
 
@@ -110,12 +109,13 @@ class Account:
         if not credentials.Username.check_username_existence(
             username,
             should_exist=True,
-        ):
-            raise AccountDoesNotExist
-
-        if not credentials.Password.authenticate_password(
+        ) or not credentials.Password.authenticate_password(
             password,
-            credentials.get_user_item(username, "username", "password"),
+            credentials.get_user_item(
+                username,
+                "username",
+                "password",
+            ),
         ):
             raise AccountDoesNotExist
 
@@ -125,7 +125,7 @@ class Account:
 
         return account
 
-    def get_value(self, result_column: str) -> Union[str, datetime]:
+    def get_value(self, result_column: str) -> str | datetime:
         """Simplify getting user values.
 
         :param str result_column: Column from which we're collecting the value
@@ -136,7 +136,7 @@ class Account:
         return credentials.get_user_item(self.user_id, "id", result_column)
 
     def set_value(
-        self, result: Union[int, str, bytes, datetime], result_column: str
+        self, result: int | str | bytes | datetime, result_column: str
     ) -> None:
         """Simplify setting user values.
 
@@ -145,6 +145,25 @@ class Account:
 
         """
         credentials.set_user_item(self.user_id, "id", result, result_column)
+
+    def update_date(self, column: str) -> None:
+        """Update database TIMESTAMP column with CURRENT_TIMESTAMP().
+
+        Used for last_login_date and last_vault_unlock_date.
+
+        :param column: Which column to update
+
+        """
+        with database.database_manager() as db:
+            # not using f-string due to SQL injection
+            sql = """UPDATE lightning_pass.credentials
+                        SET {} = CURRENT_TIMESTAMP()
+                      WHERE id = {}""".format(
+                column,
+                "%s",
+            )
+            # expecting a sequence thus val has to be a tuple (created by the trailing comma)
+            db.execute(sql, (self.user_id,))
 
     @property
     def username(self) -> str:
@@ -240,16 +259,8 @@ class Account:
         return self.get_value("last_login_date")
 
     def update_last_login_date(self) -> None:
-        """Set last login date."""
-        with database.database_manager() as db:
-            # not using f-string due to SQL injection
-            sql = """UPDATE lightning_pass.credentials
-                        SET last_login_date = CURRENT_TIMESTAMP()
-                      WHERE id = %s""" % (
-                "%s",
-            )
-            # expecting a sequence thus val has to be a tuple (created by the trailing comma)
-            db.execute(sql, (self.user_id,))
+        """Update last login date."""
+        self.update_date("last_login_date")
 
     @functools.cached_property
     def register_date(self) -> datetime:
@@ -299,13 +310,22 @@ class Account:
         )
 
     @property
+    def _last_vault_unlock_date(self) -> datetime:
+        """Return last vault unlock timestamp."""
+        return self.get_value("last_vault_unlock_date")
+
+    def update_last_vault_unlock_date(self) -> None:
+        """Update the last vault unlock date."""
+        self.update_date("last_vault_unlock_date")
+
+    @property
     def vault_pages(self) -> Generator:
         """Yield registered vault pages tied to the current account."""
         with database.database_manager() as db:
             # not using f-string due to SQL injection
             sql = """SELECT *
                        FROM lightning_pass.vaults
-                      WHERE user_id = %s""" % (
+                      WHERE user_id = {}""".format(
                 "%s",
             )
             # expecting a sequence thus val has to be a tuple (created by the trailing comma)

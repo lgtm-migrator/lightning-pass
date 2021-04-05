@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Form implementation generated from reading ui file 'vault_widget.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.3
@@ -11,7 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_vault_widget(object):
+class Ui_vault_widget:
     def setupUi(self, vault_widget):
         vault_widget.setObjectName("vault_widget")
         vault_widget.resize(416, 353)

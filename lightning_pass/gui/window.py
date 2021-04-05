@@ -5,7 +5,7 @@ import sys
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from lightning_pass.gui import events, boxes, mouse_randomness
+from lightning_pass.gui import boxes, events, mouse_randomness
 from lightning_pass.gui.gui_config import buttons
 from lightning_pass.gui.static.qt_designer.output import (
     main,

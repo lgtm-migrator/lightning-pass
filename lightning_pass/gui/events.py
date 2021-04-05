@@ -3,21 +3,21 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 import clipboard
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
 
+import lightning_pass.gui.gui_config.event_decorators as decorators
 import lightning_pass.gui.mouse_randomness as mouse_randomness
+import lightning_pass.gui.window as window
 import lightning_pass.users.account as account
 import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
-import lightning_pass.gui.gui_config.event_decorators as decorators
-import lightning_pass.gui.window as window
 from lightning_pass.gui.gui_config.widget_data import (
-    ClearPreviousWidget,
     VAULT_WIDGET_DATA,
+    ClearPreviousWidget,
 )
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
@@ -25,10 +25,10 @@ from lightning_pass.util.exceptions import (
     EmailAlreadyExists,
     InvalidEmail,
     InvalidPassword,
+    InvalidURL,
     InvalidUsername,
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
-    InvalidURL,
     VaultException,
 )
 
@@ -50,6 +50,10 @@ class Events:
         self.parent = parent
         self.main_win = parent.main_win
         self.ui = parent.ui
+
+    def __repr__(self) -> str:
+        """Provide information about this class."""
+        return f"{self.__class__.__name__}({self.parent})"
 
     def _set_current_widget(self, widget: str) -> None:
         """Set a new current widget.
@@ -73,7 +77,7 @@ class Events:
         box = getattr(self.ui.message_boxes, message_box)
         box(*args, **kwargs)
 
-    def _setup_vault_page(self, page: Optional[Vault] = None):
+    def _setup_vault_page(self, page: Vault | None = None):
         """Set up and connect a new vault page
 
         :param page: Vault object containing the data which should be shown on the current page, defaults to None
@@ -301,7 +305,7 @@ class Events:
         self.ui.account_username_line.setText(self.current_user.username)
         self.ui.account_email_line.setText(self.current_user.email)
         self.ui.account_last_log_date.setText(
-            f"Last login date: {self.current_user.last_login_date}.",
+            f"Last login date: {self.current_user.last_login_date}",
         )
         self.ui.account_pfp_pixmap_lbl.setPixmap(
             QtGui.QPixmap(self.current_user.profile_picture_path),
@@ -436,8 +440,9 @@ class Events:
             f"Current user: {self.current_user.username}",
         )
         self.ui.vault_date_lbl.setText(
-            f"Last unlock date: {str(self.current_user.register_date)}",
+            f"Last unlock date: {str(self.current_user._last_vault_unlock_date)}",
         )
+        self.current_user.update_last_vault_unlock_date()
 
         self._set_current_widget("vault")
 
@@ -534,6 +539,7 @@ class Events:
                         if not getattr(new_vault, str(key)) == val
                     ],
                 )
+
             else:
                 self._message_box(
                     "vault_created_box",

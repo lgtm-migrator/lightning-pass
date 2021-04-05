@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Form implementation generated from reading ui file 'splash_screen.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.3
@@ -11,7 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_loading_widget(object):
+class Ui_loading_widget:
     def setupUi(self, loading_widget):
         loading_widget.setObjectName("loading_widget")
         loading_widget.resize(410, 143)

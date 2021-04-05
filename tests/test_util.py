@@ -1,10 +1,7 @@
 """Test module for the users package."""
 from __future__ import annotations
 
-from typing import Union
-
 import pytest
-from pytest_mysql import factories
 
 from lightning_pass.util.credentials import Email, Password, Username
 
@@ -91,8 +88,8 @@ def test_check_password_pattern(password):
 )
 def test_check_password_match(
     password_cls: Password,
-    password: Union[str, bytes],
-    confirm_password: Union[str, bytes],
+    password: str | bytes,
+    confirm_password: str | bytes,
 ) -> None:
     """Test check_password_match func of Password.
 

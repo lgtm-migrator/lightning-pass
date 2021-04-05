@@ -6,7 +6,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional, Union
 
-
 import bcrypt
 import validator_collection
 import yagmail
@@ -37,7 +36,7 @@ def _get_user_id(column: str, value: str) -> Union[int, bool]:
         # not using f-string due to SQL injection
         sql = """SELECT id
                    FROM lightning_pass.credentials
-                  WHERE %s = %s""" % (
+                  WHERE {} = {}""".format(
             column,
             "%s",
         )
@@ -74,9 +73,9 @@ def get_user_item(
         return user_id
     with database.database_manager() as db:
         # not using f-string due to SQL injection
-        sql = """SELECT %s
+        sql = """SELECT {}
                    FROM lightning_pass.credentials
-                  WHERE id = %s""" % (
+                  WHERE id = {}""".format(
             result_column,
             "%s",
         )
@@ -109,8 +108,8 @@ def set_user_item(
         with database.database_manager() as db:
             # not using f-string due to SQL injection
             sql = """UPDATE lightning_pass.credentials
-                        SET %s = %s
-                      WHERE id = %s""" % (
+                        SET {} = {}
+                      WHERE id = {}""".format(
                 result_column,
                 "%s",
                 "%s",
@@ -146,10 +145,10 @@ def check_item_existence(
     if second_key is not None and second_key_column is not None:
         # not using f-string due to SQL injection
         sql = """SELECT EXISTS(SELECT 1
-                                 FROM %s
-                                WHERE %s = %s
-                                  AND %s = %s
-                                )""" % (
+                                 FROM {}
+                                WHERE {} = {}
+                                  AND {} = {}
+                                )""".format(
             table,
             item_column,
             "%s",
@@ -160,9 +159,9 @@ def check_item_existence(
     else:
         # not using f-string due to SQL injection
         sql = """SELECT EXISTS(SELECT 1
-                                 FROM %s
-                                WHERE %s = %s
-                                )""" % (
+                                 FROM {}
+                                WHERE {} = {}
+                                )""".format(
             table,
             item_column,
             "%s",
@@ -521,7 +520,7 @@ class Token:
         with database.database_manager() as db:
             # not using f-string due to SQL injection
             sql = """INSERT INTO lightning_pass.tokens (user_id, token)
-                          VALUES (%s, %s)""" % (
+                          VALUES ({}, {})""".format(
                 "%s",
                 "%s",
             )
@@ -544,7 +543,7 @@ class Token:
             with database.database_manager() as db:
                 # not using f-string due to SQL injection
                 sql = """DELETE FROM lightning_pass.tokens
-                               WHERE token = %s""" % (
+                               WHERE token = {}""".format(
                     "%s",
                 )
                 # query expecting a sequence thus val has to be a tuple (created by the trailing comma)

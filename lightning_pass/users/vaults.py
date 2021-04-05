@@ -1,11 +1,11 @@
 """Module containing the Vault class."""
 from __future__ import annotations
 
-from typing import NamedTuple, Union
+from typing import NamedTuple
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
-from lightning_pass.util.exceptions import InvalidURL, InvalidEmail, VaultException
+from lightning_pass.util.exceptions import InvalidEmail, InvalidURL, VaultException
 
 
 class Vault(NamedTuple):
@@ -14,11 +14,11 @@ class Vault(NamedTuple):
     website: str
     username: str
     email: str
-    password: Union[str, bytes]
+    password: str | bytes
     vault_index: int
 
 
-def get_vault(user_id: int, vault_index: int) -> Union[Vault, bool]:
+def get_vault(user_id: int, vault_index: int) -> Vault | bool:
     """Return a ``Vault`` tied to the given arguments.
 
     :param user_id: The user_id connected to the wanted ``Vault``
@@ -28,8 +28,8 @@ def get_vault(user_id: int, vault_index: int) -> Union[Vault, bool]:
     with database.database_manager() as db:
         sql = """SELECT *
                    FROM lightning_pass.vaults
-                  WHERE user_id = %s
-                    AND vault_index = %s""" % (
+                  WHERE user_id = {}
+                    AND vault_index = {}""".format(
             "%s",
             "%s",
         )
@@ -70,14 +70,7 @@ def update_vault(vault: Vault) -> None:
     if not credentials.Email.check_email_pattern(vault.email):
         raise InvalidEmail
 
-    if (
-        not vault.user_id
-        or not vault.platform_name
-        or not vault.website
-        or not vault.username
-        or not vault.email
-        or not vault.password
-    ):
+    if not all(val for key, val in zip(vault._fields, vault) if key != "vault_index"):
         raise VaultException
 
     if credentials.check_item_existence(
@@ -105,8 +98,8 @@ def delete_vault(user_id: int, vault_index: int) -> None:
     with database.database_manager() as db:
         # not using f-string due to SQL injection
         sql = """DELETE FROM lightning_pass.vaults
-                       WHERE user_id = %s
-                         AND vault_index = %s""" % (
+                       WHERE user_id = {}
+                         AND vault_index = {}""".format(
             "%s",
             "%s",
         )
@@ -116,7 +109,7 @@ def delete_vault(user_id: int, vault_index: int) -> None:
         # not using f-string due to SQL injection
         sql = """UPDATE lightning_pass.vaults
                     SET vault_index = vault_index - 1
-                  WHERE vault_index > %s""" % (
+                  WHERE vault_index > {}""".format(
             "%s",
         )
         # expecting a sequence, thus create a tuple with the trailing comma
@@ -129,14 +122,14 @@ def _update_vault(vault: Vault) -> None:
         # not using f-string due to SQL injection
         sql = """UPDATE lightning_pass.vaults
                     SET
-                        platform_name = %s,
-                        website = %s,
-                        username = %s,
-                        email = %s,
-                        password = %s
-                  WHERE user_id = %s
-                    AND vault_index = %s
-        """ % (
+                        platform_name = {},
+                        website = {},
+                        username = {},
+                        email = {},
+                        password = {}
+                  WHERE user_id = {}
+                    AND vault_index = {}
+        """.format(
             "%s",
             "%s",
             "%s",
@@ -173,8 +166,8 @@ def _new_vault(vault: Vault) -> None:
         password,
         vault_index
         )
-             VALUES (%s, %s, %s, %s, %s, %s, %s)
-        """ % (
+             VALUES ({}, {}, {}, {}, {}, {}, {})
+        """.format(
             "%s",
             "%s",
             "%s",

@@ -5,7 +5,7 @@ Used for showing information to the user.
 """
 import contextlib
 import functools
-from typing import Callable, Optional, Union, Sequence
+from typing import Callable, Optional, Union
 
 from PyQt5.QtWidgets import (
     QInputDialog,
@@ -63,6 +63,10 @@ class MessageBoxes(QWidget):
         self.parent = parent
         self.events = parent.events
         self.title = child.windowTitle()
+
+    def __repr__(self) -> str:
+        """Provide information about this class."""
+        return f"{self.__class__.__name__}({self.main_win}, {self.parent})"
 
     def message_box_factory(
         self,
