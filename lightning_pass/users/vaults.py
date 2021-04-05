@@ -1,7 +1,7 @@
 """Module containing the Vault class."""
 from __future__ import annotations
 
-from typing import NamedTuple
+from typing import NamedTuple, Union
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
@@ -14,11 +14,11 @@ class Vault(NamedTuple):
     website: str
     username: str
     email: str
-    password: str | bytes
+    password: Union[str, bytes]
     vault_index: int
 
 
-def get_vault(user_id: int, vault_index: int) -> Vault | bool:
+def get_vault(user_id: int, vault_index: int) -> Union[Vault, bool]:
     """Return a ``Vault`` tied to the given arguments.
 
     :param user_id: The user_id connected to the wanted ``Vault``

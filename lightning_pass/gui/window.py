@@ -13,7 +13,6 @@ from lightning_pass.gui.static.qt_designer.output import (
     vault_widget,
 )
 from lightning_pass.settings import LOG, TRAY_ICON
-from lightning_pass.util.exceptions import StopCollectingPositions
 
 
 def logger():
@@ -111,17 +110,14 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
         self.general_setup()
 
-        self.collector = mouse_randomness.Collector()
-
         mouse_randomness.MouseTracker.setup_tracker(
             self.ui.generate_pass_p2_tracking_lbl,
             self.on_position_changed,
         )
-        self.pass_progress = 0
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return "LightningPassWindow()"
+        return f"{self.__class__.__name__}()"
 
     @property
     def current_index(self) -> int:
@@ -151,23 +147,15 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         :param QPoint pos: Mouse position
 
         """
-        try:
-            self.collector.collect_position(pos)
-        except StopCollectingPositions:
-            if not self.ui.generate_pass_p2_final_pass_line.text():
-                for i in self.collector:
-                    if self.gen.get_character(i) is not None:
-                        break
-                else:
-                    logger().log.error(
-                        "Ran out of mouse positions during password generation.",
-                    )
+        if self.pass_progress > 1000:
+            return
 
-                self.ui.generate_pass_p2_final_pass_line.setText(self.gen.password)
-        else:
-            self.pass_progress += 1
-        finally:
-            self.ui.generate_pass_p2_prgrs_bar.setValue(self.pass_progress)
+        if self.gen.div_check.send(self.pass_progress) and self.pass_progress != 0:
+            self.gen.get_character(mouse_randomness.PosTuple(pos.x(), pos.y()))
+
+        self.ui.generate_pass_p2_final_pass_line.setText(self.gen.password)
+        self.pass_progress += 1
+        self.ui.generate_pass_p2_prgrs_bar.setValue(self.pass_progress)
 
 
 class VaultWidget(QtWidgets.QWidget):

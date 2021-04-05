@@ -37,10 +37,6 @@ class AccountDoesNotExist(AccountException):
     """Raised when user tries to login with incorrect login details."""
 
 
-class StopCollectingPositions(AccountException):
-    """Raised when all needed mouse positions are collected."""
-
-
 class VaultException(Exception):
     """Base exception for all exceptions connected to vault management."""
 
@@ -57,6 +53,5 @@ __all__ = [
     "InvalidPassword",
     "InvalidUsername",
     "PasswordsDoNotMatch",
-    "StopCollectingPositions",
     "UsernameAlreadyExists",
 ]

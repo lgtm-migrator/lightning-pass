@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 import clipboard
 import qdarkstyle
@@ -77,7 +77,7 @@ class Events:
         box = getattr(self.ui.message_boxes, message_box)
         box(*args, **kwargs)
 
-    def _setup_vault_page(self, page: Vault | None = None):
+    def _setup_vault_page(self, page: Optional[Vault] = None):
         """Set up and connect a new vault page
 
         :param page: Vault object containing the data which should be shown on the current page, defaults to None
@@ -259,6 +259,7 @@ class Events:
     def generate_pass_event(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
         self._set_current_widget("generate_pass")
+        self.parent.pass_progress = 0
 
     def get_generator(self) -> mouse_randomness.PwdGenerator:
         """Get Generator from current password params.

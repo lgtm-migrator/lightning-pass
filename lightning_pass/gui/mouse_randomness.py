@@ -3,11 +3,9 @@ import contextlib
 import functools
 import random
 import string
-from typing import Generator, Optional, Union
+from typing import Generator, Optional, Union, NamedTuple
 
 from PyQt5 import QtCore, QtWidgets
-
-from lightning_pass.util.exceptions import StopCollectingPositions
 
 
 class MouseTracker(QtCore.QObject):
@@ -59,38 +57,9 @@ class MouseTracker(QtCore.QObject):
         tracker.position_changed.connect(on_change)
 
 
-CollectorSet = tuple[tuple[int, int]]
-
-
-class Collector:
-    """This class contains functionality for recording current mouse position."""
-
-    def __init__(self, data: CollectorSet = None) -> None:
-        """Class constructor."""
-        self.randomness_set = CollectorSet
-        if data:
-            self.randomness_set = data
-
-    def __repr__(self) -> str:
-        """Provide information about this class."""
-        return f"Collector({self.randomness_set})"
-
-    def __iter__(self) -> Generator:
-        """Yield mouse movement tuples."""
-        yield from self.randomness_set
-
-    def collect_position(self, pos: QtCore.QPoint) -> None:
-        """Collect mouse position.
-
-        :param QPoint pos: Current cursor position
-
-        :raises StopCollectingPositions: if 1000 mouse positions have been collected
-
-        """
-        if len(self.randomness_set) > 1000:
-            raise StopCollectingPositions
-
-        self.randomness_set = (*self.randomness_set, (pos.x(), pos.y()))
+class PosTuple(NamedTuple):
+    x: int
+    y: int
 
 
 class PwdGenerator:
@@ -119,9 +88,32 @@ class PwdGenerator:
         self.lowercase = lowercase
         self.uppercase = uppercase
 
+        self.div = int(1000 / self.length)
+        self.div_check = self.div_check()
+        next(self.div_check)
+
         self.password = ""
 
-    def get_character(self, position: tuple[int, int]) -> Optional[str]:
+    def __repr__(self) -> str:
+        """Provide information about this class."""
+        return f"""{self.__class__.__name__}(
+{self.length}, {self.numbers}, {self.symbols}, {self.lowercase}, {self.uppercase})"""
+
+    def div_check(self) -> Generator[bool, int, bool]:
+        """Generator used to check whether a character should be collected.
+
+        Used to make password generation look smooth since characters are shown on the fly.
+
+        """
+        while self.length <= 1000:
+            current_progress = yield
+            try:
+                yield True if current_progress % self.div == 0 else False
+            except (ZeroDivisionError, TypeError):
+                yield False
+        return False
+
+    def get_character(self, position: PosTuple) -> Optional[str]:
         """Get a eligible password character by generating a random seed from the mouse position tuple.
 
         Chooses an item from the string.printable property based on the calculated index.
@@ -130,16 +122,16 @@ class PwdGenerator:
 
         """
         if len(self.password) > self.length:
-            return self.password
+            return
 
-        sd = position[0] + 1j * position[1]
+        sd = position.x + 1j * position.y
         random.seed(sd)
         flt = random.random()
         div = 1 / 94  # 0.010638297872340425 : 94 eligible symbols in string.printable
 
-        indx = flt / div
+        i = flt / div
 
-        char = str(string.printable)[int(indx)]
+        char = str(string.printable)[int(i)]
 
         with contextlib.suppress(ValueError):
             char = int(char)
@@ -185,7 +177,6 @@ class PwdGenerator:
 
 
 __all__ = [
-    "Collector",
     "MouseTracker",
     "PwdGenerator",
 ]
