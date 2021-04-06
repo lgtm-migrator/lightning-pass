@@ -1,6 +1,10 @@
 """Module containing the main GUI classes."""
+from __future__ import annotations
+
 import logging
+import functools
 import sys
+from typing import TYPE_CHECKING, Callable
 
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -14,6 +18,9 @@ from lightning_pass.gui.static.qt_designer.output import (
 )
 from lightning_pass.settings import LOG, TRAY_ICON
 
+if TYPE_CHECKING:
+    from PyQt5.QtWidgets import QApplication
+
 
 def logger():
     log = logging.getLogger(__name__)
@@ -26,13 +33,59 @@ def logger():
     return log
 
 
-def run() -> None:
-    """Show main window with everything set up."""
-    # SplashScreen()
-    app = QtWidgets.QApplication(sys.argv)
-    main_window = LightningPassWindow()
+def window_runner(func) -> Callable:
+    """Decorate a function to run a window without the Qt boilerplate.
 
-    # tray icon setup
+    :param func: The functions to decorate
+
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs) -> None:
+        """Wrap the function.
+
+        :param args: Optional positional arguments
+        :param kwargs: Optional keyword arguments
+
+        """
+        QtCore.QCoreApplication.setApplicationName("Lightning Pass")
+        app = QtWidgets.QApplication(sys.argv)
+
+        win = func(app, *args, **kwargs)
+        win.show()
+
+        app.exec()
+
+    return wrapper
+
+
+def run() -> None:
+    """Run the application with everything."""
+    run_splash_screen()
+    run_main_window()
+
+
+@window_runner
+def run_splash_screen(_) -> SplashScreen:
+    """Return ``SplashScreen`` window."""
+    return SplashScreen()
+
+
+@window_runner
+def run_main_window(app) -> LightningPassWindow:
+    """Return ``LightningPassWindow`` window."""
+    main_window = LightningPassWindow()
+    setup_tray_icon(app, main_window)
+    return main_window
+
+
+def setup_tray_icon(app: QApplication, main_window: LightningPassWindow) -> None:
+    """Setup a tray icon for the main window.
+
+    :param app: The currently running``QApplication`` instance
+    :param main_window: The window which will be shown
+
+    """
     tray_icon = QtWidgets.QSystemTrayIcon(
         QtGui.QIcon(str(TRAY_ICON)),
         app,
@@ -40,23 +93,23 @@ def run() -> None:
     tray_icon.setToolTip("Lightning Pass")
     # inherit main window to follow current style sheet
     menu = QtWidgets.QMenu(main_window.main_win)
+
     quit_action = menu.addAction("Exit Lightning Pass")
     quit_action.triggered.connect(quit)
-    tray_icon.setContextMenu(menu)
 
+    generate_option = menu.addAction("Generate a password")
+    generate_option.triggered.connect(main_window.events.generate_pass_event)
+
+    tray_icon.setContextMenu(menu)
     tray_icon.show()
-    main_window.show()
-    app.exec()
 
 
 class SplashScreen(QtWidgets.QWidget):
     """Splash Screen."""
 
-    def __init__(self) -> None:
+    def __init__(self, *args, **kwargs) -> None:
         """Widget constructor."""
-        app = QtWidgets.QApplication(sys.argv)
-
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         self.widget = QtWidgets.QWidget()
         self.widget.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
@@ -65,14 +118,14 @@ class SplashScreen(QtWidgets.QWidget):
         self.ui = splash_screen.Ui_loading_widget()
         self.ui.setupUi(self.widget)
 
-        self.widget.show()
-
         self.timer = QtCore.QTimer(self)
         self.timer.timeout.connect(self.increase)
         self.progress = 0
-        self.timer.start(30)
 
-        app.exec_()
+    def show(self) -> None:
+        """Show the ``SplashScreen`` and initialize loading."""
+        self.widget.show()
+        self.timer.start(30)
 
     def increase(self) -> None:
         """Increase loading bar progress by 1 point and close widget if 100% has been reached."""
@@ -91,12 +144,10 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         super().__init__(*args, **kwargs)
 
         self.main_win = QtWidgets.QMainWindow()
-
         self.ui = main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
         self.events = events.Events(self)
-
         buttons.Buttons(self).setup_all()
 
         self.ui.message_boxes = boxes.MessageBoxes(
