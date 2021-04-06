@@ -61,19 +61,27 @@ def window_runner(func) -> Callable:
 
 def run() -> None:
     """Run the application with everything."""
-    run_splash_screen()
+    # run_splash_screen()
     run_main_window()
 
 
 @window_runner
 def run_splash_screen(_) -> SplashScreen:
-    """Return ``SplashScreen`` window."""
+    """Return ``SplashScreen`` window.
+
+    Dump the ``app`` arg passed in by the decorator.
+
+    """
     return SplashScreen()
 
 
 @window_runner
 def run_main_window(app) -> LightningPassWindow:
-    """Return ``LightningPassWindow`` window."""
+    """Return ``LightningPassWindow`` window.
+
+    :param app: The current ``QApplication`` instance
+
+    """
     main_window = LightningPassWindow()
     setup_tray_icon(app, main_window)
     return main_window
@@ -107,9 +115,9 @@ def setup_tray_icon(app: QApplication, main_window: LightningPassWindow) -> None
 class SplashScreen(QtWidgets.QWidget):
     """Splash Screen."""
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, parent=None) -> None:
         """Widget constructor."""
-        super().__init__(*args, **kwargs)
+        super().__init__(parent)
 
         self.widget = QtWidgets.QWidget()
         self.widget.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
@@ -139,16 +147,17 @@ class SplashScreen(QtWidgets.QWidget):
 class LightningPassWindow(QtWidgets.QMainWindow):
     """Main Window."""
 
-    def __init__(self, *args, **kwargs) -> None:
+    def __init__(self, parent=None) -> None:
         """Construct the class."""
-        super().__init__(*args, **kwargs)
+        super().__init__(parent=parent)
 
         self.main_win = QtWidgets.QMainWindow()
         self.ui = main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
         self.events = events.Events(self)
-        buttons.Buttons(self).setup_all()
+        self.buttons = buttons.Buttons(self)
+        self.buttons.setup_all()
 
         self.ui.message_boxes = boxes.MessageBoxes(
             child=self.main_win,

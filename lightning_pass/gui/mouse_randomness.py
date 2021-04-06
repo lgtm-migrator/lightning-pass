@@ -1,8 +1,8 @@
 """Module containing classes used for operations with mouse randomness generation."""
 import contextlib
 import functools
-import random
 import string
+import random
 from typing import Generator, Optional, Union, NamedTuple
 
 from PyQt5 import QtCore, QtWidgets
@@ -70,6 +70,31 @@ class PasswordOptions(NamedTuple):
     uppercase: bool
 
 
+class Chars(NamedTuple):
+    chars: tuple
+    length: int
+
+
+def printable_options(options: PasswordOptions) -> Chars:
+    """Return all of the printable chars to be used.
+
+    :param options: The given options
+
+    """
+    final = ()
+
+    if options.numbers:
+        final += tuple(string.digits)
+    if options.lowercase:
+        final += tuple(string.ascii_lowercase)
+    if options.uppercase:
+        final += tuple(string.ascii_uppercase)
+    if options.symbols:
+        final += tuple(string.punctuation)
+
+    return Chars(final, len(final))
+
+
 class PwdGenerator:
     """Holds user's chosen parameters for password generation and contains the password generation functionality.
 
@@ -80,6 +105,7 @@ class PwdGenerator:
     def __init__(self, options: PasswordOptions) -> None:
         """Construct the class."""
         self.options = options
+        self.chars = printable_options(self.options)
 
         self.div = int(1000 / self.options.length)
         self.div_check = self.div_check()
@@ -121,11 +147,10 @@ class PwdGenerator:
         sd = position.x + 1j * position.y
         random.seed(sd)
         flt = random.random()
-        div = 1 / 94  # 0.010638297872340425 : 94 eligible symbols in string.printable
+        div = 1 / self.chars.length
 
-        i = flt / div
-
-        char = str(string.printable)[int(i)]
+        index = flt / div
+        char = self.chars.chars[int(index)]
 
         with contextlib.suppress(ValueError):
             char = int(char)

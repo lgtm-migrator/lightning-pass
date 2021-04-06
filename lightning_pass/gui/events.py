@@ -5,7 +5,6 @@ import contextlib
 import pathlib
 from typing import TYPE_CHECKING, Optional
 
-import clipboard
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
 
@@ -100,17 +99,8 @@ class Events:
                 except (TypeError, UnboundLocalError):
                     method()
 
-        self.ui.vault_widget.ui.vault_update_btn.clicked.connect(
-            self.update_vault_page_event,
-        )
-        self.ui.vault_widget.ui.vault_forward_tool_btn.clicked.connect(
-            lambda: self.change_vault_page_event(1),
-        )
-        self.ui.vault_widget.ui.vault_backward_tool_btn.clicked.connect(
-            lambda: self.change_vault_page_event(-1),
-        )
-
         self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget.widget)
+        self.parent.buttons.setup_vault_buttons()
 
     def _rebuild_vault_stacked_widget(self):
         """Rebuild ``self.ui.vault_stacked_widget``."""
@@ -276,7 +266,7 @@ class Events:
     def get_generator(self) -> mouse_randomness.PwdGenerator:
         """Get Generator from current password params.
 
-        :returns: PwdGenerator object
+        :returns: the ``PwdGenerator`` with current values
 
         """
         return mouse_randomness.PwdGenerator(self.pwd_generator_values)
@@ -293,7 +283,8 @@ class Events:
                 self.parent.on_position_changed,
             )
 
-        if not all(self.pwd_generator_values):
+        # exclude length by the generator expression
+        if not any(val for val in self.pwd_generator_values if isinstance(val, bool)):
             self._message_box("no_options_generate_box", "Generator")
         else:
             self.parent.gen = self.get_generator()
@@ -301,10 +292,6 @@ class Events:
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
 
             self._set_current_widget("generate_pass_phase2")
-
-    def copy_password_event(self) -> None:
-        """Copy generated password into clipboard."""
-        clipboard.copy(self.ui.generate_pass_p2_final_pass_line.text())
 
     @decorators.login_required("account")
     def account_event(self) -> None:
@@ -507,7 +494,7 @@ class Events:
         Used later to choose correct message box.
 
         """
-        exists = vaults.get_vault(
+        previous_vault = vaults.get_vault(
             self.current_user.user_id,
             self._vault_widget_vault.vault_index,
         )
@@ -535,14 +522,14 @@ class Events:
         else:
             self.ui.vault_widget.ui.vault_password_line.clear()
 
-            if exists:
+            if previous_vault:
                 self._message_box(
                     "vault_updated_box",
                     "Vault",
                     self._vault_widget_vault.platform_name,
                     [
                         key
-                        for key, val in zip(exists._fields, exists)
+                        for key, val in zip(previous_vault._fields, previous_vault)
                         if not getattr(new_vault, str(key)) == val
                     ],
                 )

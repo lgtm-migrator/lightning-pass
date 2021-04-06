@@ -3,15 +3,27 @@
 Used for connecting each button on the GUI to various events or lambdas.
 
 """
-from typing import Any
+from typing import Any, NamedTuple
 
+import clipboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from lightning_pass.settings import DARK_STYLESHEET, LIGHT_STYLESHEET
 
 
+class Clickable(NamedTuple):
+    widget: str
+    action: str
+
+
+class VaultToolButton(NamedTuple):
+    widget: str
+    item: str
+    source: str
+
+
 class Buttons:
-    """Used to setup buttons on the LightningPassWindow."""
+    """Used to setup buttons on the ``LightningPassWindow``."""
 
     def __init__(
         self,
@@ -36,86 +48,95 @@ class Buttons:
 
     def setup_buttons(self) -> None:
         """Connect all buttons on all widgets"""
-        buttons_dict = {
+        buttons_set = {
             # home
-            "home_login_btn": "login_event",
-            "home_register_btn": "register_event",
-            "home_generate_password_btn": "generate_pass_event",
+            Clickable("home_login_btn", "login_event"),
+            Clickable("home_register_btn", "register_event"),
+            Clickable("home_generate_password_btn", "generate_pass_event"),
             # login
-            "log_main_btn": "home_event",
-            "log_forgot_pass_btn": "forgot_password_event",
-            "log_login_btn_2": "login_user_event",
+            Clickable("log_main_btn", "home_event"),
+            Clickable("log_forgot_pass_btn", "forgot_password_event"),
+            Clickable("log_login_btn_2", "login_user_event"),
             # register
-            "reg_main_btn": "home_event",
-            "reg_register_btn": "register_user_event",
+            Clickable("reg_main_btn", "home_event"),
+            Clickable("reg_register_btn", "register_user_event"),
             # forgot_password
-            "forgot_pass_main_menu_btn": "home_event",
-            "forgot_pass_reset_btn": "send_token_event",
+            Clickable("forgot_pass_main_menu_btn", "home_event"),
+            Clickable("forgot_pass_reset_btn", "send_token_event"),
             # reset_token
-            "reset_token_main_btn": "home_event",
-            "reset_token_submit_btn": "submit_reset_token_event",
+            Clickable("reset_token_main_btn", "home_event"),
+            Clickable("reset_token_submit_btn", "submit_reset_token_event"),
             # reset_password
-            "reset_pass_main_btn": "home_event",
-            "reset_pass_confirm_btn": "submit_reset_password_event",
+            Clickable("reset_pass_main_btn", "home_event"),
+            Clickable("reset_pass_confirm_btn", "submit_reset_password_event"),
             # generate_pass
-            "generate_pass_generate_btn": "generate_pass_phase2_event",
-            "generate_pass_main_menu_btn": "home_event",
+            Clickable("generate_pass_generate_btn", "generate_pass_phase2_event"),
+            Clickable("generate_pass_main_menu_btn", "home_event"),
             # generate_pass_phase2
-            "generate_pass_p2_main_btn": "home_event",
-            "generate_pass_p2_reset_btn": "generate_pass_phase2_event",
-            "generate_pass_p2_copy_tool_btn": "copy_password_event",
+            Clickable("generate_pass_p2_main_btn", "home_event"),
+            Clickable("generate_pass_p2_reset_btn", "generate_pass_phase2_event"),
             # account
-            "account_main_menu_btn": "home_event",
-            "account_change_pfp_btn": "change_pfp_event",
-            "account_logout_btn": "logout_event",
-            "account_change_pass_btn": "change_pass_event",
-            "account_edit_details_btn": "edit_details_event",
-            "account_vault_btn": "vault_event",
+            Clickable("account_main_menu_btn", "home_event"),
+            Clickable("account_change_pfp_btn", "change_pfp_event"),
+            Clickable("account_logout_btn", "logout_event"),
+            Clickable("account_change_pass_btn", "change_pass_event"),
+            Clickable("account_edit_details_btn", "edit_details_event"),
+            Clickable("account_vault_btn", "vault_event"),
             # vault
-            "vault_add_page_btn": "add_vault_page_event",
-            "vault_remove_page_btn": "remove_vault_page_event",
-            "vault_menu_btn": "home_event",
-            "vault_lock_btn": "vault_lock_event",
+            Clickable("vault_add_page_btn", "add_vault_page_event"),
+            Clickable("vault_remove_page_btn", "remove_vault_page_event"),
+            Clickable("vault_menu_btn", "home_event"),
+            Clickable("vault_lock_btn", "vault_lock_event"),
             # master_password
-            "master_pass_menu_btn": "home_event",
-            "master_pass_save_btn": "master_password_submit_event",
+            Clickable("master_pass_menu_btn", "home_event"),
+            Clickable("master_pass_save_btn", "master_password_submit_event"),
         }
 
-        for button, event in buttons_dict.items():
-            getattr(self.ui, button).clicked.connect(
-                getattr(self.main_win.events, event),
+        for button in buttons_set:
+            getattr(self.ui, button.widget).clicked.connect(
+                getattr(self.main_win.events, button.action),
             )
+
+        # miscellaneous
+        self.ui.generate_pass_p2_copy_tool_btn.clicked.connect(
+            lambda: clipboard.copy(self.ui.generate_pass_p2_final_pass_line.text()),
+        )
 
     def setup_menu_bar(self) -> None:
         """Connect all menu bar actions."""
-        menu_bar_dict = {
+        menu_bar_set = {
             # menu_general
-            "action_main_menu": "home_event",
+            Clickable("action_main_menu", "home_event"),
             # menu_password
-            "action_generate": "generate_pass_event",
+            Clickable("action_generate", "generate_pass_event"),
             # menu_users
-            "action_login": "login_event",
-            "action_register": "register_event",
-            "action_forgot_password": "forgot_password_event",
-            "action_reset_token": "reset_token_event",
+            Clickable("action_login", "login_event"),
+            Clickable("action_register", "register_event"),
+            Clickable("action_forgot_password", "forgot_password_event"),
+            Clickable("action_reset_token", "reset_token_event"),
             # menu_account
-            "action_profile": "account_event",
-            "action_vault": "vault_event",
-            "action_master_password": "master_password_event",
+            Clickable("action_profile", "account_event"),
+            Clickable("action_vault", "vault_event"),
+            Clickable("action_master_password", "master_password_event"),
         }
 
-        for action, event in menu_bar_dict.items():
-            getattr(self.ui, action).triggered.connect(
-                getattr(self.main_win.events, event),
+        for button in menu_bar_set:
+            getattr(self.ui, button.widget).triggered.connect(
+                getattr(self.main_win.events, button.action),
             )
 
-        # menu_theme
-        self.ui.action_light.triggered.connect(
-            lambda: self.main_win.events.toggle_stylesheet_light(LIGHT_STYLESHEET),
-        )
-        self.ui.action_dark.triggered.connect(
-            lambda: self.main_win.events.toggle_stylesheet_dark(DARK_STYLESHEET),
-        )
+        menu_theme_set = {
+            # themes
+            Clickable("action_light", LIGHT_STYLESHEET),
+            Clickable("action_dark", DARK_STYLESHEET),
+        }
+
+        for action in menu_theme_set:
+            getattr(self.ui, action.widget).triggered.connect(
+                lambda sheet=action.action: self.main_win.events.toggle_stylesheet_light(
+                    sheet
+                ),
+            )
 
     def data_validation(self) -> None:
         """Disable whitespaces in some input fields."""
@@ -136,6 +157,41 @@ class Buttons:
             getattr(self.ui, line).setValidator(
                 QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+")),
             )
+
+    def setup_vault_buttons(self):
+        """Connect all buttons on a new vault widget."""
+
+        # tool buttons for copying vault items
+        vault_copy_tool_buttons_set = {
+            VaultToolButton(
+                "vault_copy_username_tool_btn", "username", "vault_username_line"
+            ),
+            VaultToolButton("vault_copy_email_tool_btn", "email", "vault_email_line"),
+            VaultToolButton(
+                "vault_copy_password_tool_btn", "password", "vault_password_line"
+            ),
+        }
+
+        parent = self.ui.vault_widget.ui
+        for button in vault_copy_tool_buttons_set:
+            getattr(parent, button.widget).clicked.connect(
+                # since lambda has a default > dump the first bool passed in by the widget parent
+                lambda _, line=getattr(parent, button.source): _copy_text(line),
+            )
+
+        self.ui.vault_widget.ui.vault_update_btn.clicked.connect(
+            self.main_win.events.update_vault_page_event,
+        )
+        self.ui.vault_widget.ui.vault_forward_tool_btn.clicked.connect(
+            lambda: self.main_win.events.change_vault_page_event(1),
+        )
+        self.ui.vault_widget.ui.vault_backward_tool_btn.clicked.connect(
+            lambda: self.main_win.events.change_vault_page_event(-1),
+        )
+
+
+def _copy_text(obj: QtWidgets.QLineEdit):
+    clipboard.copy(obj.text())
 
 
 __all__ = [
