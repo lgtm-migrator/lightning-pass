@@ -43,7 +43,7 @@ def get_vault(user_id: int, vault_index: int) -> Union[Vault, bool]:
             result[3],
             result[4],
             result[5],
-            ...,
+            ...,  #:todo:
             result[7],
         )
     except TypeError:
@@ -64,8 +64,11 @@ def update_vault(vault: Vault) -> None:
     :raises VaultException: if one (or more) vault fields are empty
 
     """
-    if not credentials.validate_url(vault.website):
+    if not (url := credentials.validate_url(vault.website)):
         raise InvalidURL
+
+    # replace website value with a correct url
+    vault = Vault(*vault[:2], url, *vault[3:])
 
     if not credentials.Email.check_email_pattern(vault.email):
         raise InvalidEmail
@@ -142,7 +145,7 @@ def _update_vault(vault: Vault) -> None:
             sql,
             (
                 vault.platform_name,
-                vault.email,
+                vault.website,
                 vault.username,
                 vault.email,
                 credentials.Password.hash_password(vault.password),

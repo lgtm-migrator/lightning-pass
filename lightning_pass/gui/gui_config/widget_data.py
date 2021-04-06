@@ -1,55 +1,63 @@
 from typing import NamedTuple, Optional
 
-_c = ("clear", None)
-_s_ch = ("setChecked", True)
-
 
 class WidgetItem(NamedTuple):
     name: str
-    method: Optional[str] = _c[0]  # "clear"
-    args: Optional[any] = _c[1]  # None
+    method: Optional[str] = "clear"
+    args: Optional[any] = None
 
 
-WIDGET_DATA: dict[int : set[Optional[WidgetItem]]] = {
-    1: {None},
-    2: {
+WIDGET_DATA = (
+    None,
+    # index: 1
+    {None},
+    # index: 2
+    {
         WidgetItem("log_username_line_edit"),
         WidgetItem("log_password_line_edit"),
     },
-    3: {
+    # index: 3
+    {
         WidgetItem("reg_username_line"),
         WidgetItem("reg_password_line"),
         WidgetItem("reg_conf_pass_line"),
         WidgetItem("reg_email_line"),
     },
-    4: {WidgetItem("forgot_pass_email_line")},
-    5: {WidgetItem("reset_token_token_line")},
-    6: {
+    # index: 4
+    {WidgetItem("forgot_pass_email_line")},
+    # index: 5
+    {WidgetItem("reset_token_token_line")},
+    # index: 6
+    {
         WidgetItem("reset_pass_new_pass_line"),
         WidgetItem("reset_pass_conf_new_line"),
     },
-    7: {
+    # index: 7
+    {
         WidgetItem("generate_pass_spin_box", "setValue", 16),
-        # _s_ch = ("setChecked", True)
-        WidgetItem("generate_pass_numbers_check", *_s_ch),
-        WidgetItem("generate_pass_symbols_check", *_s_ch),
-        WidgetItem("generate_pass_lower_check", *_s_ch),
-        WidgetItem("generate_pass_upper_check", *_s_ch),
+        WidgetItem("generate_pass_numbers_check", "setChecked", True),
+        WidgetItem("generate_pass_symbols_check", "setChecked", True),
+        WidgetItem("generate_pass_lower_check", "setChecked", True),
+        WidgetItem("generate_pass_upper_check", "setChecked", True),
     },
-    8: {WidgetItem("generate_pass_p2_final_pass_line")},
-    9: {
+    # index: 8
+    {WidgetItem("generate_pass_p2_final_pass_line")},
+    # index: 9
+    {
         WidgetItem("account_username_line"),
         WidgetItem("account_email_line"),
         WidgetItem("account_last_log_date"),
         WidgetItem("account_pfp_pixmap_lbl"),
     },
-    10: {None},
-    11: {
+    # index: 10
+    {None},
+    # index: 11
+    {
         WidgetItem("master_pass_current_pass_line"),
         WidgetItem("master_pass_master_pass_line"),
         WidgetItem("master_pass_conf_master_pass_line"),
     },
-}
+)
 
 VAULT_WIDGET_DATA: set[WidgetItem] = {
     WidgetItem("vault_platform_line", "setText", "platform_name"),

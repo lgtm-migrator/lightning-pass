@@ -552,8 +552,10 @@ class Token:
         return False
 
 
-def validate_url(url: str) -> bool:
+def validate_url(url: str) -> Union[str, bool]:
     """Check whether a url is valid.
+
+    If url was only malformed, return the fixed version.
 
     :param url: The url to evaluate
 
@@ -563,9 +565,11 @@ def validate_url(url: str) -> bool:
     if not bool(parsed_url.scheme):
         parsed_url = parsed_url._replace(**{"scheme": "http"})
 
-    return validator_collection.checkers.is_url(
-        parsed_url.geturl().replace("///", "//"),
-    )
+    if validator_collection.checkers.is_url(
+        url := parsed_url.geturl().replace("///", "//"),
+    ):
+        return url
+    return False
 
 
 __all__ = [

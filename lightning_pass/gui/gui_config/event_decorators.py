@@ -27,7 +27,7 @@ def login_required(page_to_access: str | None = None) -> Callable:
         """
 
         @functools.wraps(func)
-        def wrapper(self: Events) -> Callable | None:
+        def wrapper(self: Events, *args, **kwargs) -> Callable | None:
             """Check the "current_user" attribute.
 
             :param self: Class instance to give access to its attributes
@@ -36,7 +36,7 @@ def login_required(page_to_access: str | None = None) -> Callable:
 
             """
             if hasattr(self, "current_user"):
-                return func(self)
+                return func(self, *args, **kwargs)
             else:
                 self.ui.message_boxes.login_required_box(
                     "Account",
@@ -67,7 +67,7 @@ def master_password_required(page_to_access: str | None = None) -> Callable:
         """
 
         @functools.wraps(func)
-        def wrapper(self: Events) -> Callable | None:
+        def wrapper(self: Events, *args, **kwargs) -> Callable | None:
             """Check if current user has a master password setup.
 
             :param self: Class instance to give access to its attributes
@@ -76,7 +76,7 @@ def master_password_required(page_to_access: str | None = None) -> Callable:
 
             """
             if self.current_user.master_password:
-                return func(self)
+                return func(self, *args, **kwargs)
             else:
                 self.ui.message_boxes.master_password_required_box(page=page_to_access)
 
@@ -104,7 +104,7 @@ def vault_unlock_required(page_to_access: str | None = None) -> Callable:
         """
 
         @functools.wraps(func)
-        def wrapper(self: Events) -> Callable | None:
+        def wrapper(self: Events, *args, **kwargs) -> Callable | None:
             """Check the vault_unlocked attribute of the current user.
 
             :param self: Class instance to give access to its attributes
@@ -113,7 +113,7 @@ def vault_unlock_required(page_to_access: str | None = None) -> Callable:
 
             """
             if self.current_user.vault_unlocked:
-                return func(self)
+                return func(self, *args, **kwargs)
             else:
                 self.ui.message_boxes.vault_unlock_required_box(page=page_to_access)
 

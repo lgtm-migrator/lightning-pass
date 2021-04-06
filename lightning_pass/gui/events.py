@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING, Optional, Sequence, Iterator
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -32,8 +32,27 @@ from lightning_pass.util.exceptions import (
 )
 
 if TYPE_CHECKING:
+    from PyQt5.QtWidgets import QWidget
+
     from lightning_pass.users.vaults import Vault
     from lightning_pass.gui.mouse_randomness import PasswordOptions
+    from lightning_pass.gui.mouse_randomness import PwdGenerator
+
+
+@contextlib.contextmanager
+def _disable_widget(*widgets: Sequence[QWidget]) -> Iterator[None]:
+    """Simple context manager to momentarily disable given widgets.
+
+    :param widgets: Positional arguments containing the widgets which should be disabled
+
+    """
+    for widget in widgets:
+        widget.setEnabled(False)
+    try:
+        yield
+    finally:
+        for widget in widgets:
+            widget.setEnabled(True)
 
 
 class Events:
@@ -211,9 +230,9 @@ class Events:
         if credentials.Email.check_email_pattern(
             email := self.ui.forgot_pass_email_line.text(),
         ):
-            self.ui.reset_token_submit_btn.setEnabled(False)
-            credentials.Email.send_reset_email(email)
-            self.ui.reset_token_submit_btn.setEnabled(True)
+            # momentarily disable the button to avoid multiple send requests
+            with _disable_widget(self.ui.reset_token_submit_btn):
+                credentials.Email.send_reset_email(email)
 
             self._message_box("reset_email_sent_box", "Forgot Password")
         else:
@@ -240,7 +259,7 @@ class Events:
         """Attempt to change user's password, show message box if something goes wrong, otherwise move to login page."""
         try:
             account.change_password(
-                ...,
+                ...,  # todo:
                 self.ui.reset_pass_new_pass_line.text(),
                 self.ui.reset_pass_conf_new_line.text(),
             )
@@ -263,7 +282,7 @@ class Events:
         self._set_current_widget("generate_pass")
         self.parent.pass_progress = 0
 
-    def get_generator(self) -> mouse_randomness.PwdGenerator:
+    def get_generator(self) -> PwdGenerator:
         """Get Generator from current password params.
 
         :returns: the ``PwdGenerator`` with current values
@@ -337,9 +356,9 @@ class Events:
 
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
-        if self.current_user.username != (i := self.ui.account_username_line.text()):
+        if self.current_user.username != (name := self.ui.account_username_line.text()):
             try:
-                self.current_user.username = i
+                self.current_user.username = name
             except InvalidUsername:
                 self._message_box("invalid_username_box", "Account")
             except UsernameAlreadyExists:
@@ -347,9 +366,9 @@ class Events:
             else:
                 self._message_box("detail_updated_box", "Account", "username")
 
-        if self.current_user.email != (i := self.ui.account_email_line.text()):
+        if self.current_user.email != (email := self.ui.account_email_line.text()):
             try:
-                self.current_user.email = i
+                self.current_user.email = email
             except InvalidEmail:
                 self._message_box("invalid_email_box", "Account")
             except EmailAlreadyExists:
@@ -423,8 +442,12 @@ class Events:
     @decorators.login_required("vault")
     @decorators.master_password_required("vault")
     @decorators.vault_unlock_required("vault")
-    def vault_event(self) -> None:
-        """Switch to vault window."""
+    def vault_event(self, previous_index: Optional[int] = None) -> None:
+        """Switch to vault window.
+
+        :param previous_index: The index of the window before rebuilding
+
+        """
         self._rebuild_vault_stacked_widget()
 
         for page in self.current_user.vault_pages:
@@ -439,6 +462,9 @@ class Events:
         self.current_user.update_last_vault_unlock_date()
 
         self._set_current_widget("vault")
+
+        if previous_index:
+            self.ui.vault_stacked_widget.setCurrentIndex(previous_index)
 
     def add_vault_page_event(self) -> None:
         """Add a new vault page.
@@ -520,7 +546,7 @@ class Events:
         except VaultException:
             self._message_box("invalid_vault_box", "Vault")
         else:
-            self.ui.vault_widget.ui.vault_password_line.clear()
+            self.ui.vault_widget.ui.vault_password_line.clear()  #:todo:
 
             if previous_vault:
                 self._message_box(
@@ -533,13 +559,14 @@ class Events:
                         if not getattr(new_vault, str(key)) == val
                     ],
                 )
-
             else:
                 self._message_box(
                     "vault_created_box",
                     "Vault",
                     self._vault_widget_vault.platform_name,
                 )
+
+            self.vault_event(previous_index=self.vault_stacked_widget_index)
 
     def toggle_stylesheet_light(self, *args: any) -> None:
         """Change stylesheet to light mode."""

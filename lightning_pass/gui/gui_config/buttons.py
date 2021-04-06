@@ -3,6 +3,7 @@
 Used for connecting each button on the GUI to various events or lambdas.
 
 """
+import webbrowser
 from typing import Any, NamedTuple
 
 import clipboard
@@ -126,7 +127,7 @@ class Buttons:
             )
 
         menu_theme_set = {
-            # themes
+            # menu_general > themes
             Clickable("action_light", LIGHT_STYLESHEET),
             Clickable("action_dark", DARK_STYLESHEET),
         }
@@ -173,20 +174,26 @@ class Buttons:
         }
 
         parent = self.ui.vault_widget.ui
+        events = self.main_win.events
+
+        parent.vault_open_web_tool_btn.clicked.connect(
+            lambda: webbrowser.get().open(parent.vault_web_line.text(), new=2)
+        )
         for button in vault_copy_tool_buttons_set:
             getattr(parent, button.widget).clicked.connect(
                 # since lambda has a default > dump the first bool passed in by the widget parent
                 lambda _, line=getattr(parent, button.source): _copy_text(line),
             )
 
-        self.ui.vault_widget.ui.vault_update_btn.clicked.connect(
-            self.main_win.events.update_vault_page_event,
+        parent.vault_update_btn.clicked.connect(
+            events.update_vault_page_event,
         )
-        self.ui.vault_widget.ui.vault_forward_tool_btn.clicked.connect(
-            lambda: self.main_win.events.change_vault_page_event(1),
+
+        parent.vault_forward_tool_btn.clicked.connect(
+            lambda: events.change_vault_page_event(1),
         )
-        self.ui.vault_widget.ui.vault_backward_tool_btn.clicked.connect(
-            lambda: self.main_win.events.change_vault_page_event(-1),
+        parent.vault_backward_tool_btn.clicked.connect(
+            lambda: events.change_vault_page_event(-1),
         )
 
 
