@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Form implementation generated from reading ui file 'main.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.3
@@ -9,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_lightning_pass:
+class Ui_lightning_pass(object):
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
         lightning_pass.resize(661, 374)
@@ -375,7 +377,8 @@ class Ui_lightning_pass:
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
         self.reset_pass_new_pass_line.setFont(font)
-        self.reset_pass_new_pass_line.setReadOnly(True)
+        self.reset_pass_new_pass_line.setEchoMode(QtWidgets.QLineEdit.Password)
+        self.reset_pass_new_pass_line.setReadOnly(False)
         self.reset_pass_new_pass_line.setClearButtonEnabled(True)
         self.reset_pass_new_pass_line.setObjectName("reset_pass_new_pass_line")
         self.gridLayout_11.addWidget(self.reset_pass_new_pass_line, 1, 1, 1, 2)
@@ -384,8 +387,9 @@ class Ui_lightning_pass:
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
         self.reset_pass_conf_new_line.setFont(font)
+        self.reset_pass_conf_new_line.setEchoMode(QtWidgets.QLineEdit.Password)
         self.reset_pass_conf_new_line.setDragEnabled(False)
-        self.reset_pass_conf_new_line.setReadOnly(True)
+        self.reset_pass_conf_new_line.setReadOnly(False)
         self.reset_pass_conf_new_line.setClearButtonEnabled(True)
         self.reset_pass_conf_new_line.setObjectName("reset_pass_conf_new_line")
         self.gridLayout_11.addWidget(self.reset_pass_conf_new_line, 2, 1, 1, 2)
@@ -485,7 +489,7 @@ class Ui_lightning_pass:
         self.gridLayout_6.addWidget(self.generate_pass_p2_rnd_lbl, 0, 0, 1, 4)
         self.generate_pass_p2_tracking_lbl = QtWidgets.QLabel(self.generate_pass_phase2)
         self.generate_pass_p2_tracking_lbl.setEnabled(True)
-        self.generate_pass_p2_tracking_lbl.setMouseTracking(True)
+        self.generate_pass_p2_tracking_lbl.setMouseTracking(False)
         self.generate_pass_p2_tracking_lbl.setStyleSheet(
             "background-color: blue; border: 3px solid black"
         )
@@ -1110,7 +1114,7 @@ class Ui_lightning_pass:
         self.menu_bar.addAction(self.menu_account_2.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(10)
+        self.stacked_widget.setCurrentIndex(8)
         self.vault_stacked_widget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 

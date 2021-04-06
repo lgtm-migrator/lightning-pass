@@ -12,7 +12,7 @@ import yagmail
 from PyQt5 import QtCore
 
 import lightning_pass.util.database as database
-from lightning_pass.settings import EMAIL_DICT, PFP_FOLDER
+from lightning_pass.settings import EMAIL_DATA, PFP_FOLDER
 from lightning_pass.util.exceptions import (
     EmailAlreadyExists,
     InvalidEmail,
@@ -446,8 +446,8 @@ class Email:
         """
         if cls.check_email_existence(email, should_exist=True):
             yag = yagmail.SMTP(
-                {EMAIL_DICT["username"]: "lightning_pass@noreply.com"},
-                EMAIL_DICT["password"],
+                {EMAIL_DATA.email: "lightning_pass@noreply.com"},
+                EMAIL_DATA.password,
             )
             yag.send(
                 to=email,

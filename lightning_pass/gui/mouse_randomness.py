@@ -62,42 +62,35 @@ class PosTuple(NamedTuple):
     y: int
 
 
+class PasswordOptions(NamedTuple):
+    length: int
+    numbers: bool
+    symbols: bool
+    lowercase: bool
+    uppercase: bool
+
+
 class PwdGenerator:
     """Holds user's chosen parameters for password generation and contains the password generation functionality.
 
-    :param int length: Password length
-    :param bool numbers: Password option
-    :param bool symbols: Password option
-    :param bool lowercase: Password option
-    :param bool uppercase: Password option
+    :param options: The NamedTuple containing the password options chosen by the user
 
     """
 
-    def __init__(
-        self,
-        length: int,
-        numbers: bool,
-        symbols: bool,
-        lowercase: bool,
-        uppercase: bool,
-    ) -> None:
+    def __init__(self, options: PasswordOptions) -> None:
         """Construct the class."""
-        self.length = length
-        self.numbers = numbers
-        self.symbols = symbols
-        self.lowercase = lowercase
-        self.uppercase = uppercase
+        self.options = options
 
-        self.div = int(1000 / self.length)
+        self.div = int(1000 / self.options.length)
         self.div_check = self.div_check()
+        # prepare generator for sending values
         next(self.div_check)
 
         self.password = ""
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"""{self.__class__.__name__}(
-{self.length}, {self.numbers}, {self.symbols}, {self.lowercase}, {self.uppercase})"""
+        return f"""{self.__class__.__name__}({self.options})"""
 
     def div_check(self) -> Generator[bool, int, bool]:
         """Generator used to check whether a character should be collected.
@@ -105,10 +98,11 @@ class PwdGenerator:
         Used to make password generation look smooth since characters are shown on the fly.
 
         """
-        while self.length <= 1000:
-            current_progress = yield
+        # stops yielding if length has been reached
+        while self.options.length <= 1000:
             try:
-                yield True if current_progress % self.div == 0 else False
+                # waits for sent value
+                yield True if (yield) % self.div == 0 else False
             except (ZeroDivisionError, TypeError):
                 yield False
         return False
@@ -121,7 +115,7 @@ class PwdGenerator:
         :returns: Generated password if it reached the wanted length
 
         """
-        if len(self.password) > self.length:
+        if len(self.password) > self.options.length:
             return
 
         sd = position.x + 1j * position.y
@@ -159,9 +153,9 @@ class PwdGenerator:
 
         """
         if (
-            (char.islower() and self.lowercase)
-            or (char.isupper() and self.uppercase)
-            or (self.symbols and not char.islower() and not char.isupper())
+            (char.islower() and self.options.lowercase)
+            or (char.isupper() and self.options.uppercase)
+            or (self.options.symbols and not char.islower() and not char.isupper())
         ):
             self.password += char
 
@@ -172,7 +166,7 @@ class PwdGenerator:
         :param char: Character
 
         """
-        if self.numbers:
+        if self.options.numbers:
             self.password += str(char)
 
 

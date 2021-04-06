@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import os
+from typing import NamedTuple
 from pathlib import Path
 
 import dotenv
@@ -19,25 +20,30 @@ def static_folder() -> Path:
     return parent_folder() / "gui/static"
 
 
-dotenv.load_dotenv()
-DB_DICT = {
-    "host": os.getenv("DB_HOST"),
-    "user": os.getenv("DB_USER"),
-    "password": os.getenv("DB_PASS"),
-    "database": os.getenv("DB_DB"),
-}
-EMAIL_DICT = {
-    "email": os.getenv("EMAIL_USER"),
-    "password": os.getenv("EMAIL_PASS"),
-}
+class DatabaseCredentials(NamedTuple):
+    host: str
+    user: str
+    password: str
+    database: str
+
+
+class EmailCredentials(NamedTuple):
+    email: str
+    password: str
+
 
 LIGHT_STYLESHEET = static_folder() / "light.qss"
 DARK_STYLESHEET = static_folder() / "dark.qss"
-
 TRAY_ICON = static_folder() / "tray_icon.png"
 PFP_FOLDER = parent_folder() / "users/profile_pictures"
-
 LOG = parent_folder().parent / "misc/logs.log"
+
+
+dotenv.load_dotenv()
+DB_DATA = DatabaseCredentials(
+    os.getenv("DB_HOST"), os.getenv("DB_USER"), os.getenv("DB_PASS"), os.getenv("DB_DB")
+)
+EMAIL_DATA = EmailCredentials(os.getenv("EMAIL_USER"), os.getenv("EMAIL_PASS"))
 
 
 def _copy(self: Path, target: Path) -> None:
@@ -53,7 +59,7 @@ def _copy(self: Path, target: Path) -> None:
     shutil.copy(self, target)
 
 
-# monkey Patch copy functionality into every Path instance
+# monkey Patch copy functionality into every Path object
 # noinspection PyTypeHints
 Path.copy = _copy  # type: ignore
 
@@ -73,7 +79,7 @@ _CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-         """
+"""
 
 _TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -87,7 +93,7 @@ _TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
   KEY `id_idx` (`user_id`),
   CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
-         """
+"""
 
 _VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -112,7 +118,8 @@ with database.database_manager() as db:
 
 __all__ = [
     "DARK_STYLESHEET",
-    "DB_DICT",
+    "DB_DATA",
+    "EMAIL_DATA",
     "LIGHT_STYLESHEET",
     "LOG",
     "PFP_FOLDER",

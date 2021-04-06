@@ -110,11 +110,6 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
         self.general_setup()
 
-        mouse_randomness.MouseTracker.setup_tracker(
-            self.ui.generate_pass_p2_tracking_lbl,
-            self.on_position_changed,
-        )
-
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"{self.__class__.__name__}()"

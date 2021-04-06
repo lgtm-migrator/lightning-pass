@@ -34,6 +34,7 @@ from lightning_pass.util.exceptions import (
 
 if TYPE_CHECKING:
     from lightning_pass.users.vaults import Vault
+    from lightning_pass.gui.mouse_randomness import PasswordOptions
 
 
 class Events:
@@ -152,6 +153,17 @@ class Events:
         """Set a new ``vault_stacked_widget_index``."""
         self.ui.vault_stacked_widget.setCurrentIndex(i)
 
+    @property
+    def pwd_generator_values(self) -> PasswordOptions:
+        """Return current password generation values."""
+        return mouse_randomness.PasswordOptions(
+            self.ui.generate_pass_spin_box.value(),
+            self.ui.generate_pass_numbers_check.isChecked(),
+            self.ui.generate_pass_symbols_check.isChecked(),
+            self.ui.generate_pass_lower_check.isChecked(),
+            self.ui.generate_pass_upper_check.isChecked(),
+        )
+
     def home_event(self) -> None:
         """Switch to home widget."""
         self._set_current_widget("home")
@@ -267,13 +279,7 @@ class Events:
         :returns: PwdGenerator object
 
         """
-        return mouse_randomness.PwdGenerator(
-            self.ui.generate_pass_spin_box.value(),
-            bool(self.ui.generate_pass_numbers_check.isChecked()),
-            bool(self.ui.generate_pass_symbols_check.isChecked()),
-            bool(self.ui.generate_pass_lower_check.isChecked()),
-            bool(self.ui.generate_pass_upper_check.isChecked()),
-        )
+        return mouse_randomness.PwdGenerator(self.pwd_generator_values)
 
     def generate_pass_phase2_event(self) -> None:
         """Switch to the second password generation widget and reset previous values.
@@ -281,16 +287,16 @@ class Events:
         If no password options were checked, shows message box letting the user know about it.
 
         """
-        if (
-            not self.ui.generate_pass_numbers_check.isChecked()
-            and not self.ui.generate_pass_symbols_check.isChecked()
-            and not self.ui.generate_pass_lower_check.isChecked()
-            and not self.ui.generate_pass_upper_check.isChecked()
-        ):
+        if not self.ui.generate_pass_p2_tracking_lbl.hasMouseTracking():
+            mouse_randomness.MouseTracker.setup_tracker(
+                self.ui.generate_pass_p2_tracking_lbl,
+                self.parent.on_position_changed,
+            )
+
+        if not all(self.pwd_generator_values):
             self._message_box("no_options_generate_box", "Generator")
         else:
             self.parent.gen = self.get_generator()
-            self.parent.collector.randomness_set = {*()}
             self.parent.pass_progress = 0
             self.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
 
