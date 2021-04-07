@@ -17,1654 +17,1761 @@
    <property name="autoFillBackground">
     <bool>true</bool>
    </property>
-   <layout class="QGridLayout" name="gridLayout_9">
-    <item row="0" column="0">
-     <widget class="QStackedWidget" name="stacked_widget">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="font">
-       <font>
-        <family>Segoe UI Light</family>
-        <pointsize>10</pointsize>
-       </font>
-      </property>
-      <property name="currentIndex">
-       <number>11</number>
-      </property>
-      <widget class="QWidget" name="loading">
-       <property name="cursor">
-        <cursorShape>WaitCursor</cursorShape>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_8">
-        <item row="0" column="0">
-         <widget class="QLabel" name="loading_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="cursor">
-           <cursorShape>WaitCursor</cursorShape>
-          </property>
-          <property name="text">
-           <string>Loading Lightning Pass...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QProgressBar" name="loading_progress_bar">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>28</pointsize>
-           </font>
-          </property>
-          <property name="cursor">
-           <cursorShape>WaitCursor</cursorShape>
-          </property>
-          <property name="maximum">
-           <number>3000</number>
-          </property>
-          <property name="value">
-           <number>0</number>
-          </property>
-          <property name="textDirection">
-           <enum>QProgressBar::TopToBottom</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="home">
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="2" column="1">
-         <widget class="QPushButton" name="home_register_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>16</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Register</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="home_login_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>16</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Login</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="home_welcome_lbl">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-            <weight>50</weight>
-            <bold>false</bold>
-           </font>
-          </property>
-          <property name="locale">
-           <locale language="English" country="UnitedStates"/>
-          </property>
-          <property name="text">
-           <string>Welcome to Lightning Pass!</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" rowspan="2">
-         <widget class="QPushButton" name="home_generate_password_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>16</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Generate Password</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="login">
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="log_login_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Login</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="log_entry_username_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Username:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="3">
-         <widget class="QLineEdit" name="log_username_line_edit">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your username.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="log_entry_register_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="3">
-         <widget class="QLineEdit" name="log_password_line_edit">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your password.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QPushButton" name="log_login_btn_2">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Login</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QPushButton" name="log_forgot_pass_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Forgot Password?</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3">
-         <widget class="QPushButton" name="log_main_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="register_2">
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="3" column="0">
-         <widget class="QLabel" name="reg_conf_pass_entry_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Confirm Password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="4">
-         <widget class="QLabel" name="reg_register_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Register</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="reg_username_entry_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Username:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="reg_password_entry_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="reg_email_entry_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Email:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0" colspan="2">
-         <widget class="QPushButton" name="reg_register_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Register</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2" colspan="3">
-         <widget class="QPushButton" name="reg_main_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QLineEdit" name="reg_email_line">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your email.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="reg_conf_pass_line">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your password again.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="reg_password_line">
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your password.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="reg_username_line">
-          <property name="text">
-           <string/>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your username.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="forgot_password">
-       <layout class="QGridLayout" name="gridLayout_4">
-        <item row="1" column="0">
-         <widget class="QLabel" name="forgot_pass_email_entry_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Email:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="forgot_pass_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Forgot Password</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="forgot_pass_main_menu_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QPushButton" name="forgot_pass_reset_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Send reset token</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="forgot_pass_email_line">
-          <property name="placeholderText">
-           <string notr="true">Enter your account email.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="reset_token">
-       <layout class="QGridLayout" name="gridLayout_10">
-        <item row="2" column="0" colspan="2">
-         <widget class="QPushButton" name="reset_token_submit_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Submit Reset Token</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QPushButton" name="reset_token_main_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="reset_token_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Reset Token</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="reset_token_token_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Token:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="reset_token_token_line">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your reset token.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="reset_password">
-       <layout class="QGridLayout" name="gridLayout_11">
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="reset_pass_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Reset Password</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="reset_pass_new_pass_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>New Password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="reset_pass_conf_new_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Confirm New Password</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QPushButton" name="reset_pass_confirm_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Confirm</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="QPushButton" name="reset_pass_main_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="2">
-         <widget class="QLineEdit" name="reset_pass_new_pass_line">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your new password.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="2">
-         <widget class="QLineEdit" name="reset_pass_conf_new_line">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="dragEnabled">
-           <bool>false</bool>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your new password again.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="generate_pass">
-       <layout class="QGridLayout" name="gridLayout_5">
-        <item row="1" column="4">
-         <widget class="QCheckBox" name="generate_pass_lower_check">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Lowercase</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="6">
-         <widget class="QLabel" name="generate_pas_main_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Generate Password</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="3">
-         <widget class="QCheckBox" name="generate_pass_symbols_check">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Symbols</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="5">
-         <widget class="QPushButton" name="generate_pass_generate_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Generate</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QCheckBox" name="generate_pass_numbers_check">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Numbers</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="5">
-         <widget class="QCheckBox" name="generate_pass_upper_check">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Uppercase</string>
-          </property>
-          <property name="checked">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="5">
-         <widget class="QPushButton" name="generate_pass_main_menu_btn">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QSpinBox" name="generate_pass_spin_box">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="wrapping">
-           <bool>true</bool>
-          </property>
-          <property name="buttonSymbols">
-           <enum>QAbstractSpinBox::PlusMinus</enum>
-          </property>
-          <property name="specialValueText">
-           <string/>
-          </property>
-          <property name="accelerated">
-           <bool>true</bool>
-          </property>
-          <property name="correctionMode">
-           <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
-          </property>
-          <property name="showGroupSeparator" stdset="0">
-           <bool>true</bool>
-          </property>
-          <property name="suffix">
-           <string> characters</string>
-          </property>
-          <property name="prefix">
-           <string>Length: </string>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>999</number>
-          </property>
-          <property name="value">
-           <number>16</number>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="generate_pass_phase2">
-       <layout class="QGridLayout" name="gridLayout_6">
-        <item row="0" column="0" colspan="4">
-         <widget class="QLabel" name="generate_pass_p2_rnd_lbl">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>11</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Generate randomness by hovering your mouse over the blue area.</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="4">
-         <widget class="QLabel" name="generate_pass_p2_tracking_lbl">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="mouseTracking">
-           <bool>false</bool>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">background-color: blue; border: 3px solid black</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="4">
-         <widget class="QProgressBar" name="generate_pass_p2_prgrs_bar">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="maximum">
-           <number>1000</number>
-          </property>
-          <property name="value">
-           <number>0</number>
-          </property>
-          <property name="textVisible">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="generate_pass_p2_final_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Generated password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1" colspan="2">
-         <widget class="QLineEdit" name="generate_pass_p2_final_pass_line">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="readOnly">
-           <bool>true</bool>
-          </property>
-          <property name="placeholderText">
-           <string>Generated password will appear here.</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="3">
-         <widget class="QToolButton" name="generate_pass_p2_copy_tool_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="statusTip">
-           <string/>
-          </property>
-          <property name="text">
-           <string>Copy</string>
-          </property>
-          <property name="popupMode">
-           <enum>QToolButton::InstantPopup</enum>
-          </property>
-          <property name="toolButtonStyle">
-           <enum>Qt::ToolButtonTextBesideIcon</enum>
-          </property>
-          <property name="autoRaise">
-           <bool>true</bool>
-          </property>
-          <property name="arrowType">
-           <enum>Qt::RightArrow</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QPushButton" name="generate_pass_p2_reset_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Reset and generate a new password</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2" colspan="2">
-         <widget class="QPushButton" name="generate_pass_p2_main_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="account">
-       <layout class="QGridLayout" name="gridLayout_7">
-        <item row="0" column="4">
-         <widget class="QLabel" name="account_pfp_pixmap_lbl">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>135</width>
-            <height>135</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>135</width>
-            <height>135</height>
-           </size>
-          </property>
-          <property name="mouseTracking">
-           <bool>true</bool>
-          </property>
-          <property name="acceptDrops">
-           <bool>true</bool>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">border: 2px dashed</string>
-          </property>
-          <property name="text">
-           <string/>
-          </property>
-          <property name="pixmap">
-           <pixmap>C:/Users/Luky/.designer/profile_pictures/default.png</pixmap>
-          </property>
-          <property name="scaledContents">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="4" rowspan="3">
-         <widget class="QPushButton" name="account_vault_btn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Vault U+1F512</string>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-          <property name="checked">
-           <bool>false</bool>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QPushButton" name="account_edit_details_btn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Edit Details</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1" colspan="3">
-         <widget class="QLineEdit" name="account_username_line">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your new username.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="4">
-         <widget class="QLabel" name="account_lbl">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Account</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="account_username_lbl">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Username:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="4">
-         <widget class="QPushButton" name="account_change_pfp_btn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Change Picture</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="account_email_lbl">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Email:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QLabel" name="account_last_log_date">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Last login date: 0000-00-00 00:00:00.</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2" colspan="2">
-         <widget class="QPushButton" name="account_change_pass_btn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Change Password?</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1" colspan="3">
-         <widget class="QLineEdit" name="account_email_line">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="readOnly">
-           <bool>false</bool>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your new email.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QPushButton" name="account_logout_btn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Logout</string>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="3">
-         <widget class="QPushButton" name="account_main_menu_btn">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="vault">
-       <layout class="QGridLayout" name="gridLayout_12">
-        <item row="1" column="2">
-         <widget class="Line" name="line_2">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>1</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="Line" name="line_3">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="midLineWidth">
-           <number>5</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="Line" name="line">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>1</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="0">
-         <widget class="QPushButton" name="vault_lock_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Lock vault</string>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="QLabel" name="vault_username_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Current user:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="3" rowspan="6">
-         <widget class="QStackedWidget" name="vault_stacked_widget">
-          <property name="frameShape">
-           <enum>QFrame::NoFrame</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="vault_dummy_page1">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-          </widget>
-          <widget class="QWidget" name="vault_dummy_page2">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QPushButton" name="vault_remove_page_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Remove current page</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="2">
-         <widget class="Line" name="line_6">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="vault_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Vault</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QPushButton" name="vault_add_page_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Add page</string>
-          </property>
-         </widget>
-        </item>
-        <item row="5" column="1">
-         <widget class="QPushButton" name="vault_menu_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Main menu</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="2">
-         <widget class="Line" name="line_5">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="lineWidth">
-           <number>1</number>
-          </property>
-          <property name="midLineWidth">
-           <number>0</number>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0" colspan="2">
-         <widget class="QLabel" name="vault_date_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Last unlock date: 0000-00-00 00:00:00</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="Line" name="line_4">
-          <property name="frameShadow">
-           <enum>QFrame::Plain</enum>
-          </property>
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="master_password">
-       <layout class="QGridLayout" name="gridLayout_13">
-        <item row="0" column="0" colspan="2">
-         <widget class="QLabel" name="master_pass_main_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe Print</family>
-            <pointsize>26</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Master Password</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="master_pass_current_pass_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Current Password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QLineEdit" name="master_pass_current_pass_line">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your current password.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="master_pass_master_pass_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Master Password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QLineEdit" name="master_pass_master_pass_line">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your new master password.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="master_pass_conf_master_pass_lbl">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Confirm Master Password:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QLineEdit" name="master_pass_conf_master_pass_line">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="echoMode">
-           <enum>QLineEdit::Password</enum>
-          </property>
-          <property name="placeholderText">
-           <string>Enter your master password again.</string>
-          </property>
-          <property name="clearButtonEnabled">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QPushButton" name="master_pass_menu_btn">
-          <property name="text">
-           <string>Main Menu</string>
-          </property>
-          <property name="default">
-           <bool>false</bool>
-          </property>
-          <property name="flat">
-           <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0" colspan="2">
-         <widget class="QPushButton" name="master_pass_save_btn">
-          <property name="font">
-           <font>
-            <family>Segoe UI Light</family>
-            <pointsize>10</pointsize>
-           </font>
-          </property>
-          <property name="text">
-           <string>Save Master Password</string>
-          </property>
-          <property name="autoDefault">
-           <bool>false</bool>
-          </property>
-          <property name="default">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </widget>
-    </item>
-   </layout>
+   <widget class="QStackedWidget" name="stacked_widget">
+    <property name="geometry">
+     <rect>
+      <x>9</x>
+      <y>9</y>
+      <width>628</width>
+      <height>305</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="font">
+     <font>
+      <family>Segoe UI Light</family>
+      <pointsize>10</pointsize>
+     </font>
+    </property>
+    <property name="currentIndex">
+     <number>8</number>
+    </property>
+    <widget class="QWidget" name="loading">
+     <property name="cursor">
+      <cursorShape>WaitCursor</cursorShape>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_8">
+      <item row="0" column="0">
+       <widget class="QLabel" name="loading_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>WaitCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>Loading Lightning Pass...</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QProgressBar" name="loading_progress_bar">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>28</pointsize>
+         </font>
+        </property>
+        <property name="cursor">
+         <cursorShape>WaitCursor</cursorShape>
+        </property>
+        <property name="maximum">
+         <number>3000</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="textDirection">
+         <enum>QProgressBar::TopToBottom</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="home">
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="1">
+       <widget class="QPushButton" name="home_register_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Register</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QPushButton" name="home_login_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Login</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="home_welcome_lbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+          <weight>50</weight>
+          <bold>false</bold>
+         </font>
+        </property>
+        <property name="locale">
+         <locale language="English" country="UnitedStates"/>
+        </property>
+        <property name="text">
+         <string>Welcome to Lightning Pass!</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" rowspan="2">
+       <widget class="QPushButton" name="home_generate_password_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>16</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Generate Password</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="login">
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="1" column="0">
+       <widget class="QLabel" name="log_entry_username_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Username:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="3">
+       <widget class="QLineEdit" name="log_username_line_edit">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your username.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="log_entry_register_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="3">
+       <widget class="QLineEdit" name="log_password_line_edit">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your password.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QPushButton" name="log_login_btn_2">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Login</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="log_forgot_pass_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Forgot Password?</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QPushButton" name="log_main_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="4">
+       <widget class="QLabel" name="log_login_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Login</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="register_2">
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="3" column="0">
+       <widget class="QLabel" name="reg_conf_pass_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Confirm Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="reg_username_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Username:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="reg_password_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="reg_email_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Email:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0" colspan="2">
+       <widget class="QPushButton" name="reg_register_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Register</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2" colspan="3">
+       <widget class="QPushButton" name="reg_main_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLineEdit" name="reg_email_line">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your email.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="reg_conf_pass_line">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your password again.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="reg_password_line">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your password.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="reg_username_line">
+        <property name="text">
+         <string/>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your username.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="5">
+       <widget class="QLabel" name="reg_register_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Register</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="forgot_password">
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="1" column="0">
+       <widget class="QLabel" name="forgot_pass_email_entry_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Email:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="forgot_pass_main_menu_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QPushButton" name="forgot_pass_reset_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Send Reset Token</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="forgot_pass_email_line">
+        <property name="placeholderText">
+         <string notr="true">Enter your account email.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QLabel" name="forgot_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Forgot Password</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="reset_token">
+     <layout class="QGridLayout" name="gridLayout_10">
+      <item row="2" column="0" colspan="2">
+       <widget class="QPushButton" name="reset_token_submit_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Submit Reset Token</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QPushButton" name="reset_token_main_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="reset_token_token_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Token:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="reset_token_token_line">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your reset token.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QLabel" name="reset_token_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Reset Token</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="reset_password">
+     <layout class="QGridLayout" name="gridLayout_11">
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="reset_password_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Reset Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="reset_password_new_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>New Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QLineEdit" name="reset_password_new_pass_line">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your new password.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="reset_password_conf_new_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Confirm New Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <widget class="QLineEdit" name="reset_password_conf_new_pass_line">
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Confirm your new password.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QPushButton" name="reset_password_confirm_btn">
+        <property name="text">
+         <string>Confirm Reset Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QPushButton" name="reset_password_main_btn">
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="change_password">
+     <layout class="QGridLayout" name="gridLayout_9">
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="change_password_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Change Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="change_password_current_pass_lbl">
+        <property name="text">
+         <string>Current Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="2">
+       <widget class="QLineEdit" name="change_password_current_pass_line">
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your current password.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="change_password_new_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>New Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="2">
+       <widget class="QLineEdit" name="change_password_new_pass_line">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your new password.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="change_password_conf_new_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Confirm New Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="QLineEdit" name="change_password_conf_new_line">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="dragEnabled">
+         <bool>false</bool>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your new password again.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QPushButton" name="change_password_confirm_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Confirm Change Password</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="change_password_main_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="generate_pass">
+     <layout class="QGridLayout" name="gridLayout_5">
+      <item row="1" column="4">
+       <widget class="QCheckBox" name="generate_pass_lower_check">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Lowercase</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="6">
+       <widget class="QLabel" name="generate_pas_main_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Generate Password</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QCheckBox" name="generate_pass_symbols_check">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Symbols</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="5">
+       <widget class="QPushButton" name="generate_pass_generate_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Generate</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QCheckBox" name="generate_pass_numbers_check">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Numbers</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="5">
+       <widget class="QCheckBox" name="generate_pass_upper_check">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Uppercase</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="5">
+       <widget class="QPushButton" name="generate_pass_main_menu_btn">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QSpinBox" name="generate_pass_spin_box">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="wrapping">
+         <bool>true</bool>
+        </property>
+        <property name="buttonSymbols">
+         <enum>QAbstractSpinBox::PlusMinus</enum>
+        </property>
+        <property name="specialValueText">
+         <string/>
+        </property>
+        <property name="accelerated">
+         <bool>true</bool>
+        </property>
+        <property name="correctionMode">
+         <enum>QAbstractSpinBox::CorrectToNearestValue</enum>
+        </property>
+        <property name="showGroupSeparator" stdset="0">
+         <bool>true</bool>
+        </property>
+        <property name="suffix">
+         <string> characters</string>
+        </property>
+        <property name="prefix">
+         <string>Length: </string>
+        </property>
+        <property name="minimum">
+         <number>1</number>
+        </property>
+        <property name="maximum">
+         <number>999</number>
+        </property>
+        <property name="value">
+         <number>16</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="generate_pass_phase2">
+     <layout class="QGridLayout" name="gridLayout_6">
+      <item row="0" column="0" colspan="4">
+       <widget class="QLabel" name="generate_pass_p2_rnd_lbl">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Generate randomness by hovering your mouse over the blue area.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="4">
+       <widget class="QLabel" name="generate_pass_p2_tracking_lbl">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="mouseTracking">
+         <bool>false</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">background-color: blue; border: 3px solid black</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="4">
+       <widget class="QProgressBar" name="generate_pass_p2_prgrs_bar">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="maximum">
+         <number>1000</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+        <property name="textVisible">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="generate_pass_p2_final_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Generated Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1" colspan="2">
+       <widget class="QLineEdit" name="generate_pass_p2_final_pass_line">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="readOnly">
+         <bool>true</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Generated password will appear here.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QToolButton" name="generate_pass_p2_copy_tool_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="statusTip">
+         <string/>
+        </property>
+        <property name="text">
+         <string>Copy</string>
+        </property>
+        <property name="popupMode">
+         <enum>QToolButton::InstantPopup</enum>
+        </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonTextBesideIcon</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
+        </property>
+        <property name="arrowType">
+         <enum>Qt::RightArrow</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QPushButton" name="generate_pass_p2_reset_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Reset and generate a new password</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2" colspan="2">
+       <widget class="QPushButton" name="generate_pass_p2_main_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="account">
+     <layout class="QGridLayout" name="gridLayout_7">
+      <item row="0" column="4">
+       <widget class="QLabel" name="account_pfp_pixmap_lbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>135</width>
+          <height>135</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>135</width>
+          <height>135</height>
+         </size>
+        </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
+        <property name="acceptDrops">
+         <bool>true</bool>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">border: 2px dashed</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+        <property name="pixmap">
+         <pixmap>C:/Users/Luky/.designer/profile_pictures/default.png</pixmap>
+        </property>
+        <property name="scaledContents">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="4" rowspan="3">
+       <widget class="QPushButton" name="account_vault_btn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Vault U+1F512</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QPushButton" name="account_edit_details_btn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Edit Details</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="3">
+       <widget class="QLineEdit" name="account_username_line">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your new username.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="4">
+       <widget class="QLabel" name="account_lbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Account</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="account_username_lbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Username:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QPushButton" name="account_change_pfp_btn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Change Picture</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="account_email_lbl">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Email:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QLabel" name="account_last_log_date">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Last login date: 0000-00-00 00:00:00.</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2" colspan="2">
+       <widget class="QPushButton" name="account_change_pass_btn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Change Password?</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1" colspan="3">
+       <widget class="QLineEdit" name="account_email_line">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>32</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="readOnly">
+         <bool>false</bool>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your new email.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="account_logout_btn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Logout</string>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="3">
+       <widget class="QPushButton" name="account_main_menu_btn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="vault">
+     <layout class="QGridLayout" name="gridLayout_12">
+      <item row="1" column="2">
+       <widget class="Line" name="line_2">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="Line" name="line_3">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="midLineWidth">
+         <number>5</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="Line" name="line">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>1</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="0">
+       <widget class="QPushButton" name="vault_lock_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Lock Vault</string>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QLabel" name="vault_username_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Current User:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3" rowspan="6">
+       <widget class="QStackedWidget" name="vault_stacked_widget">
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="currentIndex">
+         <number>0</number>
+        </property>
+        <widget class="QWidget" name="vault_dummy_page1">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+        <widget class="QWidget" name="vault_dummy_page2">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QPushButton" name="vault_remove_page_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Remove Current Page</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="2">
+       <widget class="Line" name="line_6">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QLabel" name="vault_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Vault</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QPushButton" name="vault_add_page_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Add Page</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QPushButton" name="vault_menu_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="Line" name="line_5">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="lineWidth">
+         <number>1</number>
+        </property>
+        <property name="midLineWidth">
+         <number>0</number>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0" colspan="2">
+       <widget class="QLabel" name="vault_date_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Last Unlock Date: 0000-00-00 00:00:00</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="Line" name="line_4">
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+    <widget class="QWidget" name="master_password">
+     <layout class="QGridLayout" name="gridLayout_13">
+      <item row="1" column="0">
+       <widget class="QLabel" name="master_pass_current_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Current Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="master_pass_current_pass_line">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your current password.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="master_pass_master_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Master Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="master_pass_master_pass_line">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your new master password.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="master_pass_conf_master_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Confirm Master Password:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QLineEdit" name="master_pass_conf_master_pass_line">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="echoMode">
+         <enum>QLineEdit::Password</enum>
+        </property>
+        <property name="placeholderText">
+         <string>Enter your master password again.</string>
+        </property>
+        <property name="clearButtonEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="2">
+       <widget class="QPushButton" name="master_pass_menu_btn">
+        <property name="text">
+         <string>Main Menu</string>
+        </property>
+        <property name="default">
+         <bool>false</bool>
+        </property>
+        <property name="flat">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
+       <widget class="QPushButton" name="master_pass_save_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Save Master Password</string>
+        </property>
+        <property name="autoDefault">
+         <bool>false</bool>
+        </property>
+        <property name="default">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="3">
+       <widget class="QLabel" name="master_pass_main_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe Print</family>
+          <pointsize>26</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Master Password</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menu_bar">
    <property name="geometry">
@@ -1727,6 +1834,7 @@
      <string>account</string>
     </property>
     <addaction name="action_profile"/>
+    <addaction name="action_change_password"/>
     <addaction name="action_master_password"/>
     <addaction name="action_vault"/>
    </widget>
@@ -1856,6 +1964,9 @@
      <pointsize>10</pointsize>
     </font>
    </property>
+   <property name="menuRole">
+    <enum>QAction::AboutQtRole</enum>
+   </property>
   </action>
   <action name="action_vault">
    <property name="text">
@@ -1880,6 +1991,26 @@
    </property>
    <property name="shortcutContext">
     <enum>Qt::WindowShortcut</enum>
+   </property>
+  </action>
+  <action name="action_change_password">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>change_password</string>
+   </property>
+   <property name="font">
+    <font>
+     <family>Segoe UI Light</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="menuRole">
+    <enum>QAction::TextHeuristicRole</enum>
    </property>
   </action>
  </widget>

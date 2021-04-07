@@ -254,15 +254,20 @@ contain at least one special character."""
         """
         self._item_already_exists_box("email", parent_lbl)().exec()
 
-    def passwords_do_not_match_box(self, parent_lbl: str) -> None:
+    def passwords_do_not_match_box(
+        self,
+        parent_lbl: str,
+        item: str = "Passwords",
+    ) -> None:
         """Show passwords do not match message box.
 
-        :param str parent_lbl: Specifies which window instantiated current box
+        :param parent_lbl: Specifies which window instantiated current box
+        :param item: Alter the message a bit
 
         """
         self.message_box_factory(
             parent_lbl,
-            "Passwords don't match.",
+            f"{item} don't match.",
             informative_text="Please try again.",
         ).exec()
 
@@ -373,9 +378,14 @@ contain at least one special character."""
         :param str parent_lbl: Specifies which window instantiated current box
 
         """
-        self.message_box_factory(
+        box = self._yes_no_box(
+            event_handler_factory({"&Yes": self.events.generate_pass_event}), "No"
+        )
+        box(
             parent_lbl,
             "Password can't be generate without a single parameter.",
+            QMessageBox.Question,
+            informative_text="Would you like to reset the values?",
         ).exec()
 
     def master_password_required_box(
@@ -543,6 +553,27 @@ class InputDialogs(QWidget):
         self.main_win = child
         self.title = "Lightning Pass"
 
+    def _input_password_dialog(
+        self,
+        parent_lbl: str,
+        account_username: str,
+        password_type: str,
+    ) -> Union[str, bool]:
+        """Show a general password input dialog.
+
+        :param parent_lbl: Specifies which windows instantiated the current box
+        :param account_username: Username of the account for which we're getting the password
+        :param password_type: Specifies which kind of password should be put into the dialog
+
+        """
+        password, i = QInputDialog.getText(
+            self.main_win,
+            parent_lbl,
+            f"{password_type} for {account_username}:",
+            QLineEdit.Password,
+        )
+        return password if i else False
+
     def master_password_dialog(
         self,
         parent_lbl: str,
@@ -554,14 +585,7 @@ class InputDialogs(QWidget):
         :param account_username: The username of the current user
 
         """
-        password, i = QInputDialog.getText(
-            self.main_win,
-            parent_lbl,
-            f"Master password for {account_username}:",
-            QLineEdit.Password,
-        )
-
-        return password if i else False
+        return self._input_password_dialog(parent_lbl, account_username, "Password")
 
 
 __all__ = [

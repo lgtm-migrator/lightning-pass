@@ -4,7 +4,7 @@ import secrets
 import urllib.parse as urlparse
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional, Union, NamedTuple
 
 import bcrypt
 import validator_collection
@@ -12,7 +12,7 @@ import yagmail
 from PyQt5 import QtCore
 
 import lightning_pass.util.database as database
-from lightning_pass.settings import EMAIL_DATA, PFP_FOLDER
+from lightning_pass.settings import PFP_FOLDER, Credentials
 from lightning_pass.util.exceptions import (
     EmailAlreadyExists,
     InvalidEmail,
@@ -20,6 +20,7 @@ from lightning_pass.util.exceptions import (
     InvalidUsername,
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
+    AccountDoesNotExist,
 )
 
 
@@ -178,6 +179,15 @@ def check_item_existence(
     return True
 
 
+def reset_password(password: str, confirm_password: str, user_id: int) -> None:
+    """"""
+    if not Password.check_password_pattern(password):
+        raise InvalidPassword
+    if not Password.check_password_match(password, confirm_password):
+        raise PasswordsDoNotMatch
+    set_user_item(user_id, "user_id", Password.hash_password(password), "password")
+
+
 class Username:
     """This class holds various utils connected to any username.
 
@@ -252,6 +262,13 @@ class Username:
 
         """
         return check_item_existence(username, "username", should_exist=should_exist)
+
+
+class NewPassword(NamedTuple):
+    previous_password: bytes
+    confirm_previous: str
+    new_password: str
+    confirm_new: str
 
 
 class Password:
@@ -366,8 +383,8 @@ class Password:
     ) -> bool:
         """Check if passwords match.
 
-        :param Union[str, bytes] password: Entered password.
-        :param Union[str, bytes] current_password: Password stored in the database.
+        :param password: Entered password.
+        :param current_password: Password stored in the database.
 
         :returns: True or False based on the authentication result
 
@@ -376,6 +393,29 @@ class Password:
             password.encode("utf-8"),
             current_password.encode("utf-8"),
         )
+
+    @classmethod
+    def change_password_check(cls, password_data: NewPassword) -> Optional[bool]:
+        """Check eligibility of new passwords.
+
+        :param password_data: All of the information needed to check the passwords
+
+        :returns: True if all checks have passed
+
+        """
+        if not cls.authenticate_password(
+            current_password=password_data.previous_password,
+            password=password_data.confirm_previous,
+        ):
+            raise AccountDoesNotExist
+        if not cls.check_password_pattern(password_data.new_password):
+            raise InvalidPassword
+        if not cls.check_password_match(
+            password_data.new_password,
+            password_data.confirm_new,
+        ):
+            raise PasswordsDoNotMatch
+        return True
 
 
 class Email:
@@ -446,8 +486,8 @@ class Email:
         """
         if cls.check_email_existence(email, should_exist=True):
             yag = yagmail.SMTP(
-                {EMAIL_DATA.email: "lightning_pass@noreply.com"},
-                EMAIL_DATA.password,
+                {Credentials.email_user: "lightning_pass@noreply.com"},
+                Credentials.email_password,
             )
             yag.send(
                 to=email,
@@ -462,7 +502,7 @@ If you did not make this request, ignore this email and no changes will be made 
         else:
             loop = QtCore.QEventLoop()
             QtCore.QTimer.singleShot(2000, loop.quit)
-            loop.exec_()
+            loop.exec()
 
 
 class ProfilePicture:

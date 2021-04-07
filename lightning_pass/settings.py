@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import os
-from typing import NamedTuple
+from dataclasses import dataclass
 from pathlib import Path
 
 import dotenv
@@ -20,18 +20,6 @@ def static_folder() -> Path:
     return parent_folder() / "gui/static"
 
 
-class DatabaseCredentials(NamedTuple):
-    host: str
-    user: str
-    password: str
-    database: str
-
-
-class EmailCredentials(NamedTuple):
-    email: str
-    password: str
-
-
 LIGHT_STYLESHEET = static_folder() / "light.qss"
 DARK_STYLESHEET = static_folder() / "dark.qss"
 TRAY_ICON = static_folder() / "tray_icon.png"
@@ -40,10 +28,17 @@ LOG = parent_folder().parent / "misc/logs.log"
 
 
 dotenv.load_dotenv()
-DB_DATA = DatabaseCredentials(
-    os.getenv("DB_HOST"), os.getenv("DB_USER"), os.getenv("DB_PASS"), os.getenv("DB_DB")
-)
-EMAIL_DATA = EmailCredentials(os.getenv("EMAIL_USER"), os.getenv("EMAIL_PASS"))
+
+
+@dataclass(frozen=True)
+class Credentials:
+    db_host = os.getenv("DB_HOST")
+    db_user = os.getenv("DB_USER")
+    db_password = os.getenv("DB_PASS")
+    db_database = os.getenv("DB_DB")
+
+    email_user = os.getenv("EMAIL_USER")
+    email_password = os.getenv("EMAIL_PASS")
 
 
 def _copy(self: Path, target: Path) -> None:
@@ -118,8 +113,7 @@ with database.database_manager() as db:
 
 __all__ = [
     "DARK_STYLESHEET",
-    "DB_DATA",
-    "EMAIL_DATA",
+    "Credentials",
     "LIGHT_STYLESHEET",
     "LOG",
     "PFP_FOLDER",

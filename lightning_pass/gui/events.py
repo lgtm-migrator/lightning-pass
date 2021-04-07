@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Optional, Sequence, Iterator, Union
+from typing import TYPE_CHECKING, Optional, Sequence, Iterator, Union, Any
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -32,7 +32,7 @@ from lightning_pass.util.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QWidget
+    from PyQt5.QtWidgets import QWidget, QMainWindow
 
     from lightning_pass.users.vaults import Vault
     from lightning_pass.gui.mouse_randomness import PasswordOptions
@@ -59,19 +59,17 @@ class Events:
     """Used to provide utilities to connections to the events funcs."""
 
     current_user: Union[Account, bool]
+    __current_token: str
 
     def __init__(
         self,
-        parent: QtWidgets.QMainWindow,
-        *args: any,
-        **kwargs: any,
+        parent: QMainWindow,
+        *args: Any,
+        **kwargs: Any,
     ) -> None:
         """Construct the class."""
         super().__init__(*args, **kwargs)
         self.parent = parent
-        self.main_win = parent.main_win
-        self.ui = parent.ui
-
         self.current_user = False
 
     def __repr__(self) -> str:
@@ -87,7 +85,9 @@ class Events:
 
         """
         with ClearPreviousWidget(self.parent):
-            self.ui.stacked_widget.setCurrentWidget(getattr(self.ui, widget))
+            self.parent.ui.stacked_widget.setCurrentWidget(
+                getattr(self.parent.ui, widget)
+            )
 
     def _message_box(self, message_box: str, *args: any, **kwargs: any) -> None:
         """Show a chosen message box with the given positional and keyword arguments.
@@ -97,8 +97,17 @@ class Events:
         :param kwargs: Optional keyword arguments
 
         """
-        box = getattr(self.ui.message_boxes, message_box)
-        box(*args, **kwargs)
+        getattr(self.parent.ui.message_boxes, message_box)(*args, **kwargs)
+
+    def _input_dialog(self, input_dialog: str, *args: Any, **kwargs: Any) -> None:
+        """Show a chosen message box with the given positional and keyword arguments.
+
+        :param message_box: The message box type to show
+        :param args: Optional positional arguments
+        :param kwargs: Optional keyword arguments
+
+        """
+        getattr(self.parent.ui.input_dialogs, input_dialog)(*args, **kwargs)
 
     def _setup_vault_page(self, page: Optional[Vault] = None):
         """Set up and connect a new vault page
@@ -106,12 +115,14 @@ class Events:
         :param page: Vault object containing the data which should be shown on the current page, defaults to None
 
         """
-        self.ui.vault_widget = window.VaultWidget()
-        self.ui.vault_stacked_widget.addWidget(self.ui.vault_widget.widget)
+        self.parent.ui.vault_widget = window.VaultWidget()
+        self.parent.ui.vault_stacked_widget.addWidget(
+            self.parent.ui.vault_widget.widget
+        )
 
         if page:
             for data in VAULT_WIDGET_DATA:
-                obj = getattr(self.ui.vault_widget.ui, data.name)
+                obj = getattr(self.parent.ui.vault_widget.ui, data.name)
                 method = getattr(obj, data.method)
 
                 with contextlib.suppress(TypeError):
@@ -122,30 +133,38 @@ class Events:
                 except (TypeError, UnboundLocalError):
                     method()
 
-        self.ui.vault_stacked_widget.setCurrentWidget(self.ui.vault_widget.widget)
+        self.parent.ui.vault_stacked_widget.setCurrentWidget(
+            self.parent.ui.vault_widget.widget
+        )
         self.parent.buttons.setup_vault_buttons()
 
     def _rebuild_vault_stacked_widget(self):
         """Rebuild ``self.ui.vault_stacked_widget``."""
-        self.ui.vault_stacked_widget = QtWidgets.QStackedWidget(self.ui.vault)
-        self.ui.vault_stacked_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.ui.vault_stacked_widget.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.ui.vault_stacked_widget.setObjectName("vault_stacked_widget")
-        self.ui.vault_dummy_page1 = QtWidgets.QWidget()
-        self.ui.vault_dummy_page1.setEnabled(False)
-        self.ui.vault_dummy_page1.setObjectName("vault_dummy_page1")
-        self.ui.vault_stacked_widget.addWidget(self.ui.vault_dummy_page1)
-        self.ui.gridLayout_12.addWidget(self.ui.vault_stacked_widget, 0, 3, 6, 1)
+        self.parent.ui.vault_stacked_widget = QtWidgets.QStackedWidget(
+            self.parent.ui.vault
+        )
+        self.parent.ui.vault_stacked_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.parent.ui.vault_stacked_widget.setFrameShadow(QtWidgets.QFrame.Plain)
+        self.parent.ui.vault_stacked_widget.setObjectName("vault_stacked_widget")
+        self.parent.ui.vault_dummy_page1 = QtWidgets.QWidget()
+        self.parent.ui.vault_dummy_page1.setEnabled(False)
+        self.parent.ui.vault_dummy_page1.setObjectName("vault_dummy_page1")
+        self.parent.ui.vault_stacked_widget.addWidget(self.parent.ui.vault_dummy_page1)
+        self.parent.ui.gridLayout_12.addWidget(
+            self.parent.ui.vault_stacked_widget, 0, 3, 6, 1
+        )
 
     @property
     def _vault_widget_vault(self) -> Vault:
-        """Return ``Vault object`` instantiated with the current vault widget values.
+        """Return ``Vault`` instantiated with the current vault widget values.
 
         Finds the new values by accessing the children objects of the current widget.
         The indexes point to the ``line_edit`` objects containing the string values.
 
         """
-        children_objects = self.ui.vault_stacked_widget.currentWidget().children()
+        children_objects = (
+            self.parent.ui.vault_stacked_widget.currentWidget().children()
+        )
         return vaults.Vault(
             self.current_user.user_id,
             children_objects[1].text(),
@@ -159,22 +178,22 @@ class Events:
     @property
     def vault_stacked_widget_index(self) -> int:
         """Return the current ``vault_stacked_widget`` index."""
-        return self.ui.vault_stacked_widget.currentIndex()
+        return self.parent.ui.vault_stacked_widget.currentIndex()
 
     @vault_stacked_widget_index.setter
     def vault_stacked_widget_index(self, i) -> None:
         """Set a new ``vault_stacked_widget_index``."""
-        self.ui.vault_stacked_widget.setCurrentIndex(i)
+        self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
 
     @property
     def pwd_generator_values(self) -> PasswordOptions:
         """Return current password generation values in the ``PasswordOptions``."""
         return mouse_randomness.PasswordOptions(
-            self.ui.generate_pass_spin_box.value(),
-            self.ui.generate_pass_numbers_check.isChecked(),
-            self.ui.generate_pass_symbols_check.isChecked(),
-            self.ui.generate_pass_lower_check.isChecked(),
-            self.ui.generate_pass_upper_check.isChecked(),
+            self.parent.ui.generate_pass_spin_box.value(),
+            self.parent.ui.generate_pass_numbers_check.isChecked(),
+            self.parent.ui.generate_pass_symbols_check.isChecked(),
+            self.parent.ui.generate_pass_lower_check.isChecked(),
+            self.parent.ui.generate_pass_upper_check.isChecked(),
         )
 
     def home_event(self) -> None:
@@ -189,8 +208,8 @@ class Events:
         """Try to login a user. If successful, show the account widget."""
         try:
             self.current_user = Account.login(
-                self.ui.log_username_line_edit.text(),
-                self.ui.log_password_line_edit.text(),
+                self.parent.ui.log_username_line_edit.text(),
+                self.parent.ui.log_password_line_edit.text(),
             )
         except AccountException:
             self._message_box("invalid_login_box", "Login")
@@ -205,10 +224,10 @@ class Events:
         """Try to register a user. If successful, show login widget."""
         try:
             self.current_user = Account.register(
-                self.ui.reg_username_line.text(),
-                self.ui.reg_password_line.text(),
-                self.ui.reg_conf_pass_line.text(),
-                self.ui.reg_email_line.text(),
+                self.parent.ui.reg_username_line.text(),
+                self.parent.ui.reg_password_line.text(),
+                self.parent.ui.reg_conf_pass_line.text(),
+                self.parent.ui.reg_email_line.text(),
             )
         except InvalidUsername:
             self._message_box("invalid_username_box", "Register")
@@ -229,66 +248,95 @@ class Events:
         """Switch to forgot password widget and reset previous email."""
         self._set_current_widget("forgot_password")
 
+    def reset_token_event(self) -> None:
+        """Switch to reset token page and reset previous values."""
+        self._set_current_widget("reset_token")
+
     def send_token_event(self) -> None:
         """Send token and switch to token page."""
         if credentials.Email.check_email_pattern(
-            email := self.ui.forgot_pass_email_line.text(),
+            email := self.parent.ui.forgot_pass_email_line.text(),
         ):
             # momentarily disable the button to avoid multiple send requests
-            with _disable_widget(self.ui.reset_token_submit_btn):
+            with _disable_widget(self.parent.ui.reset_token_submit_btn):
                 credentials.Email.send_reset_email(email)
 
             self._message_box("reset_email_sent_box", "Forgot Password")
         else:
             self._message_box("invalid_email_box", "Forgot Password")
 
-    def reset_token_event(self) -> None:
-        """Switch to reset token page and reset previous values."""
-        self._set_current_widget("reset_token")
-
     def submit_reset_token_event(self) -> None:
         """If submitted token is correct, proceed to password change widget."""
         if credentials.Token.check_token_existence(
-            self.ui.reset_token_token_line.text(),
+            token := self.parent.ui.reset_token_token_line.text()
         ):
+            self.__current_token = token
             self.reset_password_event()
         else:
             self._message_box("invalid_token_box", "Reset Password")
 
     def reset_password_event(self) -> None:
-        """Move to reset password page."""
+        """Switch to the reset password widget."""
         self._set_current_widget("reset_password")
 
-    def submit_reset_password_event(self) -> None:
-        """Change user's password.
-
-        Show message box if something goes wrong, otherwise move to login page.
-
-        """
+    def reset_password_submit_event(self) -> None:
+        """"""
         try:
-            self.current_user.password = (
-                ...,  # todo:
-                self.ui.reset_pass_new_pass_line.text(),
-                self.ui.reset_pass_conf_new_line.text(),
+            credentials.reset_password(
+                self.parent.ui.reset_password_new_pass_line.text(),
+                self.parent.ui.reset_password_conf_new_pass_line.text(),
+                int(self.__current_token[-2:]),
             )
         except InvalidPassword:
             self._message_box("invalid_password_box", "Reset Password")
         except PasswordsDoNotMatch:
             self._message_box("passwords_do_not_match_box", "Reset Password")
         else:
-            del self.parent.change_pass_id
+            self._message_box("detail_updated_box", "Reset Password", detail="password")
+            del self.__current_token
+
+    @decorators.login_required
+    def change_pass_event(self) -> None:
+        """Change password for current user."""
+        self._set_current_widget("change_password")
+
+    def submit_change_password_event(self) -> None:
+        """Change user's password.
+
+        Show message box if something goes wrong, otherwise move to login page.
+
+        """
+        try:
+            self.current_user.password = credentials.NewPassword(
+                self.current_user.password,
+                self.parent.ui.change_password_current_pass_line.text(),
+                self.parent.ui.change_password_new_pass_line.text(),
+                self.parent.ui.change_password_conf_new_line.text(),
+            )
+        except AccountDoesNotExist:
+            self._message_box("invalid_login_box", "Change Password")
+        except InvalidPassword:
+            self._message_box(
+                "invalid_password_box", "Change Password", item="new password"
+            )
+        except PasswordsDoNotMatch:
+            self._message_box(
+                "passwords_do_not_match_box",
+                "Change Password",
+                item="New passwords",
+            )
+        else:
             self._message_box(
                 "detail_updated_box",
-                "Reset Password",
+                "Change Password",
                 "password",
             )
-
-            self.login_event()
+            self.change_pass_event()
 
     def generate_pass_event(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
         self._set_current_widget("generate_pass")
-        self.parent.pass_progress = 0
+        self.parent.ui.pass_progress = 0
 
     def get_generator(self) -> PwdGenerator:
         """Get Generator from current password params.
@@ -304,9 +352,9 @@ class Events:
         If no password options were checked, shows message box letting the user know about it.
 
         """
-        if not self.ui.generate_pass_p2_tracking_lbl.hasMouseTracking():
+        if not self.parent.ui.generate_pass_p2_tracking_lbl.hasMouseTracking():
             mouse_randomness.MouseTracker.setup_tracker(
-                self.ui.generate_pass_p2_tracking_lbl,
+                self.parent.ui.generate_pass_p2_tracking_lbl,
                 self.parent.on_position_changed,
             )
 
@@ -316,19 +364,21 @@ class Events:
         else:
             self.parent.gen = self.get_generator()
             self.parent.pass_progress = 0
-            self.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
+            self.parent.ui.generate_pass_p2_prgrs_bar.setValue(
+                self.parent.pass_progress
+            )
 
             self._set_current_widget("generate_pass_phase2")
 
     @decorators.login_required(page_to_access="account")
     def account_event(self) -> None:
         """Switch to account widget and set current user values."""
-        self.ui.account_username_line.setText(self.current_user.username)
-        self.ui.account_email_line.setText(self.current_user.email)
-        self.ui.account_last_log_date.setText(
+        self.parent.ui.account_username_line.setText(self.current_user.username)
+        self.parent.ui.account_email_line.setText(self.current_user.email)
+        self.parent.ui.account_last_log_date.setText(
             f"Last login date: {self.current_user.last_login_date}",
         )
-        self.ui.account_pfp_pixmap_lbl.setPixmap(
+        self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
             QtGui.QPixmap(self.current_user.profile_picture_path),
         )
 
@@ -357,14 +407,11 @@ class Events:
         del self.current_user
         self.home_event()
 
-    @decorators.login_required
-    def change_pass_event(self) -> None:
-        """Change password for current user."""
-        ...
-
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
-        if self.current_user.username != (name := self.ui.account_username_line.text()):
+        if self.current_user.username != (
+            name := self.parent.ui.account_username_line.text(),
+        ):
             try:
                 self.current_user.username = name
             except InvalidUsername:
@@ -372,9 +419,11 @@ class Events:
             except UsernameAlreadyExists:
                 self._message_box("username_already_exists_box", "Account")
             else:
-                self._message_box("detail_updated_box", "Account", "username")
+                self._message_box("detail_updated_box", "Account", detail="username")
 
-        if self.current_user.email != (email := self.ui.account_email_line.text()):
+        if self.current_user.email != (
+            email := self.parent.ui.account_email_line.text(),
+        ):
             try:
                 self.current_user.email = email
             except InvalidEmail:
@@ -403,10 +452,11 @@ class Events:
 
         """
         try:
-            self.current_user.master_password = (
-                self.ui.master_pass_current_pass_line.text(),
-                self.ui.master_pass_master_pass_line.text(),
-                self.ui.master_pass_conf_master_pass_line.text(),
+            self.current_user.master_password = credentials.NewPassword(
+                self.current_user.password,
+                self.parent.ui.master_pass_current_pass_line.text(),
+                self.parent.ui.master_pass_master_pass_line.text(),
+                self.parent.ui.master_pass_conf_master_pass_line.text(),
             )
         except AccountDoesNotExist:
             self._message_box("invalid_login_box", "Master Password")
@@ -417,12 +467,16 @@ class Events:
                 item="master password",
             )
         except PasswordsDoNotMatch:
-            self._message_box("passwords_do_not_match_box", "Master Password")
+            self._message_box(
+                "passwords_do_not_match_box",
+                "Master Password",
+                item="Master passwords",
+            )
         else:
             self._message_box(
                 "detail_updated_box",
                 "Master Password",
-                detail="master password",
+                detail="Master password",
             )
 
     @decorators.login_required
@@ -461,10 +515,10 @@ class Events:
         for page in self.current_user.vault_pages:
             self._setup_vault_page(page)
 
-        self.ui.vault_username_lbl.setText(
+        self.parent.ui.vault_username_lbl.setText(
             f"Current user: {self.current_user.username}",
         )
-        self.ui.vault_date_lbl.setText(
+        self.parent.ui.vault_date_lbl.setText(
             f"Last unlock date: {str(self.current_user._last_vault_unlock_date)}",
         )
         self.current_user.update_last_vault_unlock_date()
@@ -472,7 +526,7 @@ class Events:
         self._set_current_widget("vault")
 
         if previous_index:
-            self.ui.vault_stacked_widget.setCurrentIndex(previous_index)
+            self.parent.ui.vault_stacked_widget.setCurrentIndex(previous_index)
 
     def add_vault_page_event(self) -> None:
         """Add a new vault page.
@@ -482,11 +536,11 @@ class Events:
 
         """
         if (page := self.current_user.vault_pages_int) == (
-            count := self.ui.vault_stacked_widget.count() - 1
+            count := self.parent.ui.vault_stacked_widget.count() - 1
         ):
             # empty one not found -> create new one
             self._setup_vault_page()
-            self.ui.vault_widget.ui.vault_page_lbl.setText(str(page))
+            self.parent.ui.vault_widget.ui.vault_page_lbl.setText(str(page))
         else:
             # empty one found -> switch to it
             self.vault_stacked_widget_index = count
@@ -561,7 +615,7 @@ class Events:
         except VaultException:
             self._message_box("invalid_vault_box", "Vault")
         else:
-            self.ui.vault_widget.ui.vault_password_line.clear()  #:todo:
+            self.parent.ui.vault_widget.ui.vault_password_line.clear()  #:todo:
 
             if previous_vault:
                 self._message_box(
@@ -587,13 +641,13 @@ class Events:
         """Change stylesheet to light mode."""
         if args:
             ...
-        self.main_win.setStyleSheet("")
+        self.parent.main_win.setStyleSheet("")
 
     def toggle_stylesheet_dark(self, *args: any) -> None:
         """Change stylesheet to dark mode."""
         if args:
             ...
-        self.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
+        self.parent.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
 
 
 __all__ = [

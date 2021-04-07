@@ -8,7 +8,8 @@ class WidgetItem(NamedTuple):
 
 
 WIDGET_DATA = (
-    None,
+    # index: 0
+    {None},
     # index: 1
     {None},
     # index: 2
@@ -29,10 +30,16 @@ WIDGET_DATA = (
     {WidgetItem("reset_token_token_line")},
     # index: 6
     {
-        WidgetItem("reset_pass_new_pass_line"),
-        WidgetItem("reset_pass_conf_new_line"),
+        WidgetItem("reset_password_new_pass_line"),
+        WidgetItem("reset_password_conf_new_pass_line"),
     },
     # index: 7
+    {
+        WidgetItem("change_password_current_pass_line"),
+        WidgetItem("change_password_new_pass_line"),
+        WidgetItem("change_password_conf_new_line"),
+    },
+    # index: 8
     {
         WidgetItem("generate_pass_spin_box", "setValue", 16),
         WidgetItem("generate_pass_numbers_check", "setChecked", True),
@@ -40,18 +47,18 @@ WIDGET_DATA = (
         WidgetItem("generate_pass_lower_check", "setChecked", True),
         WidgetItem("generate_pass_upper_check", "setChecked", True),
     },
-    # index: 8
-    {WidgetItem("generate_pass_p2_final_pass_line")},
     # index: 9
+    {WidgetItem("generate_pass_p2_final_pass_line")},
+    # index: 10
     {
         WidgetItem("account_username_line"),
         WidgetItem("account_email_line"),
         WidgetItem("account_last_log_date"),
         WidgetItem("account_pfp_pixmap_lbl"),
     },
-    # index: 10
-    {None},
     # index: 11
+    {None},
+    # index: 12
     {
         WidgetItem("master_pass_current_pass_line"),
         WidgetItem("master_pass_master_pass_line"),

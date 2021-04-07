@@ -3,29 +3,15 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import Generator, Optional, Union
+from typing import TYPE_CHECKING, Generator, Optional, Union
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
 from lightning_pass.users.vaults import Vault
 from lightning_pass.util.exceptions import AccountDoesNotExist
 
-
-def change_password(user_id: int, password: str, confirm_password: str) -> None:
-    """Check eligibility of new passwords and possibly change the password.
-
-    :raises InvalidPassword: if the passwords do not match the required pattern.
-    :raises PasswordsDoNotMatch: if password and confirm_password are not the same.
-
-    """
-    # Exceptions: InvalidPassword, PasswordsDoNotMatch
-    credentials.Password(password, confirm_password).__call__()
-    credentials.set_user_item(
-        user_id,
-        "id",
-        credentials.Password.hash_password(password),
-        "password",
-    )
+if TYPE_CHECKING:
+    from lightning_pass.util.credentials import NewPassword
 
 
 class Account:
@@ -125,7 +111,7 @@ class Account:
 
         return account
 
-    def get_value(self, result_column: str) -> Union[str, datetime]:
+    def get_value(self, result_column: str) -> Union[str, bytes, datetime]:
         """Simplify getting user values.
 
         :param str result_column: Column from which we're collecting the value
@@ -189,7 +175,7 @@ class Account:
         self.set_value(value, "username")
 
     @property
-    def password(self) -> str:
+    def password(self) -> bytes:
         """Password property.
 
         :returns: user's password in database
@@ -198,8 +184,13 @@ class Account:
         return self.get_value("password")
 
     @password.setter
-    def password(self) -> None:
-        ...
+    def password(self, password_data: NewPassword) -> None:
+        # Exceptions: AccountDoesNotExist, InvalidPassword, PasswordsDoNotMatch
+        if credentials.Password.change_password_check(password_data):
+            self.set_value(
+                credentials.Password.hash_password(password_data.new_password),
+                "password",
+            )
 
     @property
     def email(self) -> str:
@@ -284,34 +275,22 @@ class Account:
         return self.get_value("master_password")
 
     @master_password.setter
-    def master_password(self, password_information: tuple[str, str, str]) -> None:
+    def master_password(self, password_data: NewPassword) -> None:
         """Set a new master password.
 
-        :param password_information:
-            index 0: Current normal password, used to check account ownership
-            index 1: New master password
-            index 2: Second master password, used to check that the new passwords match
+        :param password_data: The data container will all the neede information
 
         :raises AccountDoesNotExist: if the normal password is not correct
         :raises PasswordsDoNotMatch: if the master passwords do not match
         :raises InvalidPassword: if the master password doesn't meet the required pattern
 
         """
-        if not credentials.Password.authenticate_password(
-            password_information[0], self.password
-        ):
-            raise AccountDoesNotExist
-
-        # Exceptions: InvalidPassword, PasswordsDoNotMatch
-        credentials.Password(
-            password_information[1],
-            password_information[2],
-        )()
-
-        self.set_value(
-            credentials.Password.hash_password(password_information[1]),
-            "master_password",
-        )
+        # Exceptions: AccountDoesNotExist, InvalidPassword, PasswordsDoNotMatch
+        if credentials.Password.change_password_check(password_data):
+            self.set_value(
+                credentials.Password.hash_password(password_data.new_password),
+                "master_password",
+            )
 
     @property
     def _last_vault_unlock_date(self) -> datetime:

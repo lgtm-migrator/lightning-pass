@@ -19,14 +19,15 @@ def database_manager() -> Iterator[None]:
     :returns: database connection cursor
 
     """
-    from lightning_pass.settings import DB_DATA
+    # avoid circular import
+    from lightning_pass.settings import Credentials
 
     try:
         con: MySQLConnection = mysql.connector.connect(
-            host=DB_DATA.host,
-            user=DB_DATA.user,
-            password=DB_DATA.password,
-            database=DB_DATA.database,
+            host=Credentials.db_host,
+            user=Credentials.db_user,
+            password=Credentials.db_password,
+            database=Credentials.db_database,
         )
         # fix unread results with buffered cursor
         cur: MySQLCursor = con.cursor(buffered=True)

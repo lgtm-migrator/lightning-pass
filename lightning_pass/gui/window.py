@@ -199,14 +199,14 @@ class LightningPassWindow(QtWidgets.QMainWindow):
     def on_position_changed(self, pos: QtCore.QPoint) -> None:
         """Handle changes in mouse position over connected label.
 
-        :param QPoint pos: Mouse position
+        :param pos: Mouse position
 
         """
         if self.pass_progress > 1000:
             return
 
         if self.gen.div_check.send(self.pass_progress) and self.pass_progress != 0:
-            self.gen.get_character(mouse_randomness.PosTuple(pos.x(), pos.y()))
+            self.gen.get_character(pos.x(), pos.y())
 
         self.ui.generate_pass_p2_final_pass_line.setText(self.gen.password)
         self.pass_progress += 1

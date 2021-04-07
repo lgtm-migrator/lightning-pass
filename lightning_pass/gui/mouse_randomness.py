@@ -57,11 +57,6 @@ class MouseTracker(QtCore.QObject):
         tracker.position_changed.connect(on_change)
 
 
-class PosTuple(NamedTuple):
-    x: int
-    y: int
-
-
 class PasswordOptions(NamedTuple):
     length: int
     numbers: bool
@@ -133,7 +128,7 @@ class PwdGenerator:
                 yield False
         return False
 
-    def get_character(self, position: PosTuple) -> Optional[str]:
+    def get_character(self, x: int, y: int) -> Optional[str]:
         """Get a eligible password character by generating a random seed from the mouse position tuple.
 
         Chooses an item from the string.printable property based on the calculated index.
@@ -144,13 +139,13 @@ class PwdGenerator:
         if len(self.password) > self.options.length:
             return
 
-        sd = position.x + 1j * position.y
+        sd = x + 1j * y
         random.seed(sd)
         flt = random.random()
         div = 1 / self.chars.length
 
-        index = flt / div
-        char = self.chars.chars[int(index)]
+        index = flt // div
+        char = self.chars.chars[index]
 
         with contextlib.suppress(ValueError):
             char = int(char)

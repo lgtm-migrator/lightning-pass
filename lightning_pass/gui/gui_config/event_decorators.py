@@ -61,7 +61,7 @@ def _base_decorator(
             ):
                 return _func_executor(func, *args, **kwargs)
             else:
-                getattr(self.ui.message_boxes, __message_box)(
+                getattr(self.parent.ui.message_boxes, __message_box)(
                     __box_parent_lbl,
                     page=page_to_access,
                 )

@@ -68,8 +68,11 @@ class Buttons:
             Clickable("reset_token_main_btn", "home_event"),
             Clickable("reset_token_submit_btn", "submit_reset_token_event"),
             # reset_password
-            Clickable("reset_pass_main_btn", "home_event"),
-            Clickable("reset_pass_confirm_btn", "submit_reset_password_event"),
+            Clickable("reset_password_confirm_btn", "reset_password_submit_event"),
+            Clickable("reset_password_main_btn", "home_event"),
+            # change_password
+            Clickable("change_password_main_btn", "home_event"),
+            Clickable("change_password_confirm_btn", "submit_change_password_event"),
             # generate_pass
             Clickable("generate_pass_generate_btn", "generate_pass_phase2_event"),
             Clickable("generate_pass_main_menu_btn", "home_event"),
@@ -117,6 +120,7 @@ class Buttons:
             Clickable("action_reset_token", "reset_token_event"),
             # menu_account
             Clickable("action_profile", "account_event"),
+            Clickable("action_change_password", "change_password_event"),
             Clickable("action_vault", "vault_event"),
             Clickable("action_master_password", "master_password_event"),
         }
@@ -146,8 +150,10 @@ class Buttons:
             "reg_password_line",
             "reg_conf_pass_line",
             "reg_email_line",
-            "reset_pass_new_pass_line",
-            "reset_pass_conf_new_line",
+            "reset_password_new_pass_line",
+            "reset_password_conf_new_pass_line",
+            "change_password_new_pass_line",
+            "change_password_conf_new_line",
             "account_username_line",
             "account_email_line",
             "master_pass_master_pass_line",
