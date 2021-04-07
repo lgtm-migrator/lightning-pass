@@ -164,7 +164,7 @@ class Events:
 
     @property
     def pwd_generator_values(self) -> PasswordOptions:
-        """Return current password generation values."""
+        """Return current password generation values in the ``PasswordOptions``."""
         return mouse_randomness.PasswordOptions(
             self.ui.generate_pass_spin_box.value(),
             self.ui.generate_pass_numbers_check.isChecked(),
@@ -256,7 +256,11 @@ class Events:
         self._set_current_widget("reset_password")
 
     def submit_reset_password_event(self) -> None:
-        """Attempt to change user's password, show message box if something goes wrong, otherwise move to login page."""
+        """Change user's password.
+
+        Show message box if something goes wrong, otherwise move to login page.
+
+        """
         try:
             account.change_password(
                 ...,  # todo:
@@ -312,7 +316,7 @@ class Events:
 
             self._set_current_widget("generate_pass_phase2")
 
-    @decorators.login_required("account")
+    @decorators.login_required(page_to_access="account")
     def account_event(self) -> None:
         """Switch to account widget and set current user values."""
         self.ui.account_username_line.setText(self.current_user.username)
@@ -349,7 +353,7 @@ class Events:
         del self.current_user
         self.home_event()
 
-    @decorators.login_required()
+    @decorators.login_required
     def change_pass_event(self) -> None:
         """Change password for current user."""
         ...
@@ -376,7 +380,7 @@ class Events:
             else:
                 self._message_box("detail_updated_box", "Account", detail="email")
 
-    @decorators.login_required("master password")
+    @decorators.login_required(page_to_access="master password")
     def master_password_event(self) -> None:
         """Switch to master password widget."""
         self._set_current_widget("master_password")
@@ -417,8 +421,8 @@ class Events:
                 detail="master password",
             )
 
-    @decorators.login_required()
-    @decorators.master_password_required()
+    @decorators.login_required
+    @decorators.master_password_required
     def master_password_dialog_event(self) -> None:
         """Show an input dialog asking the user to enter their current master password.
 
@@ -439,9 +443,9 @@ class Events:
             self.current_user.vault_unlocked = False
             self._message_box("invalid_login_box", "Vault")
 
-    @decorators.login_required("vault")
-    @decorators.master_password_required("vault")
-    @decorators.vault_unlock_required("vault")
+    @decorators.login_required(page_to_access="vault")
+    @decorators.master_password_required(page_to_access="vault")
+    @decorators.vault_unlock_required(page_to_access="vault")
     def vault_event(self, previous_index: Optional[int] = None) -> None:
         """Switch to vault window.
 
@@ -485,17 +489,24 @@ class Events:
 
     def remove_vault_page_event(self) -> None:
         """Remove the current vault page."""
+        platform = self._vault_widget_vault.platform_name
+
+        self._message_box(
+            "confirm_vault_deletion_box",
+            "Vault",
+            platform,
+        )
+
         vaults.delete_vault(
             self.current_user.user_id,
             self.vault_stacked_widget_index - 1,
         )
 
-        platform = self._vault_widget_vault.platform_name
         self.vault_event()
         self._message_box(
             "vault_page_deleted_box",
-            platform,
             "Vault",
+            platform,
         )
 
     def vault_lock_event(self) -> None:

@@ -5,8 +5,9 @@ Used for showing information to the user.
 """
 import contextlib
 import functools
-from typing import Callable, Optional, Union
+from typing import Callable, Optional, Union, NamedTuple
 
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QInputDialog,
     QLineEdit,
@@ -47,10 +48,24 @@ def event_handler_factory(options: dict[str, Callable[[], None]]) -> Callable[[]
         """
         with contextlib.suppress(KeyError):
             event = options[btn.text()]
+            print(btn.text())
         with contextlib.suppress(UnboundLocalError):
             event()
 
     return handler
+
+
+class MessageBoxOperation(NamedTuple):
+    func: str
+    args: Optional[
+        Union[
+            str,
+            QMessageBox.Icon,
+            QMessageBox.StandardButtons,
+            QMessageBox.StandardButton,
+            Callable,
+        ]
+    ] = None
 
 
 class MessageBoxes(QWidget):
@@ -88,7 +103,7 @@ class MessageBoxes(QWidget):
         :param parent_lbl: Specifies which window instantiated the new message box
         :param text: Main text to be displayed on the message box
         :param icon: Message box icon type, defaults to QMessageBox.Warning
-        :param informative_text: Additional text, defaults to None
+        :param informative_text: Additional text to appear below the root text, defaults to None
         :param standard_buttons: Extra buttons to be shown on the message box, defaults to None
         :param default_button: Default button, defaults to None
         :param event_handler: Handler for clicks on buttons, defaults to None
@@ -99,21 +114,23 @@ class MessageBoxes(QWidget):
         box = QMessageBox(self.main_win)
 
         operations = {
-            "setWindowTitle": f"{self.title} - {parent_lbl}",
-            "setText": text,
-            "setIcon": icon,
-            "setInformativeText": informative_text,
-            "setStandardButtons": standard_buttons,
-            "setDefaultButton": default_button,
+            MessageBoxOperation("setWindowTitle", f"{self.title} - {parent_lbl}"),
+            MessageBoxOperation("setText", text),
+            MessageBoxOperation("setIcon", icon),
+            MessageBoxOperation("setInformativeText", informative_text),
+            MessageBoxOperation("setStandardButtons", standard_buttons),
+            MessageBoxOperation("setDefaultButton", default_button),
         }
 
-        for func, val in operations.items():
+        for operation in operations:
             # suppress TypeError if this information is missing
             with contextlib.suppress(TypeError):
-                getattr(box, func)(val)
+                getattr(box, operation.func)(operation.args)
 
         if event_handler:
             box.buttonClicked.connect(event_handler)
+
+        box.setTextFormat(Qt.RichText)
 
         return box
 
@@ -256,15 +273,15 @@ contain at least one special character."""
         :param page: The page which the user tried to access, defaults to None
 
         """
-        event_handler = event_handler_factory({"&Yes": self.events.login_event})
-
         text = (
             f"Please log in to access the {page} page."
             if page
             else "Please log in to access that page."
         )
 
-        box = self._yes_no_box(event_handler, "No")
+        box = self._yes_no_box(
+            event_handler_factory({"&Yes": self.events.login_event}), "No"
+        )
         box(
             parent_lbl,
             text,
@@ -340,9 +357,9 @@ contain at least one special character."""
         :param str parent_lbl: Specifies which window instantiated current box
 
         """
-        event_handler = event_handler_factory({"&Yes": self.events.reset_token_event})
-
-        box = self._yes_no_box(event_handler, "Yes")
+        box = self._yes_no_box(
+            event_handler_factory({"&Yes": self.events.reset_token_event}), "Yes"
+        )
         box(
             parent_lbl,
             "The reset email has been sent.",
@@ -421,14 +438,27 @@ contain at least one special character."""
         :param parent_lbl: Specifies which window instantiated the current box, defaults to "Vault"
 
         """
-        event_handler = event_handler_factory({"&Yes": self.events.vault_event})
-
-        box = self._yes_no_box(event_handler, "Yes")
+        box = self._yes_no_box(
+            event_handler_factory({"&Yes": self.events.vault_event}), "Yes"
+        )
         box(
             parent_lbl,
             "Your vault has been unlocked.",
             QMessageBox.Question,
             informative_text="Would you like to move to the vault page?",
+        ).exec()
+
+    def vault_created_box(self, parent_lbl: str, platform: str) -> None:
+        """Show a message box indicating that a new vault page has been created.
+
+        :param parent_lbl: Specifies which windows instantiated the current box
+        :param platform: The platform affected by this change
+
+        """
+        self.message_box_factory(
+            parent_lbl,
+            f"Vault page for {platform} created.",
+            None,
         ).exec()
 
     def vault_page_deleted_box(
@@ -445,19 +475,6 @@ contain at least one special character."""
         self.message_box_factory(
             parent_lbl,
             f"Vault page for {platform} deleted.",
-            None,
-        ).exec()
-
-    def vault_created_box(self, parent_lbl: str, platform: str) -> None:
-        """Show a message box indicating that a new vault page has been created.
-
-        :param parent_lbl: Specifies which windows instantiated the current box
-        :param platform: The platform affected by this change
-
-        """
-        self.message_box_factory(
-            parent_lbl,
-            f"Vault page for {platform} created.",
             None,
         ).exec()
 
@@ -482,8 +499,7 @@ contain at least one special character."""
             return
 
         informative = (
-            f"""{', '.join(updated_values[:-1])} and {updated_values[-1]}
-have been successfully updated."""
+            f"""{', '.join(updated_values[:-1])} and {updated_values[-1]} have been successfully updated."""
             if len(updated_values) > 1
             else f"{updated_values[0]} has been successfully updated."
         )
@@ -493,6 +509,29 @@ have been successfully updated."""
             f"Vault page for {platform} updated.",
             None,
             informative_text=informative,
+        ).exec()
+
+    def confirm_vault_deletion_box(self, parent_lbl: str, platform: str) -> None:
+        """Show a message box asking the user to confirm deletion of a vault page.
+
+        :param parent_lbl: Specifies which windows instantiated the current box
+        :param platform: The platform which will be deleted
+
+        """
+        self.message_box_factory(
+            parent_lbl,
+            f"You are about to delete {platform}.",
+            QMessageBox.Question,
+            informative_text=f"""All of the data connected to {platform} will be permanently deleted, are you sure you want to proceed?""",
+            standard_buttons=QMessageBox.Cancel | QMessageBox.Yes,
+            default_button=QMessageBox.Cancel,
+            event_handler=event_handler_factory(
+                {
+                    "Cancel": self.events.vault_event(
+                        previous_index=self.events.vault_stacked_widget_index
+                    ),
+                },
+            ),
         ).exec()
 
 

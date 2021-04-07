@@ -2,15 +2,15 @@
 from __future__ import annotations
 
 import functools
-from typing import TYPE_CHECKING, Callable
-
-if TYPE_CHECKING:
-    from lightning_pass.gui.events import Events
+from typing import Callable, Optional
 
 
-def login_required(page_to_access: str | None = None) -> Callable:
+def login_required(
+    function: Optional[Callable] = None, page_to_access: str | None = None
+) -> Callable:
     """Decorate to ensure that a user has to be logged in to access a specific event.
 
+    :param function: Will become the actual function if decorator is used without parenthesis, defaults to None
     :param page_to_access: The page user tried to access, used to modify the message box, defaults to None
 
     :return: the decorated function
@@ -27,30 +27,38 @@ def login_required(page_to_access: str | None = None) -> Callable:
         """
 
         @functools.wraps(func)
-        def wrapper(self: Events, *args, **kwargs) -> Callable | None:
+        def wrapper(*args, **kwargs) -> Callable | None:
             """Check the "current_user" attribute.
 
-            :param self: Class instance to give access to its attributes
+            :param args: Positional arguments, first one should be the class attribute which contains
+                the data about the state of currently logged user (or not).
+            :param kwargs: Keyword arguments
 
             :return: executed function or None and show a message box indicating need log in
 
             """
+            self = args[0]
             if hasattr(self, "current_user"):
-                return func(self, *args, **kwargs)
+                return func(*args, **kwargs)
             else:
                 self.ui.message_boxes.login_required_box(
                     "Account",
-                    page_to_access,
+                    page=page_to_access,
                 )
 
         return wrapper
 
+    if function:
+        return decorator(function)
     return decorator
 
 
-def master_password_required(page_to_access: str | None = None) -> Callable:
+def master_password_required(
+    function: Optional[Callable] = None, page_to_access: str | None = None
+) -> Callable:
     """Decorate to ensure that a master password is set up to access a specific event.
 
+    :param function: Will become the actual function if decorator is used without parenthesis, defaults to None
     :param page_to_access: The page user tried to access, used to modify the message box, defaults to None
 
     :return: the decorated function
@@ -67,27 +75,35 @@ def master_password_required(page_to_access: str | None = None) -> Callable:
         """
 
         @functools.wraps(func)
-        def wrapper(self: Events, *args, **kwargs) -> Callable | None:
+        def wrapper(*args, **kwargs) -> Callable | None:
             """Check if current user has a master password setup.
 
-            :param self: Class instance to give access to its attributes
+            :param args: Positional arguments, first one should be the class attribute which contains
+                the data about the master password state (or not).
+            :param kwargs: Keyword arguments
 
             :return: executed function or None and show message box indicating need to set up the master password
 
             """
+            self = args[0]
             if self.current_user.master_password:
-                return func(self, *args, **kwargs)
+                return func(*args, **kwargs)
             else:
                 self.ui.message_boxes.master_password_required_box(page=page_to_access)
 
         return wrapper
 
+    if function:
+        return decorator(function)
     return decorator
 
 
-def vault_unlock_required(page_to_access: str | None = None) -> Callable:
+def vault_unlock_required(
+    function: Optional[Callable] = None, page_to_access: str | None = None
+) -> Callable:
     """Decorate to ensure that a vault is unlocked to access a specific event.
 
+    :param function: Will become the actual function if decorator is used without parenthesis, defaults to None
     :param page_to_access: The page user tried to access, used to modify the message box, defaults to None
 
     :return: the decorated function
@@ -104,21 +120,26 @@ def vault_unlock_required(page_to_access: str | None = None) -> Callable:
         """
 
         @functools.wraps(func)
-        def wrapper(self: Events, *args, **kwargs) -> Callable | None:
+        def wrapper(*args, **kwargs) -> Callable | None:
             """Check the vault_unlocked attribute of the current user.
 
-            :param self: Class instance to give access to its attributes
+            :param args: Positional arguments, first one should be the class attribute which contains
+                the data about vault state (or not).
+            :param kwargs: Keyword arguments
 
             :return: executed function or None and show a message box indicating unlock vault
 
             """
+            self = args[0]
             if self.current_user.vault_unlocked:
-                return func(self, *args, **kwargs)
+                return func(*args, **kwargs)
             else:
                 self.ui.message_boxes.vault_unlock_required_box(page=page_to_access)
 
         return wrapper
 
+    if function:
+        return decorator(function)
     return decorator
 
 
