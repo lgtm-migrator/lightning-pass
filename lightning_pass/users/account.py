@@ -197,6 +197,10 @@ class Account:
         """
         return self.get_value("password")
 
+    @password.setter
+    def password(self) -> None:
+        ...
+
     @property
     def email(self) -> str:
         """Email property.

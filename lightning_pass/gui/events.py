@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Optional, Sequence, Iterator
+from typing import TYPE_CHECKING, Optional, Sequence, Iterator, Union
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -11,9 +11,9 @@ from PyQt5 import QtGui, QtWidgets
 import lightning_pass.gui.gui_config.event_decorators as decorators
 import lightning_pass.gui.mouse_randomness as mouse_randomness
 import lightning_pass.gui.window as window
-import lightning_pass.users.account as account
 import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
+from lightning_pass.users.account import Account
 from lightning_pass.gui.gui_config.widget_data import (
     VAULT_WIDGET_DATA,
     ClearPreviousWidget,
@@ -58,6 +58,8 @@ def _disable_widget(*widgets: Sequence[QWidget]) -> Iterator[None]:
 class Events:
     """Used to provide utilities to connections to the events funcs."""
 
+    current_user: Union[Account, bool]
+
     def __init__(
         self,
         parent: QtWidgets.QMainWindow,
@@ -69,6 +71,8 @@ class Events:
         self.parent = parent
         self.main_win = parent.main_win
         self.ui = parent.ui
+
+        self.current_user = False
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -184,7 +188,7 @@ class Events:
     def login_user_event(self) -> None:
         """Try to login a user. If successful, show the account widget."""
         try:
-            self.current_user = account.Account.login(
+            self.current_user = Account.login(
                 self.ui.log_username_line_edit.text(),
                 self.ui.log_password_line_edit.text(),
             )
@@ -200,7 +204,7 @@ class Events:
     def register_user_event(self) -> None:
         """Try to register a user. If successful, show login widget."""
         try:
-            self.current_user = account.Account.register(
+            self.current_user = Account.register(
                 self.ui.reg_username_line.text(),
                 self.ui.reg_password_line.text(),
                 self.ui.reg_conf_pass_line.text(),
@@ -262,7 +266,7 @@ class Events:
 
         """
         try:
-            account.change_password(
+            self.current_user.password = (
                 ...,  # todo:
                 self.ui.reset_pass_new_pass_line.text(),
                 self.ui.reset_pass_conf_new_line.text(),

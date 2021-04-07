@@ -5,15 +5,33 @@ import functools
 from typing import Callable, Optional
 
 
-def login_required(
-    function: Optional[Callable] = None, page_to_access: str | None = None
+def _base_decorator(
+    __function: Optional[Callable] = None,
+    /,
+    *,
+    __base_obj: Optional[str] = None,
+    __condition_object: Optional[Callable] = None,
+    __message_box: Optional[str] = None,
+    __box_parent_lbl: Optional[str] = None,
+    page_to_access: Optional[str] = None,
 ) -> Callable:
-    """Decorate to ensure that a user has to be logged in to access a specific event.
+    """Create a custom decorator which can be altered at runtime.
 
-    :param function: Will become the actual function if decorator is used without parenthesis, defaults to None
-    :param page_to_access: The page user tried to access, used to modify the message box, defaults to None
+    Decorate to ensure that a specific condition is true in order access a specific event.
+    All additional params passed into the deco factory must be used as keyword arguments.
+        If they were passed in as positional, they would override the _function param.
 
-    :return: the decorated function
+    :param __function: Will become the actual function if decorator is used without parenthesis
+        Not supposed to be used manually, defaults to Non
+    :param __base_obj: The parent object of the item to check
+    :param __condition_object: The object to be called to check whether decorator should advance
+        or show the previously defined message box
+    :param __message_box: The message box to be shown if the condition check fails
+    :param __box_parent_lbl: The label to be shown on the message box
+    :param page_to_access: The page user tried to access, used to modify the message box.
+        As of right now, the only kwarg to be used with the actual decorator, defaults to None
+
+    :return: the decorated function decorated with the specified decorator
 
     """
 
@@ -28,119 +46,83 @@ def login_required(
 
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Callable | None:
-            """Check the "current_user" attribute.
+            """Wrap the original function.
 
             :param args: Positional arguments, first one should be the class attribute which contains
-                the data about the state of currently logged user (or not).
-            :param kwargs: Keyword arguments
+                the information about the data we're trying to check
+            :param kwargs: Optional keyword arguments
 
             :return: executed function or None and show a message box indicating need log in
 
             """
             self = args[0]
-            if hasattr(self, "current_user"):
-                return func(*args, **kwargs)
+            if __condition_object(
+                obj=getattr(self, __base_obj) if __base_obj else self
+            ):
+                return _func_executor(func, *args, **kwargs)
             else:
-                self.ui.message_boxes.login_required_box(
-                    "Account",
+                getattr(self.ui.message_boxes, __message_box)(
+                    __box_parent_lbl,
                     page=page_to_access,
                 )
 
         return wrapper
 
-    if function:
-        return decorator(function)
+    if __function:
+        # decorator was used without parenthesis
+        return decorator(__function)
     return decorator
 
 
-def master_password_required(
-    function: Optional[Callable] = None, page_to_access: str | None = None
-) -> Callable:
-    """Decorate to ensure that a master password is set up to access a specific event.
+def _attr_checker(*, obj: any, attr: str) -> bool:
+    """Check class attributes.
 
-    :param function: Will become the actual function if decorator is used without parenthesis, defaults to None
-    :param page_to_access: The page user tried to access, used to modify the message box, defaults to None
+    All params must be passed in as keyword arguments.
+    This function is supposed to be used as a partial function.
+    Partial functions with positional arguments do not work very well.
 
-    :return: the decorated function
+    :param obj: The object which should contain the given attribute
+    :param attr: The attribute
 
     """
-
-    def decorator(func: Callable) -> Callable:
-        """Decorate the original function.
-
-        :param func: Function to decorate
-
-        :return: the decorated function
-
-        """
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> Callable | None:
-            """Check if current user has a master password setup.
-
-            :param args: Positional arguments, first one should be the class attribute which contains
-                the data about the master password state (or not).
-            :param kwargs: Keyword arguments
-
-            :return: executed function or None and show message box indicating need to set up the master password
-
-            """
-            self = args[0]
-            if self.current_user.master_password:
-                return func(*args, **kwargs)
-            else:
-                self.ui.message_boxes.master_password_required_box(page=page_to_access)
-
-        return wrapper
-
-    if function:
-        return decorator(function)
-    return decorator
+    try:
+        return bool(getattr(obj, attr))
+    except AttributeError:
+        return False
 
 
-def vault_unlock_required(
-    function: Optional[Callable] = None, page_to_access: str | None = None
-) -> Callable:
-    """Decorate to ensure that a vault is unlocked to access a specific event.
+def _func_executor(func: Callable, *args, **kwargs) -> None:
+    """Simple function execution wrapper.
 
-    :param function: Will become the actual function if decorator is used without parenthesis, defaults to None
-    :param page_to_access: The page user tried to access, used to modify the message box, defaults to None
-
-    :return: the decorated function
+    :param func: The function to execute
+    :param args: Optional positional arguments
+    :param kwargs: Optional keyword arguments
 
     """
+    try:
+        return func(*args, **kwargs)
+    except TypeError:
+        return func(args[0])
 
-    def decorator(func: Callable) -> Callable:
-        """Decorate the original function.
 
-        :param func: Function to decorate
-
-        :return: the decorated function
-
-        """
-
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> Callable | None:
-            """Check the vault_unlocked attribute of the current user.
-
-            :param args: Positional arguments, first one should be the class attribute which contains
-                the data about vault state (or not).
-            :param kwargs: Keyword arguments
-
-            :return: executed function or None and show a message box indicating unlock vault
-
-            """
-            self = args[0]
-            if self.current_user.vault_unlocked:
-                return func(*args, **kwargs)
-            else:
-                self.ui.message_boxes.vault_unlock_required_box(page=page_to_access)
-
-        return wrapper
-
-    if function:
-        return decorator(function)
-    return decorator
+login_required = functools.partial(
+    _base_decorator,
+    __condition_object=functools.partial(_attr_checker, attr="current_user"),
+    __message_box="login_required_box",
+    __box_parent_lbl="Account",
+)
+master_password_required = functools.partial(
+    _base_decorator,
+    __base_obj="current_user",
+    __condition_object=functools.partial(_attr_checker, attr="master_password"),
+    __message_box="master_password_required_box",
+)
+vault_unlock_required = functools.partial(
+    _base_decorator,
+    __base_obj="current_user",
+    __condition_object=functools.partial(_attr_checker, attr="vault_unlocked"),
+    __message_box="vault_unlock_required_box",
+)
 
 
 __all__ = ["login_required", "master_password_required", "vault_unlock_required"]
