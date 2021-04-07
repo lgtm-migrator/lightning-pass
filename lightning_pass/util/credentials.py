@@ -195,6 +195,8 @@ class Username:
 
     """
 
+    __slots__ = "_username"
+
     def __init__(self, username: str) -> None:
         """Construct the class.
 
@@ -277,6 +279,8 @@ class Password:
     Calling the class performs both pattern and matching case checks.
 
     """
+
+    __slots__ = ("_password", "confirm_password")
 
     def __init__(
         self,
@@ -425,6 +429,8 @@ class Email:
 
     """
 
+    __slots__ = "_email"
+
     def __init__(self, email: Optional[str]) -> None:
         """Construct the class.
 
@@ -508,6 +514,8 @@ If you did not make this request, ignore this email and no changes will be made 
 class ProfilePicture:
     """This class holds various utils connected to any profile picture."""
 
+    __slots__ = ()
+
     @staticmethod
     def save_picture(picture_path: Path) -> str:
         """Save picture into profile pictures folder with a token_hex filename.
@@ -538,6 +546,8 @@ class ProfilePicture:
 
 class Token:
     """This class holds various utils connected to token generation and checking."""
+
+    __slots__ = ()
 
     @staticmethod
     def generate_reset_token(user_id: int) -> str:

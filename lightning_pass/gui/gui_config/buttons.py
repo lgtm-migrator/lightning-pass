@@ -26,6 +26,8 @@ class VaultToolButton(NamedTuple):
 class Buttons:
     """Used to setup buttons on the ``LightningPassWindow``."""
 
+    __slots__ = "parent"
+
     def __init__(
         self,
         parent: QtWidgets.QMainWindow,
@@ -38,8 +40,7 @@ class Buttons:
 
         """
         super().__init__(*args, **kwargs)
-        self.main_win = parent
-        self.ui = parent.ui
+        self.parent = parent
 
     def setup_all(self):
         """Run all 3 funcs to setup everything."""
@@ -78,12 +79,12 @@ class Buttons:
             Clickable("generate_pass_main_menu_btn", "home_event"),
             # generate_pass_phase2
             Clickable("generate_pass_p2_main_btn", "home_event"),
-            Clickable("generate_pass_p2_reset_btn", "generate_pass_phase2_event"),
+            Clickable("generate_pass_p2_reset_btn", "generate_pass_again_event"),
             # account
             Clickable("account_main_menu_btn", "home_event"),
             Clickable("account_change_pfp_btn", "change_pfp_event"),
             Clickable("account_logout_btn", "logout_event"),
-            Clickable("account_change_pass_btn", "change_pass_event"),
+            Clickable("account_change_pass_btn", "change_password_event"),
             Clickable("account_edit_details_btn", "edit_details_event"),
             Clickable("account_vault_btn", "vault_event"),
             # vault
@@ -97,13 +98,15 @@ class Buttons:
         }
 
         for button in buttons_set:
-            getattr(self.ui, button.widget).clicked.connect(
-                getattr(self.main_win.events, button.action),
+            getattr(self.parent.ui, button.widget).clicked.connect(
+                getattr(self.parent.events, button.action),
             )
 
         # miscellaneous
-        self.ui.generate_pass_p2_copy_tool_btn.clicked.connect(
-            lambda: clipboard.copy(self.ui.generate_pass_p2_final_pass_line.text()),
+        self.parent.ui.generate_pass_p2_copy_tool_btn.clicked.connect(
+            lambda: clipboard.copy(
+                self.parent.ui.generate_pass_p2_final_pass_line.text(),
+            ),
         )
 
     def setup_menu_bar(self) -> None:
@@ -126,8 +129,8 @@ class Buttons:
         }
 
         for button in menu_bar_set:
-            getattr(self.ui, button.widget).triggered.connect(
-                getattr(self.main_win.events, button.action),
+            getattr(self.parent.ui, button.widget).triggered.connect(
+                getattr(self.parent.events, button.action),
             )
 
         menu_theme_set = {
@@ -137,8 +140,8 @@ class Buttons:
         }
 
         for action in menu_theme_set:
-            getattr(self.ui, action.widget).triggered.connect(
-                lambda sheet=action.action: self.main_win.events.toggle_stylesheet_light(
+            getattr(self.parent.ui, action.widget).triggered.connect(
+                lambda sheet=action.action: self.parent.events.toggle_stylesheet_light(
                     sheet
                 ),
             )
@@ -161,7 +164,7 @@ class Buttons:
         }
 
         for line in validator_lines:
-            getattr(self.ui, line).setValidator(
+            getattr(self.parent.ui, line).setValidator(
                 QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+")),
             )
 
@@ -179,8 +182,8 @@ class Buttons:
             ),
         }
 
-        parent = self.ui.vault_widget.ui
-        events = self.main_win.events
+        parent = self.parent.ui.vault_widget.ui
+        events = self.parent.events
 
         parent.vault_open_web_tool_btn.clicked.connect(
             lambda: webbrowser.get().open(parent.vault_web_line.text(), new=2)

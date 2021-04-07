@@ -79,6 +79,8 @@ VAULT_WIDGET_DATA: set[WidgetItem] = {
 class ClearPreviousWidget:
     """Handle clearing the previous widget by accessing the WIDGET_DATA dict."""
 
+    __slots__ = ("parent", "previous_index")
+
     def __init__(self, parent):
         """Context manager constructor.
 

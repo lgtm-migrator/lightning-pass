@@ -17,21 +17,14 @@ class MouseTracker(QtCore.QObject):
 
     position_changed = QtCore.pyqtSignal(QtCore.QPoint)
 
+    __slots__ = "widget"
+
     def __init__(self, widget: QtWidgets.QLabel) -> None:
         """Class constructor."""
         super().__init__(widget)
-        self._widget = widget
+        self.widget = widget
         self.widget.setMouseTracking(True)
         self.widget.installEventFilter(self)
-
-    @property
-    def widget(self) -> QtWidgets.QLabel:
-        """Widget property.
-
-        :return: Own widget
-
-        """
-        return self._widget
 
     def eventFilter(
         self, label: QtWidgets.QLabel, event: QtCore.QEvent.MouseMove
@@ -101,13 +94,12 @@ class PwdGenerator:
         """Construct the class."""
         self.options = options
         self.chars = printable_options(self.options)
-
-        self.div = int(1000 / self.options.length)
-        self.div_check = self.div_check()
-        # prepare generator for sending values
-        next(self.div_check)
-
         self.password = ""
+
+        self.div = int(1_000 // self.options.length)
+        self.div_check = self.div_check()
+        # prepare generator for receiving values
+        next(self.div_check)
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -120,7 +112,7 @@ class PwdGenerator:
 
         """
         # stops yielding if length has been reached
-        while self.options.length <= 1000:
+        while len(self.password) <= self.options.length:
             try:
                 # waits for sent value
                 yield True if (yield) % self.div == 0 else False
@@ -144,7 +136,7 @@ class PwdGenerator:
         flt = random.random()
         div = 1 / self.chars.length
 
-        index = flt // div
+        index = int(flt // div)
         char = self.chars.chars[index]
 
         with contextlib.suppress(ValueError):

@@ -46,6 +46,8 @@ def database_manager() -> Iterator[None]:
 class EnableDBSafeMode(contextlib.ContextDecorator):
     """Context manager and a decorator to temporarily enable database safe mode."""
 
+    __slots__ = ()
+
     def __enter__(self) -> None:
         """Disable database safe mode on enter."""
         with database_manager() as db:

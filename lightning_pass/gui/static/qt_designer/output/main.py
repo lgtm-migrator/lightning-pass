@@ -1146,6 +1146,7 @@ class Ui_lightning_pass(object):
         font.setFamily("Segoe UI Light")
         font.setPointSize(10)
         self.action_profile.setFont(font)
+        self.action_profile.setMenuRole(QtWidgets.QAction.AboutQtRole)
         self.action_profile.setObjectName("action_profile")
         self.action_vault = QtWidgets.QAction(lightning_pass)
         font = QtGui.QFont()
@@ -1160,6 +1161,15 @@ class Ui_lightning_pass(object):
         self.action_master_password.setFont(font)
         self.action_master_password.setShortcutContext(QtCore.Qt.WindowShortcut)
         self.action_master_password.setObjectName("action_master_password")
+        self.action_change_password = QtWidgets.QAction(lightning_pass)
+        self.action_change_password.setCheckable(False)
+        self.action_change_password.setChecked(False)
+        font = QtGui.QFont()
+        font.setFamily("Segoe UI Light")
+        font.setPointSize(10)
+        self.action_change_password.setFont(font)
+        self.action_change_password.setMenuRole(QtWidgets.QAction.TextHeuristicRole)
+        self.action_change_password.setObjectName("action_change_password")
         self.menu_users.addAction(self.action_login)
         self.menu_users.addAction(self.action_register)
         self.menu_users.addAction(self.action_forgot_password)
@@ -1170,6 +1180,7 @@ class Ui_lightning_pass(object):
         self.menu_general.addAction(self.action_main_menu)
         self.menu_general.addAction(self.menu_theme.menuAction())
         self.menu_account_2.addAction(self.action_profile)
+        self.menu_account_2.addAction(self.action_change_password)
         self.menu_account_2.addAction(self.action_master_password)
         self.menu_account_2.addAction(self.action_vault)
         self.menu_bar.addAction(self.menu_general.menuAction())
@@ -1178,7 +1189,7 @@ class Ui_lightning_pass(object):
         self.menu_bar.addAction(self.menu_account_2.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(12)
+        self.stacked_widget.setCurrentIndex(8)
         self.vault_stacked_widget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
@@ -1417,4 +1428,7 @@ class Ui_lightning_pass(object):
         self.action_vault.setText(_translate("lightning_pass", "vault"))
         self.action_master_password.setText(
             _translate("lightning_pass", "master_password")
+        )
+        self.action_change_password.setText(
+            _translate("lightning_pass", "change_password")
         )

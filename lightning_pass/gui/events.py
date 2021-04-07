@@ -163,7 +163,7 @@ class Events:
 
         """
         children_objects = (
-            self.parent.ui.vault_stacked_widget.currentWidget().children()
+            self.parent.ui.vault_stacked_widget.currentWidget().children(),
         )
         return vaults.Vault(
             self.current_user.user_id,
@@ -186,7 +186,7 @@ class Events:
         self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
 
     @property
-    def pwd_generator_values(self) -> PasswordOptions:
+    def password_options(self) -> PasswordOptions:
         """Return current password generation values in the ``PasswordOptions``."""
         return mouse_randomness.PasswordOptions(
             self.parent.ui.generate_pass_spin_box.value(),
@@ -280,7 +280,7 @@ class Events:
         self._set_current_widget("reset_password")
 
     def reset_password_submit_event(self) -> None:
-        """"""
+        """Change user's password."""
         try:
             credentials.reset_password(
                 self.parent.ui.reset_password_new_pass_line.text(),
@@ -296,7 +296,7 @@ class Events:
             del self.__current_token
 
     @decorators.login_required
-    def change_pass_event(self) -> None:
+    def change_password_event(self) -> None:
         """Change password for current user."""
         self._set_current_widget("change_password")
 
@@ -331,7 +331,7 @@ class Events:
                 "Change Password",
                 "password",
             )
-            self.change_pass_event()
+            self.change_password_event()
 
     def generate_pass_event(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
@@ -344,7 +344,7 @@ class Events:
         :returns: the ``PwdGenerator`` with current values
 
         """
-        return mouse_randomness.PwdGenerator(self.pwd_generator_values)
+        return mouse_randomness.PwdGenerator(self.password_options)
 
     def generate_pass_phase2_event(self) -> None:
         """Switch to the second password generation widget and reset previous values.
@@ -359,7 +359,7 @@ class Events:
             )
 
         # exclude length by the generator expression
-        if not any(val for val in self.pwd_generator_values if isinstance(val, bool)):
+        if not any(val for val in self.password_options if isinstance(val, bool)):
             self._message_box("no_options_generate_box", "Generator")
         else:
             self.parent.gen = self.get_generator()
@@ -369,6 +369,17 @@ class Events:
             )
 
             self._set_current_widget("generate_pass_phase2")
+
+    def generate_pass_again_event(self) -> None:
+        """Re-instantiate a new generator object with the same options.
+
+        Reset previous generation values.
+
+        """
+        self.parent.pass_progress = 0
+        self.parent.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
+        self.parent.ui.generate_pass_p2_final_pass_line.clear()
+        self.parent.gen = mouse_randomness.PwdGenerator(self.parent.gen.options)
 
     @decorators.login_required(page_to_access="account")
     def account_event(self) -> None:

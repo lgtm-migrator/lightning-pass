@@ -71,6 +71,8 @@ class MessageBoxOperation(NamedTuple):
 class MessageBoxes(QWidget):
     """This class holds the functionality to show various message boxes."""
 
+    __slots__ = ("main_win", "parent", "events", "title")
+
     def __init__(self, child: QMainWindow, parent: QMainWindow) -> None:
         """Class constructor."""
         super().__init__(parent)
@@ -546,6 +548,9 @@ contain at least one special character."""
 
 
 class InputDialogs(QWidget):
+
+    __slots__ = ("events", "main_win", "title")
+
     def __init__(self, child: QMainWindow, parent: QMainWindow) -> None:
         """Class constructor."""
         super().__init__(parent)

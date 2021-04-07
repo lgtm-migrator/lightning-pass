@@ -185,6 +185,11 @@ class Account:
 
     @password.setter
     def password(self, password_data: NewPassword) -> None:
+        """Password setter.
+
+        :param password_data: The ``NewPassword`` data storage with the new details.
+
+        """
         # Exceptions: AccountDoesNotExist, InvalidPassword, PasswordsDoNotMatch
         if credentials.Password.change_password_check(password_data):
             self.set_value(
