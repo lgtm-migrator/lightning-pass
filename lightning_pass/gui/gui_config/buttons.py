@@ -9,8 +9,6 @@ from typing import Any, NamedTuple
 import clipboard
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from lightning_pass.settings import DARK_STYLESHEET, LIGHT_STYLESHEET
-
 
 class Clickable(NamedTuple):
     widget: str
@@ -135,15 +133,20 @@ class Buttons:
 
         menu_theme_set = {
             # menu_general > themes
-            Clickable("action_light", LIGHT_STYLESHEET),
-            Clickable("action_dark", DARK_STYLESHEET),
+            Clickable(
+                "action_light",
+                getattr(self.parent.events, "toggle_stylesheet_light"),
+            ),
+            Clickable(
+                "action_dark",
+                getattr(self.parent.events, "toggle_stylesheet_dark"),
+            ),
         }
 
         for action in menu_theme_set:
             getattr(self.parent.ui, action.widget).triggered.connect(
-                lambda sheet=action.action: self.parent.events.toggle_stylesheet_light(
-                    sheet
-                ),
+                # since lambda has a default > dump the first bool passed in by the widget parent
+                lambda _, sheet=action.action: sheet()
             )
 
     def data_validation(self) -> None:

@@ -12,12 +12,12 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_lightning_pass:
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
-        lightning_pass.resize(661, 374)
+        lightning_pass.resize(705, 386)
         self.centralwidget = QtWidgets.QWidget(lightning_pass)
         self.centralwidget.setAutoFillBackground(True)
         self.centralwidget.setObjectName("centralwidget")
         self.stacked_widget = QtWidgets.QStackedWidget(self.centralwidget)
-        self.stacked_widget.setGeometry(QtCore.QRect(9, 9, 628, 305))
+        self.stacked_widget.setGeometry(QtCore.QRect(9, 9, 681, 301))
         sizePolicy = QtWidgets.QSizePolicy(
             QtWidgets.QSizePolicy.MinimumExpanding,
             QtWidgets.QSizePolicy.MinimumExpanding,
@@ -1051,7 +1051,7 @@ class Ui_lightning_pass:
         self.stacked_widget.addWidget(self.master_password)
         lightning_pass.setCentralWidget(self.centralwidget)
         self.menu_bar = QtWidgets.QMenuBar(lightning_pass)
-        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 661, 26))
+        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 705, 26))
         self.menu_bar.setObjectName("menu_bar")
         self.menu_users = QtWidgets.QMenu(self.menu_bar)
         font = QtGui.QFont()
@@ -1187,7 +1187,7 @@ class Ui_lightning_pass:
         self.menu_bar.addAction(self.menu_account_2.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(8)
+        self.stacked_widget.setCurrentIndex(10)
         self.vault_stacked_widget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 
@@ -1430,6 +1430,3 @@ class Ui_lightning_pass:
         self.action_change_password.setText(
             _translate("lightning_pass", "change_password")
         )
-
-
-__all__ = ["Ui_lightning_pass"]

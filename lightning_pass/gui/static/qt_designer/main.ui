@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>661</width>
-    <height>374</height>
+    <width>705</width>
+    <height>386</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,8 +22,8 @@
      <rect>
       <x>9</x>
       <y>9</y>
-      <width>628</width>
-      <height>305</height>
+      <width>681</width>
+      <height>301</height>
      </rect>
     </property>
     <property name="sizePolicy">
@@ -39,7 +39,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>9</number>
+     <number>10</number>
     </property>
     <widget class="QWidget" name="loading">
      <property name="cursor">
@@ -1778,7 +1778,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>661</width>
+     <width>705</width>
      <height>26</height>
     </rect>
    </property>

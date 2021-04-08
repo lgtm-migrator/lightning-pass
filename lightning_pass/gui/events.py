@@ -6,7 +6,7 @@ import pathlib
 from typing import TYPE_CHECKING, Any, Iterator, Sequence
 
 import qdarkstyle
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 import lightning_pass.gui.gui_config.event_decorators as decorators
 import lightning_pass.gui.mouse_randomness as mouse_randomness
@@ -30,6 +30,7 @@ from lightning_pass.util.exceptions import (
     UsernameAlreadyExists,
     VaultException,
 )
+from lightning_pass.util.validators import EmailValidator, PasswordValidator
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow, QWidget
@@ -88,7 +89,7 @@ class Events:
                 getattr(self.parent.ui, widget)
             )
 
-    def _message_box(self, message_box: str, *args: any, **kwargs: any) -> None:
+    def _message_box(self, message_box: str, *args: Any, **kwargs: Any) -> None:
         """Show a chosen message box with the given positional and keyword arguments.
 
         :param message_box: The message box type to show
@@ -253,12 +254,22 @@ class Events:
 
     def send_token_event(self) -> None:
         """Send token and switch to token page."""
-        if credentials.Email.check_email_pattern(
+        if EmailValidator.validate_pattern(
             email := self.parent.ui.forgot_pass_email_line.text(),
         ):
             # momentarily disable the button to avoid multiple send requests
             with _disable_widget(self.parent.ui.reset_token_submit_btn):
-                credentials.Email.send_reset_email(email)
+                if not credentials.check_item_existence(
+                    email,
+                    "email",
+                    should_exist=True,
+                ):
+                    # mimic waiting time
+                    loop = QtCore.QEventLoop()
+                    QtCore.QTimer.singleShot(2000, loop.quit)
+                    loop.exec()
+
+                credentials.send_reset_email(email)
 
             self._message_box("reset_email_sent_box", "Forgot Password")
         else:
@@ -306,7 +317,7 @@ class Events:
 
         """
         try:
-            self.current_user.password = credentials.NewPassword(
+            self.current_user.password = credentials.PasswordData(
                 self.current_user.password,
                 self.parent.ui.change_password_current_pass_line.text(),
                 self.parent.ui.change_password_new_pass_line.text(),
@@ -396,19 +407,20 @@ class Events:
 
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
+        # dump used file filter
         fname, _ = QtWidgets.QFileDialog.getOpenFileName(
             self.parent,
             "Lightning Pass - Choose your new profile picture",
             str(pathlib.Path.home()),
             "Image files (*.jpg *.png)",
         )
-
         if fname:
-            self.current_user.profile_picture = credentials.ProfilePicture.save_picture(
+            self.current_user.profile_picture = credentials.save_picture(
                 pathlib.Path(fname),
             )
-
-        self.account_event()
+            self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
+                QtGui.QPixmap(self.current_user.profile_picture_path),
+            )
 
     def logout_event(self) -> None:
         """Logout current user."""
@@ -419,8 +431,8 @@ class Events:
 
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
-        if self.current_user.username != (
-            name := self.parent.ui.account_username_line.text(),
+        if not self.current_user.username == (
+            name := self.parent.ui.account_username_line.text()
         ):
             try:
                 self.current_user.username = name
@@ -432,7 +444,7 @@ class Events:
                 self._message_box("detail_updated_box", "Account", detail="username")
 
         if self.current_user.email != (
-            email := self.parent.ui.account_email_line.text(),
+            email := self.parent.ui.account_email_line.text()
         ):
             try:
                 self.current_user.email = email
@@ -462,7 +474,7 @@ class Events:
 
         """
         try:
-            self.current_user.master_password = credentials.NewPassword(
+            self.current_user.master_password = credentials.PasswordData(
                 self.current_user.password,
                 self.parent.ui.master_pass_current_pass_line.text(),
                 self.parent.ui.master_pass_master_pass_line.text(),
@@ -488,6 +500,7 @@ class Events:
                 "Master Password",
                 detail="Master password",
             )
+            self.master_password_event()
 
     @decorators.login_required
     @decorators.master_password_required
@@ -502,8 +515,9 @@ class Events:
             self.current_user.username,
         )
 
-        if password and credentials.Password.authenticate_password(
-            password, self.current_user.master_password
+        if password and PasswordValidator.validate_authentication(
+            password,
+            self.current_user.master_password,
         ):
             self.current_user.vault_unlocked = True
             self._message_box("vault_unlocked_box")

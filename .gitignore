@@ -4,7 +4,6 @@
 # Useless profile pictures
 /lightning_pass/users/profile_pictures/
 
-# Created by .ignore support plugin (hsz.mobi)
 ### Python template
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -155,3 +154,9 @@ com_crashlytics_export_strings.xml
 crashlytics.properties
 crashlytics-build.properties
 fabric.properties
+
+# pytest stuff
+.pytest_cache/
+
+# mypy stuff
+.mypy_cache/

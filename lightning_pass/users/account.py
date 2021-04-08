@@ -8,10 +8,24 @@ from typing import TYPE_CHECKING, Generator
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
 from lightning_pass.users.vaults import Vault
-from lightning_pass.util.exceptions import AccountDoesNotExist
+from lightning_pass.util.exceptions import (
+    AccountDoesNotExist,
+    EmailAlreadyExists,
+    InvalidEmail,
+    InvalidPassword,
+    InvalidUsername,
+    PasswordsDoNotMatch,
+    UsernameAlreadyExists,
+    ValidationFailure,
+)
+from lightning_pass.util.validators import (
+    EmailValidator,
+    PasswordValidator,
+    UsernameValidator,
+)
 
 if TYPE_CHECKING:
-    from lightning_pass.util.credentials import NewPassword
+    from lightning_pass.util.credentials import PasswordData
 
 
 class Account:
@@ -58,21 +72,37 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        # Exceptions: UsernameAlreadyExists, InvalidUsername
-        credentials.Username(username)(should_exist=False)
-        # Exceptions: PasswordDoNotMatch, InvalidPassword
-        credentials.Password(
-            password,
-            confirm_password,
-        )()
-        # Exceptions: EmailAlreadyExists, Invalid email
-        credentials.Email(email)()
+        try:
+            UsernameValidator.validate_unique(username)
+        except ValidationFailure:
+            raise UsernameAlreadyExists
+        try:
+            UsernameValidator.validate_pattern(username)
+        except ValidationFailure:
+            raise InvalidUsername
 
-        # no exceptions raised -> insert into db
+        try:
+            PasswordValidator.validate_pattern(password)
+        except ValidationFailure:
+            raise InvalidPassword
+        try:
+            PasswordValidator.validate_match(password, confirm_password)
+        except ValidationFailure:
+            raise PasswordsDoNotMatch
+
+        try:
+            EmailValidator.validate_unique(email)
+        except ValidationFailure:
+            raise EmailAlreadyExists
+        try:
+            EmailValidator.validate_pattern(email)
+        except ValidationFailure:
+            raise InvalidEmail
+
         with database.database_manager() as db:
             sql = """INSERT INTO lightning_pass.credentials (username, password, email)
                           VALUES (%s, %s, %s)"""
-            val = (username, credentials.Password.hash_password(password), email)
+            val = (username, credentials.hash_password(password), email)
             db.execute(sql, val)
 
         return cls(credentials.get_user_item(username, "username", "id"))
@@ -92,23 +122,22 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        if not credentials.Username.check_username_existence(
-            username,
-            should_exist=True,
-        ) or not credentials.Password.authenticate_password(
-            password,
-            credentials.get_user_item(
-                username,
-                "username",
-                "password",
-            ),
-        ):
+        try:
+            UsernameValidator.validate_unique(username, should_exist=True)
+            PasswordValidator.validate_authentication(
+                password,
+                credentials.get_user_item(
+                    username,
+                    "username",
+                    "password",
+                ),
+            )
+        except ValidationFailure:
             raise AccountDoesNotExist
 
         account = cls(credentials.get_user_item(username, "username", "id"))
         account.last_login_date = account._last_login_date
         account.update_last_login_date()
-
         return account
 
     def get_value(self, result_column: str) -> str | bytes | datetime:
@@ -170,8 +199,15 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        # Exceptions: UsernameAlreadyExists, InvalidUsername
-        credentials.Username(value)(should_exist=False)
+        try:
+            UsernameValidator.validate_pattern(value)
+        except ValidationFailure:
+            raise InvalidUsername
+        try:
+            UsernameValidator.validate_unique(value)
+        except ValidationFailure:
+            raise UsernameAlreadyExists
+
         self.set_value(value, "username")
 
     @property
@@ -184,18 +220,37 @@ class Account:
         return self.get_value("password")
 
     @password.setter
-    def password(self, password_data: NewPassword) -> None:
+    def password(self, password_data: PasswordData) -> None:
         """Password setter.
 
         :param password_data: The ``NewPassword`` data storage with the new details.
 
         """
-        # Exceptions: AccountDoesNotExist, InvalidPassword, PasswordsDoNotMatch
-        if credentials.Password.change_password_check(password_data):
-            self.set_value(
-                credentials.Password.hash_password(password_data.new_password),
-                "password",
+        try:
+            PasswordValidator.validate_authentication(
+                password_data.confirm_previous,
+                self.password,
             )
+        except ValidationFailure:
+            raise AccountDoesNotExist
+
+        try:
+            PasswordValidator.validate_pattern(password_data.new_password)
+        except ValidationFailure:
+            raise InvalidPassword
+
+        try:
+            PasswordValidator.validate_match(
+                password_data.new_password,
+                password_data.confirm_new,
+            )
+        except ValidationFailure:
+            raise PasswordsDoNotMatch
+
+        self.set_value(
+            credentials.hash_password(str(password_data.new_password)),
+            "password",
+        )
 
     @property
     def email(self) -> str:
@@ -216,8 +271,15 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        # Exceptions: EmailAlreadyExists, InvalidEmail
-        credentials.Email(value)()
+        try:
+            EmailValidator.validate_pattern(value)
+        except ValidationFailure:
+            raise InvalidEmail
+        try:
+            EmailValidator.validate_unique(value)
+        except ValidationFailure:
+            raise EmailAlreadyExists
+
         self.set_value(value, "email")
 
     @property
@@ -245,9 +307,7 @@ class Account:
         :returns: path to user's profile picture
 
         """
-        return str(
-            credentials.ProfilePicture.get_profile_picture_path(self.profile_picture)
-        )
+        return str(credentials.get_profile_picture_path(self.profile_picture))
 
     @property
     def _last_login_date(self) -> datetime:
@@ -280,7 +340,7 @@ class Account:
         return self.get_value("master_password")
 
     @master_password.setter
-    def master_password(self, password_data: NewPassword) -> None:
+    def master_password(self, password_data: PasswordData) -> None:
         """Set a new master password.
 
         :param password_data: The data container will all the neede information
@@ -290,12 +350,29 @@ class Account:
         :raises InvalidPassword: if the master password doesn't meet the required pattern
 
         """
-        # Exceptions: AccountDoesNotExist, InvalidPassword, PasswordsDoNotMatch
-        if credentials.Password.change_password_check(password_data):
-            self.set_value(
-                credentials.Password.hash_password(password_data.new_password),
-                "master_password",
+        try:
+            PasswordValidator.validate_authentication(
+                password_data.confirm_previous,
+                self.password,
             )
+        except ValidationFailure:
+            raise AccountDoesNotExist
+        try:
+            PasswordValidator.validate_pattern(password_data.new_password)
+        except ValidationFailure:
+            raise InvalidPassword
+        try:
+            PasswordValidator.validate_match(
+                password_data.new_password,
+                password_data.confirm_new,
+            )
+        except ValidationFailure:
+            raise PasswordsDoNotMatch
+
+        self.set_value(
+            credentials.hash_password(password_data.new_password),
+            "master_password",
+        )
 
     @property
     def _last_vault_unlock_date(self) -> datetime:
@@ -307,7 +384,7 @@ class Account:
         self.update_date("last_vault_unlock_date")
 
     @property
-    def vault_pages(self) -> Generator:
+    def vault_pages(self) -> Generator[Vault, None, None]:
         """Yield registered vault pages tied to the current account."""
         with database.database_manager() as db:
             # not using f-string due to SQL injection

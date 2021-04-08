@@ -186,7 +186,9 @@ class MessageBoxes(QWidget):
 
         """
         box = self._invalid_item_box("username", parent_lbl)
-        box(informative_text="Username be at least 5 characters long.").exec()
+        box(
+            informative_text="Username be at least 5 characters long and mustn't contain any special characters.",
+        ).exec()
 
     def invalid_password_box(self, parent_lbl: str, item: str = "password") -> None:
         """Show invalid password message box.
@@ -305,7 +307,7 @@ contain at least one special character."""
             {"&Yes": self.events.forgot_password_event}
         )
 
-        box = self._yes_no_box(event_handler, "Yes")
+        box = self._yes_no_box(event_handler, "No")
         box(
             parent_lbl,
             "Could not authenticate an account with the given credentials.",
@@ -594,5 +596,9 @@ class InputDialogs(QWidget):
 
 
 __all__ = [
+    "InputDialogs",
+    "MessageBoxOperation",
     "MessageBoxes",
+    "event_handler_factory",
+    "partial_factory",
 ]
