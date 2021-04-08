@@ -30,7 +30,6 @@ from lightning_pass.util.exceptions import (
     UsernameAlreadyExists,
     VaultException,
 )
-from lightning_pass.util.validators import EmailValidator, PasswordValidator
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow, QWidget
@@ -61,14 +60,9 @@ class Events:
     current_user: Account | bool
     __current_token: str
 
-    def __init__(
-        self,
-        parent: QMainWindow,
-        *args: Any,
-        **kwargs: Any,
-    ) -> None:
+    def __init__(self, parent: QMainWindow) -> None:
         """Construct the class."""
-        super().__init__(*args, **kwargs)
+        super().__init__()
         self.parent = parent
         self.current_user = False
 
@@ -254,7 +248,7 @@ class Events:
 
     def send_token_event(self) -> None:
         """Send token and switch to token page."""
-        if EmailValidator.validate_pattern(
+        if self.current_user.email_validator.validate_pattern(
             email := self.parent.ui.forgot_pass_email_line.text(),
         ):
             # momentarily disable the button to avoid multiple send requests
@@ -515,7 +509,7 @@ class Events:
             self.current_user.username,
         )
 
-        if password and PasswordValidator.validate_authentication(
+        if password and self.current_user.password_validator.validate_authentication(
             password,
             self.current_user.master_password,
         ):

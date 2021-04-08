@@ -1,6 +1,4 @@
 """Module containing classes used for operations with mouse randomness generation."""
-import contextlib
-import functools
 import random
 import string
 from typing import Generator, NamedTuple, Optional, Union
@@ -142,12 +140,8 @@ class PwdGenerator:
         index = int(flt // div)
         char = self.chars.chars[index]
 
-        with contextlib.suppress(ValueError):
-            char = int(char)
-
         self.collect_char(char)
 
-    @functools.singledispatchmethod
     def collect_char(self, char: Union[int, str]) -> None:
         """Collect a password character.
 
@@ -155,34 +149,14 @@ class PwdGenerator:
 
         :param char: character to evaluate and potentially add to the current password.
 
-        :raises NotImplementedError: if char type is not registered
-
-        """
-        raise NotImplementedError("This character type is not supported.")
-
-    @collect_char.register(str)
-    def _(self, char: str) -> None:
-        """Evaluate string type.
-
-        :param char: Character
-
         """
         if (
             (char.islower() and self.options.lowercase)
             or (char.isupper() and self.options.uppercase)
-            or (self.options.symbols and not char.islower() and not char.isupper())
+            or (char.isdecimal() and self.options.numbers)
+            or (not char.isalnum() and self.options.symbols)
         ):
             self.password += char
-
-    @collect_char.register(int)
-    def _(self, char: int) -> None:
-        """Evaluate int type.
-
-        :param char: Character
-
-        """
-        if self.options.numbers:
-            self.password += str(char)
 
 
 __all__ = [

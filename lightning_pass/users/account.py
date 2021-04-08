@@ -5,6 +5,8 @@ import functools
 from datetime import datetime
 from typing import TYPE_CHECKING, Generator
 
+import pyfields
+
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
 from lightning_pass.users.vaults import Vault
@@ -31,17 +33,40 @@ if TYPE_CHECKING:
 class Account:
     """This class holds information about the currently logged in user."""
 
-    last_login_date: datetime
-    last_vault_unlock_date: datetime
+    user_id: int = pyfields.field(
+        check_type=True,
+        read_only=True,
+        doc="Database ID of the current account",
+    )
 
-    def __init__(self, user_id: int | None = None) -> None:
+    vault_unlocked: bool = pyfields.field(
+        check_type=True,
+        default=False,
+    )
+
+    username_validator: UsernameValidator = pyfields.field(
+        check_type=True,
+        default=UsernameValidator(),
+        doc="Username validation is done via this validator.",
+    )
+    password_validator: PasswordValidator = pyfields.field(
+        check_type=True,
+        default=PasswordValidator(),
+        doc="Password validation is done via this validator.",
+    )
+    email_validator: EmailValidator = pyfields.field(
+        check_type=True,
+        default=EmailValidator(),
+        doc="Email validation is done via this validator.",
+    )
+
+    def __init__(self, user_id: int) -> None:
         """Construct the class.
 
-        :param int user_id: User's id, defaults to None
+        :param int user_id: Database primary key ``id`` of the account
 
         """
-        self.user_id = int(user_id)
-        self.vault_unlocked = False
+        self.user_id = user_id
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -73,29 +98,29 @@ class Account:
 
         """
         try:
-            UsernameValidator.validate_unique(username)
+            cls.username_validator.validate_unique(username)
         except ValidationFailure:
             raise UsernameAlreadyExists
         try:
-            UsernameValidator.validate_pattern(username)
+            cls.username_validator.validate_pattern(username)
         except ValidationFailure:
             raise InvalidUsername
 
         try:
-            PasswordValidator.validate_pattern(password)
+            cls.password_validator.validate_pattern(password)
         except ValidationFailure:
             raise InvalidPassword
         try:
-            PasswordValidator.validate_match(password, confirm_password)
+            cls.password_validator.validate_match(password, confirm_password)
         except ValidationFailure:
             raise PasswordsDoNotMatch
 
         try:
-            EmailValidator.validate_unique(email)
+            cls.email_validator.validate_unique(email)
         except ValidationFailure:
             raise EmailAlreadyExists
         try:
-            EmailValidator.validate_pattern(email)
+            cls.email_validator.validate_pattern(email)
         except ValidationFailure:
             raise InvalidEmail
 
@@ -123,8 +148,8 @@ class Account:
 
         """
         try:
-            UsernameValidator.validate_unique(username, should_exist=True)
-            PasswordValidator.validate_authentication(
+            cls.username_validator.validate_unique(username, should_exist=True)
+            cls.password_validator.validate_authentication(
                 password,
                 credentials.get_user_item(
                     username,
@@ -200,11 +225,11 @@ class Account:
 
         """
         try:
-            UsernameValidator.validate_pattern(value)
+            self.username_validator.validate_pattern(value)
         except ValidationFailure:
             raise InvalidUsername
         try:
-            UsernameValidator.validate_unique(value)
+            self.username_validator.validate_unique(value)
         except ValidationFailure:
             raise UsernameAlreadyExists
 
@@ -227,7 +252,7 @@ class Account:
 
         """
         try:
-            PasswordValidator.validate_authentication(
+            self.password_validator.validate_authentication(
                 password_data.confirm_previous,
                 self.password,
             )
@@ -235,12 +260,12 @@ class Account:
             raise AccountDoesNotExist
 
         try:
-            PasswordValidator.validate_pattern(password_data.new_password)
+            self.password_validator.validate_pattern(password_data.new_password)
         except ValidationFailure:
             raise InvalidPassword
 
         try:
-            PasswordValidator.validate_match(
+            self.password_validator.validate_match(
                 password_data.new_password,
                 password_data.confirm_new,
             )
@@ -251,6 +276,15 @@ class Account:
             credentials.hash_password(str(password_data.new_password)),
             "password",
         )
+
+    def reset_password(self, password: str, confirm_password: str) -> None:
+        """"""
+        if not self.password_validator.validate_pattern(password):
+            raise InvalidPassword
+        if not self.password_validator.validate_match(password, confirm_password):
+            raise PasswordsDoNotMatch
+
+        self.set_value(credentials.hash_password(password), "password")
 
     @property
     def email(self) -> str:
@@ -272,11 +306,11 @@ class Account:
 
         """
         try:
-            EmailValidator.validate_pattern(value)
+            self.email_validator.validate_pattern(value)
         except ValidationFailure:
             raise InvalidEmail
         try:
-            EmailValidator.validate_unique(value)
+            self.email_validator.validate_unique(value)
         except ValidationFailure:
             raise EmailAlreadyExists
 
@@ -351,18 +385,18 @@ class Account:
 
         """
         try:
-            PasswordValidator.validate_authentication(
+            self.password_validator.validate_authentication(
                 password_data.confirm_previous,
                 self.password,
             )
         except ValidationFailure:
             raise AccountDoesNotExist
         try:
-            PasswordValidator.validate_pattern(password_data.new_password)
+            self.password_validator.validate_pattern(password_data.new_password)
         except ValidationFailure:
             raise InvalidPassword
         try:
-            PasswordValidator.validate_match(
+            self.password_validator.validate_match(
                 password_data.new_password,
                 password_data.confirm_new,
             )
@@ -407,3 +441,6 @@ class Account:
 
 
 __all__ = ["Account"]
+
+acc = Account(54)
+print(acc)

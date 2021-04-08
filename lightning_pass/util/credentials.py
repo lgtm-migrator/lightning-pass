@@ -11,8 +11,6 @@ import yagmail
 
 import lightning_pass.util.database as database
 from lightning_pass.settings import PFP_FOLDER, Credentials
-from lightning_pass.util.exceptions import InvalidPassword, PasswordsDoNotMatch
-from lightning_pass.util.validators import PasswordValidator
 
 
 def _get_user_id(column: str, value: str) -> Union[int, bool]:
@@ -175,15 +173,6 @@ class PasswordData(NamedTuple):
     confirm_previous: str
     new_password: Optional[str] = None
     confirm_new: Optional[str] = None
-
-
-def reset_password(password: str, confirm_password: str, user_id: int) -> None:
-    """"""
-    if not PasswordValidator.validate_pattern(password):
-        raise InvalidPassword
-    if not PasswordValidator.validate_match(password, confirm_password):
-        raise PasswordsDoNotMatch
-    set_user_item(user_id, "user_id", hash_password(password), "password")
 
 
 def hash_password(password: str) -> bytes:
