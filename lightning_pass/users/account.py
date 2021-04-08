@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import TYPE_CHECKING, Generator, Optional, Union
+from typing import TYPE_CHECKING, Generator
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
@@ -20,7 +20,7 @@ class Account:
     last_login_date: datetime
     last_vault_unlock_date: datetime
 
-    def __init__(self, user_id: Optional[int] = None) -> None:
+    def __init__(self, user_id: int | None = None) -> None:
         """Construct the class.
 
         :param int user_id: User's id, defaults to None
@@ -111,7 +111,7 @@ class Account:
 
         return account
 
-    def get_value(self, result_column: str) -> Union[str, bytes, datetime]:
+    def get_value(self, result_column: str) -> str | bytes | datetime:
         """Simplify getting user values.
 
         :param str result_column: Column from which we're collecting the value
@@ -122,7 +122,7 @@ class Account:
         return credentials.get_user_item(self.user_id, "id", result_column)
 
     def set_value(
-        self, result: Union[int, str, bytes, datetime], result_column: str
+        self, result: int | str | bytes | datetime, result_column: str
     ) -> None:
         """Simplify setting user values.
 

@@ -1,9 +1,9 @@
 """Module containing classes used for operations with mouse randomness generation."""
 import contextlib
 import functools
-import string
 import random
-from typing import Generator, Optional, Union, NamedTuple
+import string
+from typing import Generator, NamedTuple, Optional, Union
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -124,6 +124,9 @@ class PwdGenerator:
         """Get a eligible password character by generating a random seed from the mouse position tuple.
 
         Chooses an item from the string.printable property based on the calculated index.
+
+        :param x: The x axis mouse position
+        :param y: The y axis mouse position
 
         :returns: Generated password if it reached the wanted length
 

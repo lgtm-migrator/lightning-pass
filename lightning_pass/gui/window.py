@@ -1,15 +1,15 @@
 """Module containing the main GUI classes."""
 from __future__ import annotations
 
-import logging
 import functools
+import logging
 import sys
 from typing import TYPE_CHECKING, Callable
 
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-from lightning_pass.gui import boxes, events, mouse_randomness
+from lightning_pass.gui import boxes, events
 from lightning_pass.gui.gui_config import buttons
 from lightning_pass.gui.static.qt_designer.output import (
     main,

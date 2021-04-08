@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Optional, Sequence, Iterator, Union, Any
+from typing import TYPE_CHECKING, Any, Iterator, Sequence
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -13,11 +13,11 @@ import lightning_pass.gui.mouse_randomness as mouse_randomness
 import lightning_pass.gui.window as window
 import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
-from lightning_pass.users.account import Account
 from lightning_pass.gui.gui_config.widget_data import (
     VAULT_WIDGET_DATA,
     ClearPreviousWidget,
 )
+from lightning_pass.users.account import Account
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
     AccountException,
@@ -32,11 +32,10 @@ from lightning_pass.util.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QWidget, QMainWindow
+    from PyQt5.QtWidgets import QMainWindow, QWidget
 
+    from lightning_pass.gui.mouse_randomness import PasswordOptions, PwdGenerator
     from lightning_pass.users.vaults import Vault
-    from lightning_pass.gui.mouse_randomness import PasswordOptions
-    from lightning_pass.gui.mouse_randomness import PwdGenerator
 
 
 @contextlib.contextmanager
@@ -58,7 +57,7 @@ def _disable_widget(*widgets: Sequence[QWidget]) -> Iterator[None]:
 class Events:
     """Used to provide utilities to connections to the events funcs."""
 
-    current_user: Union[Account, bool]
+    current_user: Account | bool
     __current_token: str
 
     def __init__(
@@ -109,7 +108,7 @@ class Events:
         """
         getattr(self.parent.ui.input_dialogs, input_dialog)(*args, **kwargs)
 
-    def _setup_vault_page(self, page: Optional[Vault] = None):
+    def _setup_vault_page(self, page: Vault | None = None):
         """Set up and connect a new vault page
 
         :param page: Vault object containing the data which should be shown on the current page, defaults to None
@@ -515,7 +514,7 @@ class Events:
     @decorators.login_required(page_to_access="vault")
     @decorators.master_password_required(page_to_access="vault")
     @decorators.vault_unlock_required(page_to_access="vault")
-    def vault_event(self, previous_index: Optional[int] = None) -> None:
+    def vault_event(self, previous_index: int | None = None) -> None:
         """Switch to vault window.
 
         :param previous_index: The index of the window before rebuilding
@@ -648,13 +647,13 @@ class Events:
 
             self.vault_event(previous_index=self.vault_stacked_widget_index)
 
-    def toggle_stylesheet_light(self, *args: any) -> None:
+    def toggle_stylesheet_light(self, *args: Any) -> None:
         """Change stylesheet to light mode."""
         if args:
             ...
         self.parent.main_win.setStyleSheet("")
 
-    def toggle_stylesheet_dark(self, *args: any) -> None:
+    def toggle_stylesheet_dark(self, *args: Any) -> None:
         """Change stylesheet to dark mode."""
         if args:
             ...

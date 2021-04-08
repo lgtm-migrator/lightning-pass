@@ -2,18 +2,32 @@
 from __future__ import annotations
 
 import functools
-from typing import Callable, Optional
+from typing import Any, Callable, TypeVar, overload
+
+F = TypeVar("F", bound=Callable[..., Any])
+
+
+@overload
+def _base_decorator(__func: F) -> F:
+    """Bare decorator usage."""
+    ...
+
+
+@overload
+def _base_decorator(*, page_to_access: str | None = None) -> Callable[[F], F]:
+    """Decorator with arguments."""
+    ...
 
 
 def _base_decorator(
-    __function: Optional[Callable] = None,
+    __func: Callable | None = None,
     /,
     *,
-    __base_obj: Optional[str] = None,
-    __condition_object: Optional[Callable] = None,
-    __message_box: Optional[str] = None,
-    __box_parent_lbl: Optional[str] = None,
-    page_to_access: Optional[str] = None,
+    _base_obj: str | None = None,
+    _condition_object: Callable | None = None,
+    _message_box: str | None = None,
+    _box_parent_lbl: str | None = None,
+    page_to_access: str | None = None,
 ) -> Callable:
     """Create a custom decorator which can be altered at runtime.
 
@@ -21,13 +35,13 @@ def _base_decorator(
     All additional params passed into the deco factory must be used as keyword arguments.
         If they were passed in as positional, they would override the _function param.
 
-    :param __function: Will become the actual function if decorator is used without parenthesis
-        Not supposed to be used manually, defaults to Non
-    :param __base_obj: The parent object of the item to check
-    :param __condition_object: The object to be called to check whether decorator should advance
+    :param __func: Will become the actual function if decorator is used without parenthesis
+        Not supposed to be used manually, defaults to None
+    :param _base_obj: The parent object of the item to check
+    :param _condition_object: The object to be called to check whether decorator should advance
         or show the previously defined message box
-    :param __message_box: The message box to be shown if the condition check fails
-    :param __box_parent_lbl: The label to be shown on the message box
+    :param _message_box: The message box to be shown if the condition check fails
+    :param _box_parent_lbl: The label to be shown on the message box
     :param page_to_access: The page user tried to access, used to modify the message box.
         As of right now, the only kwarg to be used with the actual decorator, defaults to None
 
@@ -56,21 +70,19 @@ def _base_decorator(
 
             """
             self = args[0]
-            if __condition_object(
-                obj=getattr(self, __base_obj) if __base_obj else self
-            ):
+            if _condition_object(obj=getattr(self, _base_obj) if _base_obj else self):
                 return _func_executor(func, *args, **kwargs)
             else:
-                getattr(self.parent.ui.message_boxes, __message_box)(
-                    __box_parent_lbl,
+                getattr(self.parent.ui.message_boxes, _message_box)(
+                    _box_parent_lbl,
                     page=page_to_access,
                 )
 
         return wrapper
 
-    if __function:
+    if __func:
         # decorator was used without parenthesis
-        return decorator(__function)
+        return decorator(__func)
     return decorator
 
 
@@ -107,21 +119,21 @@ def _func_executor(func: Callable, *args, **kwargs) -> None:
 
 login_required = functools.partial(
     _base_decorator,
-    __condition_object=functools.partial(_attr_checker, attr="current_user"),
-    __message_box="login_required_box",
-    __box_parent_lbl="Account",
+    _condition_object=functools.partial(_attr_checker, attr="current_user"),
+    _message_box="login_required_box",
+    _box_parent_lbl="Account",
 )
 master_password_required = functools.partial(
     _base_decorator,
-    __base_obj="current_user",
-    __condition_object=functools.partial(_attr_checker, attr="master_password"),
-    __message_box="master_password_required_box",
+    _base_obj="current_user",
+    _condition_object=functools.partial(_attr_checker, attr="master_password"),
+    _message_box="master_password_required_box",
 )
 vault_unlock_required = functools.partial(
     _base_decorator,
-    __base_obj="current_user",
-    __condition_object=functools.partial(_attr_checker, attr="vault_unlocked"),
-    __message_box="vault_unlock_required_box",
+    _base_obj="current_user",
+    _condition_object=functools.partial(_attr_checker, attr="vault_unlocked"),
+    _message_box="vault_unlock_required_box",
 )
 
 

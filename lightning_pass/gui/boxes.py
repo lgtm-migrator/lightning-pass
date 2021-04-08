@@ -5,7 +5,7 @@ Used for showing information to the user.
 """
 import contextlib
 import functools
-from typing import Callable, Optional, Union, NamedTuple
+from typing import Callable, NamedTuple, Optional, Union
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (

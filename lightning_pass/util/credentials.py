@@ -4,7 +4,7 @@ import secrets
 import urllib.parse as urlparse
 from datetime import datetime
 from pathlib import Path
-from typing import Optional, Union, NamedTuple
+from typing import NamedTuple, Optional, Union
 
 import bcrypt
 import validator_collection
@@ -14,13 +14,13 @@ from PyQt5 import QtCore
 import lightning_pass.util.database as database
 from lightning_pass.settings import PFP_FOLDER, Credentials
 from lightning_pass.util.exceptions import (
+    AccountDoesNotExist,
     EmailAlreadyExists,
     InvalidEmail,
     InvalidPassword,
     InvalidUsername,
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
-    AccountDoesNotExist,
 )
 
 

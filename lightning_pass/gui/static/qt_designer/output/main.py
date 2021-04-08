@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 # Form implementation generated from reading ui file 'main.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.3
@@ -11,7 +9,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_lightning_pass(object):
+class Ui_lightning_pass:
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
         lightning_pass.resize(661, 374)
@@ -1432,3 +1430,6 @@ class Ui_lightning_pass(object):
         self.action_change_password.setText(
             _translate("lightning_pass", "change_password")
         )
+
+
+__all__ = ["Ui_lightning_pass"]
