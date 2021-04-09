@@ -155,6 +155,8 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.ui = main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
+        self.ui.vault_widget_obj = VaultWidget
+
         self.events = events.Events(self)
         self.buttons = buttons.Buttons(self)
         self.buttons.setup_all()

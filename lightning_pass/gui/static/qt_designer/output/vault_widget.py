@@ -14,7 +14,8 @@ class Ui_vault_widget:
         vault_widget.setObjectName("vault_widget")
         vault_widget.resize(416, 353)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+            QtWidgets.QSizePolicy.Preferred,
+            QtWidgets.QSizePolicy.Preferred,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -71,14 +72,14 @@ class Ui_vault_widget:
         self.gridLayout.addWidget(self.vault_username_line, 2, 3, 1, 1)
         self.vault_copy_username_tool_btn = QtWidgets.QToolButton(vault_widget)
         self.vault_copy_username_tool_btn.setCursor(
-            QtGui.QCursor(QtCore.Qt.ArrowCursor)
+            QtGui.QCursor(QtCore.Qt.ArrowCursor),
         )
         self.vault_copy_username_tool_btn.setToolTipDuration(5)
         self.vault_copy_username_tool_btn.setAccessibleName("")
         self.vault_copy_username_tool_btn.setAccessibleDescription("")
         self.vault_copy_username_tool_btn.setCheckable(False)
         self.vault_copy_username_tool_btn.setToolButtonStyle(
-            QtCore.Qt.ToolButtonIconOnly
+            QtCore.Qt.ToolButtonIconOnly,
         )
         self.vault_copy_username_tool_btn.setAutoRaise(True)
         self.vault_copy_username_tool_btn.setArrowType(QtCore.Qt.DownArrow)
@@ -164,56 +165,56 @@ class Ui_vault_widget:
         _translate = QtCore.QCoreApplication.translate
         vault_widget.setWindowTitle(_translate("vault_widget", "Form"))
         self.vault_platform_line.setPlaceholderText(
-            _translate("vault_widget", "Platform name")
+            _translate("vault_widget", "Platform name"),
         )
         self.vault_website_lbl.setText(_translate("vault_widget", "Website:"))
         self.vault_web_line.setPlaceholderText(
-            _translate("vault_widget", "Enter URL for your platform.")
+            _translate("vault_widget", "Enter URL for your platform."),
         )
         self.vault_open_web_tool_btn.setStatusTip(
-            _translate("vault_widget", "Launch website")
+            _translate("vault_widget", "Launch website"),
         )
         self.vault_open_web_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_username_lbl.setText(_translate("vault_widget", "Username:"))
         self.vault_username_line.setPlaceholderText(
-            _translate("vault_widget", "Enter account username.")
+            _translate("vault_widget", "Enter account username."),
         )
         self.vault_copy_username_tool_btn.setToolTip(
-            _translate("vault_widget", "Copy username")
+            _translate("vault_widget", "Copy username"),
         )
         self.vault_copy_username_tool_btn.setStatusTip(
-            _translate("vault_widget", "Copy username")
+            _translate("vault_widget", "Copy username"),
         )
         self.vault_copy_username_tool_btn.setWhatsThis(
-            _translate("vault_widget", "Copy username")
+            _translate("vault_widget", "Copy username"),
         )
         self.vault_copy_username_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_email_lbl.setText(_translate("vault_widget", "Email:"))
         self.vault_email_line.setPlaceholderText(
-            _translate("vault_widget", "Enter account email.")
+            _translate("vault_widget", "Enter account email."),
         )
         self.vault_copy_email_tool_btn.setToolTip(
-            _translate("vault_widget", "Copy email")
+            _translate("vault_widget", "Copy email"),
         )
         self.vault_copy_email_tool_btn.setStatusTip(
-            _translate("vault_widget", "Copy email")
+            _translate("vault_widget", "Copy email"),
         )
         self.vault_copy_email_tool_btn.setWhatsThis(
-            _translate("vault_widget", "Copy email")
+            _translate("vault_widget", "Copy email"),
         )
         self.vault_copy_email_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_password_lbl.setText(_translate("vault_widget", "Password:"))
         self.vault_password_line.setPlaceholderText(
-            _translate("vault_widget", "Enter account password.")
+            _translate("vault_widget", "Enter account password."),
         )
         self.vault_copy_password_tool_btn.setToolTip(
-            _translate("vault_widget", "Copy password")
+            _translate("vault_widget", "Copy password"),
         )
         self.vault_copy_password_tool_btn.setStatusTip(
-            _translate("vault_widget", "Copy password")
+            _translate("vault_widget", "Copy password"),
         )
         self.vault_copy_password_tool_btn.setWhatsThis(
-            _translate("vault_widget", "Copy password")
+            _translate("vault_widget", "Copy password"),
         )
         self.vault_copy_password_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_backward_tool_btn.setText(_translate("vault_widget", "..."))

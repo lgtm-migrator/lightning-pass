@@ -151,7 +151,9 @@ class MessageBoxes(QWidget):
         )
 
     def _item_already_exists_box(
-        self, item: str, parent_lbl: str
+        self,
+        item: str,
+        parent_lbl: str,
     ) -> message_box_factory:
         """Handle message boxes with information about existence of entered values.
 
@@ -206,7 +208,7 @@ class MessageBoxes(QWidget):
 contain at least 1 capital letter,
 contain at least 1 number and
 contain at least one special character."""
-            )
+            ),
         ).exec()
 
     def invalid_email_box(self, parent_lbl: str) -> None:
@@ -224,7 +226,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.forgot_password_event}
+            {"&Yes": self.events.forgot_password_event},
         )
 
         box = self._yes_no_box(event_handler, "Yes")
@@ -289,7 +291,8 @@ contain at least one special character."""
         )
 
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.login_event}), "No"
+            event_handler_factory({"&Yes": self.events.login_event}),
+            "No",
         )
         box(
             parent_lbl,
@@ -304,7 +307,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.forgot_password_event}
+            {"&Yes": self.events.forgot_password_event},
         )
 
         box = self._yes_no_box(event_handler, "No")
@@ -367,7 +370,8 @@ contain at least one special character."""
 
         """
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.reset_token_event}), "Yes"
+            event_handler_factory({"&Yes": self.events.reset_token_event}),
+            "Yes",
         )
         box(
             parent_lbl,
@@ -383,7 +387,8 @@ contain at least one special character."""
 
         """
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.generate_pass_event}), "No"
+            event_handler_factory({"&Yes": self.events.generate_pass_event}),
+            "No",
         )
         box(
             parent_lbl,
@@ -393,7 +398,9 @@ contain at least one special character."""
         ).exec()
 
     def master_password_required_box(
-        self, parent_lbl: Optional[str] = "Master Password", page: Optional[str] = None
+        self,
+        parent_lbl: Optional[str] = "Master Password",
+        page: Optional[str] = None,
     ) -> None:
         """Show message box indicating that the current user needs to setup master password to proceed.
 
@@ -453,7 +460,8 @@ contain at least one special character."""
 
         """
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.vault_event}), "Yes"
+            event_handler_factory({"&Yes": self.events.vault_event}),
+            "Yes",
         )
         box(
             parent_lbl,
@@ -542,7 +550,7 @@ contain at least one special character."""
             event_handler=event_handler_factory(
                 {
                     "Cancel": self.events.vault_event(
-                        previous_index=self.events.vault_stacked_widget_index
+                        previous_index=self.events.vault_stacked_widget_index,
                     ),
                 },
             ),

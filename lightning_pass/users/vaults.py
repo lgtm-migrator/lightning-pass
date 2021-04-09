@@ -161,7 +161,7 @@ def _new_vault(vault: Vault) -> None:
     with database.database_manager() as db:
         # not using f-string due to SQL injection
         sql = """
-        INSERT INTO lightning_pass.vaults (        
+        INSERT INTO lightning_pass.vaults (
         user_id,
         platform_name,
         website,

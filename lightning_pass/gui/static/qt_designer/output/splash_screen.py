@@ -39,7 +39,7 @@ class Ui_loading_widget:
         _translate = QtCore.QCoreApplication.translate
         loading_widget.setWindowTitle(_translate("loading_widget", "Form"))
         self.loading_label.setText(
-            _translate("loading_widget", "Loading Lightning Pass...")
+            _translate("loading_widget", "Loading Lightning Pass..."),
         )
 
 

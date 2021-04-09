@@ -3,14 +3,13 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Any, Iterator, Sequence
+from typing import TYPE_CHECKING, Any, Iterator, Sequence, Union
 
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 import lightning_pass.gui.gui_config.event_decorators as decorators
 import lightning_pass.gui.mouse_randomness as mouse_randomness
-import lightning_pass.gui.window as window
 import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
 from lightning_pass.gui.gui_config.widget_data import (
@@ -80,7 +79,7 @@ class Events:
         """
         with ClearPreviousWidget(self.parent):
             self.parent.ui.stacked_widget.setCurrentWidget(
-                getattr(self.parent.ui, widget)
+                getattr(self.parent.ui, widget),
             )
 
     def _message_box(self, message_box: str, *args: Any, **kwargs: Any) -> None:
@@ -109,9 +108,9 @@ class Events:
         :param page: Vault object containing the data which should be shown on the current page, defaults to None
 
         """
-        self.parent.ui.vault_widget = window.VaultWidget()
+        self.parent.ui.vault_widget = self.parent.ui.vault_widget_obj()
         self.parent.ui.vault_stacked_widget.addWidget(
-            self.parent.ui.vault_widget.widget
+            self.parent.ui.vault_widget.widget,
         )
 
         if page:
@@ -128,14 +127,14 @@ class Events:
                     method()
 
         self.parent.ui.vault_stacked_widget.setCurrentWidget(
-            self.parent.ui.vault_widget.widget
+            self.parent.ui.vault_widget.widget,
         )
         self.parent.buttons.setup_vault_buttons()
 
     def _rebuild_vault_stacked_widget(self):
         """Rebuild ``self.ui.vault_stacked_widget``."""
         self.parent.ui.vault_stacked_widget = QtWidgets.QStackedWidget(
-            self.parent.ui.vault
+            self.parent.ui.vault,
         )
         self.parent.ui.vault_stacked_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.parent.ui.vault_stacked_widget.setFrameShadow(QtWidgets.QFrame.Plain)
@@ -145,7 +144,11 @@ class Events:
         self.parent.ui.vault_dummy_page1.setObjectName("vault_dummy_page1")
         self.parent.ui.vault_stacked_widget.addWidget(self.parent.ui.vault_dummy_page1)
         self.parent.ui.gridLayout_12.addWidget(
-            self.parent.ui.vault_stacked_widget, 0, 3, 6, 1
+            self.parent.ui.vault_stacked_widget,
+            0,
+            3,
+            6,
+            1,
         )
 
     @property
@@ -248,7 +251,7 @@ class Events:
 
     def send_token_event(self) -> None:
         """Send token and switch to token page."""
-        if self.current_user.email_validator.validate_pattern(
+        if self.current_user.email_validator.pattern(
             email := self.parent.ui.forgot_pass_email_line.text(),
         ):
             # momentarily disable the button to avoid multiple send requests
@@ -272,7 +275,7 @@ class Events:
     def submit_reset_token_event(self) -> None:
         """If submitted token is correct, proceed to password change widget."""
         if credentials.Token.check_token_existence(
-            token := self.parent.ui.reset_token_token_line.text()
+            token := self.parent.ui.reset_token_token_line.text(),
         ):
             self.__current_token = token
             self.reset_password_event()
@@ -286,10 +289,9 @@ class Events:
     def reset_password_submit_event(self) -> None:
         """Change user's password."""
         try:
-            credentials.reset_password(
+            self.current_user.reset_password(
                 self.parent.ui.reset_password_new_pass_line.text(),
                 self.parent.ui.reset_password_conf_new_pass_line.text(),
-                int(self.__current_token[-2:]),
             )
         except InvalidPassword:
             self._message_box("invalid_password_box", "Reset Password")
@@ -321,7 +323,9 @@ class Events:
             self._message_box("invalid_login_box", "Change Password")
         except InvalidPassword:
             self._message_box(
-                "invalid_password_box", "Change Password", item="new password"
+                "invalid_password_box",
+                "Change Password",
+                item="new password",
             )
         except PasswordsDoNotMatch:
             self._message_box(
@@ -369,7 +373,7 @@ class Events:
             self.parent.gen = self.get_generator()
             self.parent.pass_progress = 0
             self.parent.ui.generate_pass_p2_prgrs_bar.setValue(
-                self.parent.pass_progress
+                self.parent.pass_progress,
             )
 
             self._set_current_widget("generate_pass_phase2")
@@ -509,7 +513,7 @@ class Events:
             self.current_user.username,
         )
 
-        if password and self.current_user.password_validator.validate_authentication(
+        if password and self.current_user.password_validator.authenticate(
             password,
             self.current_user.master_password,
         ):

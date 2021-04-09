@@ -33,7 +33,7 @@ def database_manager() -> Iterator[None]:
         cur: MySQLCursor = con.cursor(buffered=True)
     except mysql.connector.errors.InterfaceError as e:
         raise ConnectionRefusedError(
-            "Please make sure that your database is running."
+            "Please make sure that your database is running.",
         ) from e
     else:
         yield cur

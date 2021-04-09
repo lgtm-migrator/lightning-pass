@@ -25,7 +25,9 @@ class MouseTracker(QtCore.QObject):
         self.widget.installEventFilter(self)
 
     def eventFilter(
-        self, label: QtWidgets.QLabel, event: QtCore.QEvent.MouseMove
+        self,
+        label: QtWidgets.QLabel,
+        event: QtCore.QEvent.MouseMove,
     ) -> object:
         """Event filter.
 
@@ -41,7 +43,8 @@ class MouseTracker(QtCore.QObject):
 
     @staticmethod
     def setup_tracker(
-        label: QtWidgets.QLabel, on_change: QtCore.pyqtBoundSignal
+        label: QtWidgets.QLabel,
+        on_change: QtCore.pyqtBoundSignal,
     ) -> None:
         """Set up a mouse tracker over a specified label."""
         tracker = MouseTracker(label)

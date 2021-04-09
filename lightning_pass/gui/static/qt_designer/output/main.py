@@ -25,7 +25,7 @@ class Ui_lightning_pass:
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.stacked_widget.sizePolicy().hasHeightForWidth()
+            self.stacked_widget.sizePolicy().hasHeightForWidth(),
         )
         self.stacked_widget.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -78,12 +78,13 @@ class Ui_lightning_pass:
         self.gridLayout.addWidget(self.home_login_btn, 1, 1, 1, 1)
         self.home_welcome_lbl = QtWidgets.QLabel(self.home)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Preferred
+            QtWidgets.QSizePolicy.Preferred,
+            QtWidgets.QSizePolicy.Preferred,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.home_welcome_lbl.sizePolicy().hasHeightForWidth()
+            self.home_welcome_lbl.sizePolicy().hasHeightForWidth(),
         )
         self.home_welcome_lbl.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -93,7 +94,7 @@ class Ui_lightning_pass:
         font.setWeight(50)
         self.home_welcome_lbl.setFont(font)
         self.home_welcome_lbl.setLocale(
-            QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates)
+            QtCore.QLocale(QtCore.QLocale.English, QtCore.QLocale.UnitedStates),
         )
         self.home_welcome_lbl.setObjectName("home_welcome_lbl")
         self.gridLayout.addWidget(self.home_welcome_lbl, 0, 0, 1, 2)
@@ -358,15 +359,15 @@ class Ui_lightning_pass:
         font.setPointSize(10)
         self.reset_password_conf_new_pass_lbl.setFont(font)
         self.reset_password_conf_new_pass_lbl.setObjectName(
-            "reset_password_conf_new_pass_lbl"
+            "reset_password_conf_new_pass_lbl",
         )
         self.gridLayout_11.addWidget(self.reset_password_conf_new_pass_lbl, 2, 0, 1, 1)
         self.reset_password_conf_new_pass_line = QtWidgets.QLineEdit(
-            self.reset_password
+            self.reset_password,
         )
         self.reset_password_conf_new_pass_line.setReadOnly(True)
         self.reset_password_conf_new_pass_line.setObjectName(
-            "reset_password_conf_new_pass_line"
+            "reset_password_conf_new_pass_line",
         )
         self.gridLayout_11.addWidget(self.reset_password_conf_new_pass_line, 2, 1, 1, 2)
         self.reset_password_confirm_btn = QtWidgets.QPushButton(self.reset_password)
@@ -389,16 +390,16 @@ class Ui_lightning_pass:
         self.gridLayout_9.addWidget(self.change_password_lbl, 0, 0, 1, 2)
         self.change_password_current_pass_lbl = QtWidgets.QLabel(self.change_password)
         self.change_password_current_pass_lbl.setObjectName(
-            "change_password_current_pass_lbl"
+            "change_password_current_pass_lbl",
         )
         self.gridLayout_9.addWidget(self.change_password_current_pass_lbl, 1, 0, 1, 1)
         self.change_password_current_pass_line = QtWidgets.QLineEdit(
-            self.change_password
+            self.change_password,
         )
         self.change_password_current_pass_line.setEchoMode(QtWidgets.QLineEdit.Password)
         self.change_password_current_pass_line.setClearButtonEnabled(True)
         self.change_password_current_pass_line.setObjectName(
-            "change_password_current_pass_line"
+            "change_password_current_pass_line",
         )
         self.gridLayout_9.addWidget(self.change_password_current_pass_line, 1, 1, 1, 2)
         self.change_password_new_pass_lbl = QtWidgets.QLabel(self.change_password)
@@ -417,7 +418,7 @@ class Ui_lightning_pass:
         self.change_password_new_pass_line.setReadOnly(False)
         self.change_password_new_pass_line.setClearButtonEnabled(True)
         self.change_password_new_pass_line.setObjectName(
-            "change_password_new_pass_line"
+            "change_password_new_pass_line",
         )
         self.gridLayout_9.addWidget(self.change_password_new_pass_line, 2, 1, 1, 2)
         self.change_password_conf_new_lbl = QtWidgets.QLabel(self.change_password)
@@ -437,7 +438,7 @@ class Ui_lightning_pass:
         self.change_password_conf_new_line.setReadOnly(False)
         self.change_password_conf_new_line.setClearButtonEnabled(True)
         self.change_password_conf_new_line.setObjectName(
-            "change_password_conf_new_line"
+            "change_password_conf_new_line",
         )
         self.gridLayout_9.addWidget(self.change_password_conf_new_line, 3, 1, 1, 2)
         self.change_password_confirm_btn = QtWidgets.QPushButton(self.change_password)
@@ -524,12 +525,12 @@ class Ui_lightning_pass:
         self.generate_pass_spin_box.setFont(font)
         self.generate_pass_spin_box.setWrapping(True)
         self.generate_pass_spin_box.setButtonSymbols(
-            QtWidgets.QAbstractSpinBox.PlusMinus
+            QtWidgets.QAbstractSpinBox.PlusMinus,
         )
         self.generate_pass_spin_box.setSpecialValueText("")
         self.generate_pass_spin_box.setAccelerated(True)
         self.generate_pass_spin_box.setCorrectionMode(
-            QtWidgets.QAbstractSpinBox.CorrectToNearestValue
+            QtWidgets.QAbstractSpinBox.CorrectToNearestValue,
         )
         self.generate_pass_spin_box.setProperty("showGroupSeparator", True)
         self.generate_pass_spin_box.setMinimum(1)
@@ -554,15 +555,15 @@ class Ui_lightning_pass:
         self.generate_pass_p2_tracking_lbl.setEnabled(True)
         self.generate_pass_p2_tracking_lbl.setMouseTracking(False)
         self.generate_pass_p2_tracking_lbl.setStyleSheet(
-            "background-color: blue; border: 3px solid black"
+            "background-color: blue; border: 3px solid black",
         )
         self.generate_pass_p2_tracking_lbl.setText("")
         self.generate_pass_p2_tracking_lbl.setObjectName(
-            "generate_pass_p2_tracking_lbl"
+            "generate_pass_p2_tracking_lbl",
         )
         self.gridLayout_6.addWidget(self.generate_pass_p2_tracking_lbl, 1, 0, 1, 4)
         self.generate_pass_p2_prgrs_bar = QtWidgets.QProgressBar(
-            self.generate_pass_phase2
+            self.generate_pass_phase2,
         )
         self.generate_pass_p2_prgrs_bar.setEnabled(True)
         font = QtGui.QFont()
@@ -582,7 +583,7 @@ class Ui_lightning_pass:
         self.generate_pass_p2_final_lbl.setObjectName("generate_pass_p2_final_lbl")
         self.gridLayout_6.addWidget(self.generate_pass_p2_final_lbl, 3, 0, 1, 1)
         self.generate_pass_p2_final_pass_line = QtWidgets.QLineEdit(
-            self.generate_pass_phase2
+            self.generate_pass_phase2,
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -591,11 +592,11 @@ class Ui_lightning_pass:
         self.generate_pass_p2_final_pass_line.setText("")
         self.generate_pass_p2_final_pass_line.setReadOnly(True)
         self.generate_pass_p2_final_pass_line.setObjectName(
-            "generate_pass_p2_final_pass_line"
+            "generate_pass_p2_final_pass_line",
         )
         self.gridLayout_6.addWidget(self.generate_pass_p2_final_pass_line, 3, 1, 1, 2)
         self.generate_pass_p2_copy_tool_btn = QtWidgets.QToolButton(
-            self.generate_pass_phase2
+            self.generate_pass_phase2,
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -603,19 +604,19 @@ class Ui_lightning_pass:
         self.generate_pass_p2_copy_tool_btn.setFont(font)
         self.generate_pass_p2_copy_tool_btn.setStatusTip("")
         self.generate_pass_p2_copy_tool_btn.setPopupMode(
-            QtWidgets.QToolButton.InstantPopup
+            QtWidgets.QToolButton.InstantPopup,
         )
         self.generate_pass_p2_copy_tool_btn.setToolButtonStyle(
-            QtCore.Qt.ToolButtonTextBesideIcon
+            QtCore.Qt.ToolButtonTextBesideIcon,
         )
         self.generate_pass_p2_copy_tool_btn.setAutoRaise(True)
         self.generate_pass_p2_copy_tool_btn.setArrowType(QtCore.Qt.RightArrow)
         self.generate_pass_p2_copy_tool_btn.setObjectName(
-            "generate_pass_p2_copy_tool_btn"
+            "generate_pass_p2_copy_tool_btn",
         )
         self.gridLayout_6.addWidget(self.generate_pass_p2_copy_tool_btn, 3, 3, 1, 1)
         self.generate_pass_p2_reset_btn = QtWidgets.QPushButton(
-            self.generate_pass_phase2
+            self.generate_pass_phase2,
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -626,7 +627,7 @@ class Ui_lightning_pass:
         self.generate_pass_p2_reset_btn.setObjectName("generate_pass_p2_reset_btn")
         self.gridLayout_6.addWidget(self.generate_pass_p2_reset_btn, 4, 0, 1, 2)
         self.generate_pass_p2_main_btn = QtWidgets.QPushButton(
-            self.generate_pass_phase2
+            self.generate_pass_phase2,
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -647,7 +648,7 @@ class Ui_lightning_pass:
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_pfp_pixmap_lbl.sizePolicy().hasHeightForWidth()
+            self.account_pfp_pixmap_lbl.sizePolicy().hasHeightForWidth(),
         )
         self.account_pfp_pixmap_lbl.setSizePolicy(sizePolicy)
         self.account_pfp_pixmap_lbl.setMinimumSize(QtCore.QSize(135, 135))
@@ -657,19 +658,20 @@ class Ui_lightning_pass:
         self.account_pfp_pixmap_lbl.setStyleSheet("border: 2px dashed")
         self.account_pfp_pixmap_lbl.setText("")
         self.account_pfp_pixmap_lbl.setPixmap(
-            QtGui.QPixmap("C:/Users/Luky/.designer/profile_pictures/default.png")
+            QtGui.QPixmap("C:/Users/Luky/.designer/profile_pictures/default.png"),
         )
         self.account_pfp_pixmap_lbl.setScaledContents(True)
         self.account_pfp_pixmap_lbl.setObjectName("account_pfp_pixmap_lbl")
         self.gridLayout_7.addWidget(self.account_pfp_pixmap_lbl, 0, 4, 1, 1)
         self.account_vault_btn = QtWidgets.QPushButton(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_vault_btn.sizePolicy().hasHeightForWidth()
+            self.account_vault_btn.sizePolicy().hasHeightForWidth(),
         )
         self.account_vault_btn.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -684,12 +686,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_vault_btn, 2, 4, 3, 1)
         self.account_edit_details_btn = QtWidgets.QPushButton(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_edit_details_btn.sizePolicy().hasHeightForWidth()
+            self.account_edit_details_btn.sizePolicy().hasHeightForWidth(),
         )
         self.account_edit_details_btn.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -700,12 +703,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_edit_details_btn, 3, 0, 1, 2)
         self.account_username_line = QtWidgets.QLineEdit(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_username_line.sizePolicy().hasHeightForWidth()
+            self.account_username_line.sizePolicy().hasHeightForWidth(),
         )
         self.account_username_line.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -718,7 +722,8 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_username_line, 1, 1, 1, 3)
         self.account_lbl = QtWidgets.QLabel(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -732,12 +737,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_lbl, 0, 0, 1, 4)
         self.account_username_lbl = QtWidgets.QLabel(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.Preferred,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_username_lbl.sizePolicy().hasHeightForWidth()
+            self.account_username_lbl.sizePolicy().hasHeightForWidth(),
         )
         self.account_username_lbl.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -748,12 +754,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_username_lbl, 1, 0, 1, 1)
         self.account_change_pfp_btn = QtWidgets.QPushButton(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_change_pfp_btn.sizePolicy().hasHeightForWidth()
+            self.account_change_pfp_btn.sizePolicy().hasHeightForWidth(),
         )
         self.account_change_pfp_btn.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -764,12 +771,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_change_pfp_btn, 1, 4, 1, 1)
         self.account_email_lbl = QtWidgets.QLabel(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.Preferred,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_email_lbl.sizePolicy().hasHeightForWidth()
+            self.account_email_lbl.sizePolicy().hasHeightForWidth(),
         )
         self.account_email_lbl.setSizePolicy(sizePolicy)
         self.account_email_lbl.setMinimumSize(QtCore.QSize(0, 0))
@@ -781,12 +789,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_email_lbl, 2, 0, 1, 1)
         self.account_last_log_date = QtWidgets.QLabel(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_last_log_date.sizePolicy().hasHeightForWidth()
+            self.account_last_log_date.sizePolicy().hasHeightForWidth(),
         )
         self.account_last_log_date.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -797,12 +806,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_last_log_date, 4, 0, 1, 2)
         self.account_change_pass_btn = QtWidgets.QPushButton(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_change_pass_btn.sizePolicy().hasHeightForWidth()
+            self.account_change_pass_btn.sizePolicy().hasHeightForWidth(),
         )
         self.account_change_pass_btn.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -813,12 +823,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_change_pass_btn, 3, 2, 1, 2)
         self.account_email_line = QtWidgets.QLineEdit(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_email_line.sizePolicy().hasHeightForWidth()
+            self.account_email_line.sizePolicy().hasHeightForWidth(),
         )
         self.account_email_line.setSizePolicy(sizePolicy)
         self.account_email_line.setMinimumSize(QtCore.QSize(0, 32))
@@ -832,12 +843,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_email_line, 2, 1, 1, 3)
         self.account_logout_btn = QtWidgets.QPushButton(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_logout_btn.sizePolicy().hasHeightForWidth()
+            self.account_logout_btn.sizePolicy().hasHeightForWidth(),
         )
         self.account_logout_btn.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -849,12 +861,13 @@ class Ui_lightning_pass:
         self.gridLayout_7.addWidget(self.account_logout_btn, 4, 2, 1, 1)
         self.account_main_menu_btn = QtWidgets.QPushButton(self.account)
         sizePolicy = QtWidgets.QSizePolicy(
-            QtWidgets.QSizePolicy.MinimumExpanding, QtWidgets.QSizePolicy.Minimum
+            QtWidgets.QSizePolicy.MinimumExpanding,
+            QtWidgets.QSizePolicy.Minimum,
         )
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(
-            self.account_main_menu_btn.sizePolicy().hasHeightForWidth()
+            self.account_main_menu_btn.sizePolicy().hasHeightForWidth(),
         )
         self.account_main_menu_btn.setSizePolicy(sizePolicy)
         font = QtGui.QFont()
@@ -986,7 +999,7 @@ class Ui_lightning_pass:
         self.master_pass_current_pass_line.setEchoMode(QtWidgets.QLineEdit.Password)
         self.master_pass_current_pass_line.setClearButtonEnabled(True)
         self.master_pass_current_pass_line.setObjectName(
-            "master_pass_current_pass_line"
+            "master_pass_current_pass_line",
         )
         self.gridLayout_13.addWidget(self.master_pass_current_pass_line, 1, 1, 1, 1)
         self.master_pass_master_pass_lbl = QtWidgets.QLabel(self.master_password)
@@ -1011,11 +1024,11 @@ class Ui_lightning_pass:
         font.setPointSize(10)
         self.master_pass_conf_master_pass_lbl.setFont(font)
         self.master_pass_conf_master_pass_lbl.setObjectName(
-            "master_pass_conf_master_pass_lbl"
+            "master_pass_conf_master_pass_lbl",
         )
         self.gridLayout_13.addWidget(self.master_pass_conf_master_pass_lbl, 3, 0, 1, 1)
         self.master_pass_conf_master_pass_line = QtWidgets.QLineEdit(
-            self.master_password
+            self.master_password,
         )
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -1024,7 +1037,7 @@ class Ui_lightning_pass:
         self.master_pass_conf_master_pass_line.setEchoMode(QtWidgets.QLineEdit.Password)
         self.master_pass_conf_master_pass_line.setClearButtonEnabled(True)
         self.master_pass_conf_master_pass_line.setObjectName(
-            "master_pass_conf_master_pass_line"
+            "master_pass_conf_master_pass_line",
         )
         self.gridLayout_13.addWidget(self.master_pass_conf_master_pass_line, 3, 1, 1, 1)
         self.master_pass_menu_btn = QtWidgets.QPushButton(self.master_password)
@@ -1195,32 +1208,32 @@ class Ui_lightning_pass:
         _translate = QtCore.QCoreApplication.translate
         lightning_pass.setWindowTitle(_translate("lightning_pass", "Lightning Pass"))
         self.loading_lbl.setText(
-            _translate("lightning_pass", "Loading Lightning Pass...")
+            _translate("lightning_pass", "Loading Lightning Pass..."),
         )
         self.home_register_btn.setText(_translate("lightning_pass", "Register"))
         self.home_login_btn.setText(_translate("lightning_pass", "Login"))
         self.home_welcome_lbl.setText(
-            _translate("lightning_pass", "Welcome to Lightning Pass!")
+            _translate("lightning_pass", "Welcome to Lightning Pass!"),
         )
         self.home_generate_password_btn.setText(
-            _translate("lightning_pass", "Generate Password")
+            _translate("lightning_pass", "Generate Password"),
         )
         self.log_entry_username_lbl.setText(_translate("lightning_pass", "Username:"))
         self.log_username_line_edit.setPlaceholderText(
-            _translate("lightning_pass", "Enter your username.")
+            _translate("lightning_pass", "Enter your username."),
         )
         self.log_entry_register_lbl.setText(_translate("lightning_pass", "Password:"))
         self.log_password_line_edit.setPlaceholderText(
-            _translate("lightning_pass", "Enter your password.")
+            _translate("lightning_pass", "Enter your password."),
         )
         self.log_login_btn_2.setText(_translate("lightning_pass", "Login"))
         self.log_forgot_pass_btn.setText(
-            _translate("lightning_pass", "Forgot Password?")
+            _translate("lightning_pass", "Forgot Password?"),
         )
         self.log_main_btn.setText(_translate("lightning_pass", "Main Menu"))
         self.log_login_lbl.setText(_translate("lightning_pass", "Login"))
         self.reg_conf_pass_entry_lbl.setText(
-            _translate("lightning_pass", "Confirm Password:")
+            _translate("lightning_pass", "Confirm Password:"),
         )
         self.reg_username_entry_lbl.setText(_translate("lightning_pass", "Username:"))
         self.reg_password_entry_lbl.setText(_translate("lightning_pass", "Password:"))
@@ -1228,182 +1241,182 @@ class Ui_lightning_pass:
         self.reg_register_btn.setText(_translate("lightning_pass", "Register"))
         self.reg_main_btn.setText(_translate("lightning_pass", "Main Menu"))
         self.reg_email_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your email.")
+            _translate("lightning_pass", "Enter your email."),
         )
         self.reg_conf_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your password again.")
+            _translate("lightning_pass", "Enter your password again."),
         )
         self.reg_password_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your password.")
+            _translate("lightning_pass", "Enter your password."),
         )
         self.reg_username_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your username.")
+            _translate("lightning_pass", "Enter your username."),
         )
         self.reg_register_lbl.setText(_translate("lightning_pass", "Register"))
         self.forgot_pass_email_entry_lbl.setText(_translate("lightning_pass", "Email:"))
         self.forgot_pass_main_menu_btn.setText(
-            _translate("lightning_pass", "Main Menu")
+            _translate("lightning_pass", "Main Menu"),
         )
         self.forgot_pass_reset_btn.setText(
-            _translate("lightning_pass", "Send Reset Token")
+            _translate("lightning_pass", "Send Reset Token"),
         )
         self.forgot_pass_lbl.setText(_translate("lightning_pass", "Forgot Password"))
         self.reset_token_submit_btn.setText(
-            _translate("lightning_pass", "Submit Reset Token")
+            _translate("lightning_pass", "Submit Reset Token"),
         )
         self.reset_token_main_btn.setText(_translate("lightning_pass", "Main Menu"))
         self.reset_token_token_lbl.setText(_translate("lightning_pass", "Token:"))
         self.reset_token_token_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your reset token.")
+            _translate("lightning_pass", "Enter your reset token."),
         )
         self.reset_token_lbl.setText(_translate("lightning_pass", "Reset Token"))
         self.reset_password_lbl.setText(_translate("lightning_pass", "Reset Password"))
         self.reset_password_new_pass_lbl.setText(
-            _translate("lightning_pass", "New Password:")
+            _translate("lightning_pass", "New Password:"),
         )
         self.reset_password_new_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your new password.")
+            _translate("lightning_pass", "Enter your new password."),
         )
         self.reset_password_conf_new_pass_lbl.setText(
-            _translate("lightning_pass", "Confirm New Password:")
+            _translate("lightning_pass", "Confirm New Password:"),
         )
         self.reset_password_conf_new_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Confirm your new password.")
+            _translate("lightning_pass", "Confirm your new password."),
         )
         self.reset_password_confirm_btn.setText(
-            _translate("lightning_pass", "Confirm Reset Password")
+            _translate("lightning_pass", "Confirm Reset Password"),
         )
         self.reset_password_main_btn.setText(_translate("lightning_pass", "Main Menu"))
         self.change_password_lbl.setText(
-            _translate("lightning_pass", "Change Password")
+            _translate("lightning_pass", "Change Password"),
         )
         self.change_password_current_pass_lbl.setText(
-            _translate("lightning_pass", "Current Password:")
+            _translate("lightning_pass", "Current Password:"),
         )
         self.change_password_current_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your current password.")
+            _translate("lightning_pass", "Enter your current password."),
         )
         self.change_password_new_pass_lbl.setText(
-            _translate("lightning_pass", "New Password:")
+            _translate("lightning_pass", "New Password:"),
         )
         self.change_password_new_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your new password.")
+            _translate("lightning_pass", "Enter your new password."),
         )
         self.change_password_conf_new_lbl.setText(
-            _translate("lightning_pass", "Confirm New Password")
+            _translate("lightning_pass", "Confirm New Password"),
         )
         self.change_password_conf_new_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your new password again.")
+            _translate("lightning_pass", "Enter your new password again."),
         )
         self.change_password_confirm_btn.setText(
-            _translate("lightning_pass", "Confirm Change Password")
+            _translate("lightning_pass", "Confirm Change Password"),
         )
         self.change_password_main_btn.setText(_translate("lightning_pass", "Main Menu"))
         self.generate_pass_lower_check.setText(
-            _translate("lightning_pass", "Lowercase")
+            _translate("lightning_pass", "Lowercase"),
         )
         self.generate_pas_main_lbl.setText(
-            _translate("lightning_pass", "Generate Password")
+            _translate("lightning_pass", "Generate Password"),
         )
         self.generate_pass_symbols_check.setText(
-            _translate("lightning_pass", "Symbols")
+            _translate("lightning_pass", "Symbols"),
         )
         self.generate_pass_generate_btn.setText(
-            _translate("lightning_pass", "Generate")
+            _translate("lightning_pass", "Generate"),
         )
         self.generate_pass_numbers_check.setText(
-            _translate("lightning_pass", "Numbers")
+            _translate("lightning_pass", "Numbers"),
         )
         self.generate_pass_upper_check.setText(
-            _translate("lightning_pass", "Uppercase")
+            _translate("lightning_pass", "Uppercase"),
         )
         self.generate_pass_main_menu_btn.setText(
-            _translate("lightning_pass", "Main Menu")
+            _translate("lightning_pass", "Main Menu"),
         )
         self.generate_pass_spin_box.setSuffix(
-            _translate("lightning_pass", " characters")
+            _translate("lightning_pass", " characters"),
         )
         self.generate_pass_spin_box.setPrefix(_translate("lightning_pass", "Length: "))
         self.generate_pass_p2_rnd_lbl.setText(
             _translate(
                 "lightning_pass",
                 "Generate randomness by hovering your mouse over the blue area.",
-            )
+            ),
         )
         self.generate_pass_p2_final_lbl.setText(
-            _translate("lightning_pass", "Generated Password:")
+            _translate("lightning_pass", "Generated Password:"),
         )
         self.generate_pass_p2_final_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Generated password will appear here.")
+            _translate("lightning_pass", "Generated password will appear here."),
         )
         self.generate_pass_p2_copy_tool_btn.setText(
-            _translate("lightning_pass", "Copy")
+            _translate("lightning_pass", "Copy"),
         )
         self.generate_pass_p2_reset_btn.setText(
-            _translate("lightning_pass", "Reset and generate a new password")
+            _translate("lightning_pass", "Reset and generate a new password"),
         )
         self.generate_pass_p2_main_btn.setText(
-            _translate("lightning_pass", "Main Menu")
+            _translate("lightning_pass", "Main Menu"),
         )
         self.account_vault_btn.setText(_translate("lightning_pass", "Vault U+1F512"))
         self.account_edit_details_btn.setText(
-            _translate("lightning_pass", "Edit Details")
+            _translate("lightning_pass", "Edit Details"),
         )
         self.account_username_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your new username.")
+            _translate("lightning_pass", "Enter your new username."),
         )
         self.account_lbl.setText(_translate("lightning_pass", "Account"))
         self.account_username_lbl.setText(_translate("lightning_pass", "Username:"))
         self.account_change_pfp_btn.setText(
-            _translate("lightning_pass", "Change Picture")
+            _translate("lightning_pass", "Change Picture"),
         )
         self.account_email_lbl.setText(_translate("lightning_pass", "Email:"))
         self.account_last_log_date.setText(
-            _translate("lightning_pass", "Last login date: 0000-00-00 00:00:00.")
+            _translate("lightning_pass", "Last login date: 0000-00-00 00:00:00."),
         )
         self.account_change_pass_btn.setText(
-            _translate("lightning_pass", "Change Password?")
+            _translate("lightning_pass", "Change Password?"),
         )
         self.account_email_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your new email.")
+            _translate("lightning_pass", "Enter your new email."),
         )
         self.account_logout_btn.setText(_translate("lightning_pass", "Logout"))
         self.account_main_menu_btn.setText(_translate("lightning_pass", "Main Menu"))
         self.vault_lock_btn.setText(_translate("lightning_pass", "Lock Vault"))
         self.vault_username_lbl.setText(_translate("lightning_pass", "Current User:"))
         self.vault_remove_page_btn.setText(
-            _translate("lightning_pass", "Remove Current Page")
+            _translate("lightning_pass", "Remove Current Page"),
         )
         self.vault_lbl.setText(_translate("lightning_pass", "Vault"))
         self.vault_add_page_btn.setText(_translate("lightning_pass", "Add Page"))
         self.vault_menu_btn.setText(_translate("lightning_pass", "Main Menu"))
         self.vault_date_lbl.setText(
-            _translate("lightning_pass", "Last Unlock Date: 0000-00-00 00:00:00")
+            _translate("lightning_pass", "Last Unlock Date: 0000-00-00 00:00:00"),
         )
         self.master_pass_current_pass_lbl.setText(
-            _translate("lightning_pass", "Current Password:")
+            _translate("lightning_pass", "Current Password:"),
         )
         self.master_pass_current_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your current password.")
+            _translate("lightning_pass", "Enter your current password."),
         )
         self.master_pass_master_pass_lbl.setText(
-            _translate("lightning_pass", "Master Password:")
+            _translate("lightning_pass", "Master Password:"),
         )
         self.master_pass_master_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your new master password.")
+            _translate("lightning_pass", "Enter your new master password."),
         )
         self.master_pass_conf_master_pass_lbl.setText(
-            _translate("lightning_pass", "Confirm Master Password:")
+            _translate("lightning_pass", "Confirm Master Password:"),
         )
         self.master_pass_conf_master_pass_line.setPlaceholderText(
-            _translate("lightning_pass", "Enter your master password again.")
+            _translate("lightning_pass", "Enter your master password again."),
         )
         self.master_pass_menu_btn.setText(_translate("lightning_pass", "Main Menu"))
         self.master_pass_save_btn.setText(
-            _translate("lightning_pass", "Save Master Password")
+            _translate("lightning_pass", "Save Master Password"),
         )
         self.master_pass_main_lbl.setText(
-            _translate("lightning_pass", "Master Password")
+            _translate("lightning_pass", "Master Password"),
         )
         self.menu_users.setTitle(_translate("lightning_pass", "users"))
         self.menu_password.setTitle(_translate("lightning_pass", "password"))
@@ -1416,7 +1429,7 @@ class Ui_lightning_pass:
         self.action_login.setText(_translate("lightning_pass", "login"))
         self.action_register.setText(_translate("lightning_pass", "register"))
         self.action_forgot_password.setText(
-            _translate("lightning_pass", "forgot password")
+            _translate("lightning_pass", "forgot password"),
         )
         self.action_main_menu.setText(_translate("lightning_pass", "main menu"))
         self.action_light.setText(_translate("lightning_pass", "light"))
@@ -1425,8 +1438,8 @@ class Ui_lightning_pass:
         self.action_profile.setText(_translate("lightning_pass", "profile"))
         self.action_vault.setText(_translate("lightning_pass", "vault"))
         self.action_master_password.setText(
-            _translate("lightning_pass", "master_password")
+            _translate("lightning_pass", "master_password"),
         )
         self.action_change_password.setText(
-            _translate("lightning_pass", "change_password")
+            _translate("lightning_pass", "change_password"),
         )

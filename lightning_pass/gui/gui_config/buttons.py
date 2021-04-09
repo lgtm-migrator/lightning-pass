@@ -146,7 +146,7 @@ class Buttons:
         for action in menu_theme_set:
             getattr(self.parent.ui, action.widget).triggered.connect(
                 # since lambda has a default > dump the first bool passed in by the widget parent
-                lambda _, sheet=action.action: sheet()
+                lambda _, sheet=action.action: sheet(),
             )
 
     def data_validation(self) -> None:
@@ -177,11 +177,15 @@ class Buttons:
         # tool buttons for copying vault items
         vault_copy_tool_buttons_set = {
             VaultToolButton(
-                "vault_copy_username_tool_btn", "username", "vault_username_line"
+                "vault_copy_username_tool_btn",
+                "username",
+                "vault_username_line",
             ),
             VaultToolButton("vault_copy_email_tool_btn", "email", "vault_email_line"),
             VaultToolButton(
-                "vault_copy_password_tool_btn", "password", "vault_password_line"
+                "vault_copy_password_tool_btn",
+                "password",
+                "vault_password_line",
             ),
         }
 
@@ -189,7 +193,7 @@ class Buttons:
         events = self.parent.events
 
         parent.vault_open_web_tool_btn.clicked.connect(
-            lambda: webbrowser.get().open(parent.vault_web_line.text(), new=2)
+            lambda: webbrowser.get().open(parent.vault_web_line.text(), new=2),
         )
         for button in vault_copy_tool_buttons_set:
             getattr(parent, button.widget).clicked.connect(

@@ -33,7 +33,7 @@ def _base_decorator(
 
     Decorate to ensure that a specific condition is true in order access a specific event.
     All additional params passed into the deco factory must be used as keyword arguments.
-        If they were passed in as positional, they would override the _function param.
+    If they were passed in as positional, they would override the __function param.
 
     :param __func: Will become the actual function if decorator is used without parenthesis
         Not supposed to be used manually, defaults to None

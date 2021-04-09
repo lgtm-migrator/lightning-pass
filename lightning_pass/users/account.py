@@ -3,9 +3,7 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import TYPE_CHECKING, Generator
-
-import pyfields
+from typing import TYPE_CHECKING, Generator, TypeVar
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
@@ -24,41 +22,22 @@ from lightning_pass.util.validators import (
     EmailValidator,
     PasswordValidator,
     UsernameValidator,
+    Validator,
 )
 
 if TYPE_CHECKING:
     from lightning_pass.util.credentials import PasswordData
 
 
+_V = TypeVar("_V", bound=Validator)
+
+
 class Account:
     """This class holds information about the currently logged in user."""
 
-    user_id: int = pyfields.field(
-        check_type=True,
-        read_only=True,
-        doc="Database ID of the current account",
-    )
-
-    vault_unlocked: bool = pyfields.field(
-        check_type=True,
-        default=False,
-    )
-
-    username_validator: UsernameValidator = pyfields.field(
-        check_type=True,
-        default=UsernameValidator(),
-        doc="Username validation is done via this validator.",
-    )
-    password_validator: PasswordValidator = pyfields.field(
-        check_type=True,
-        default=PasswordValidator(),
-        doc="Password validation is done via this validator.",
-    )
-    email_validator: EmailValidator = pyfields.field(
-        check_type=True,
-        default=EmailValidator(),
-        doc="Email validation is done via this validator.",
-    )
+    username_validator: _V = UsernameValidator()
+    password_validator: _V = PasswordValidator()
+    email_validator: _V = EmailValidator()
 
     def __init__(self, user_id: int) -> None:
         """Construct the class.
@@ -66,7 +45,8 @@ class Account:
         :param int user_id: Database primary key ``id`` of the account
 
         """
-        self.user_id = user_id
+        self._user_id = user_id
+        self.vault_unlocked = False
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -98,29 +78,29 @@ class Account:
 
         """
         try:
-            cls.username_validator.validate_unique(username)
+            cls.username_validator.unique(username)
         except ValidationFailure:
             raise UsernameAlreadyExists
         try:
-            cls.username_validator.validate_pattern(username)
+            cls.username_validator.pattern(username)
         except ValidationFailure:
             raise InvalidUsername
 
         try:
-            cls.password_validator.validate_pattern(password)
+            cls.password_validator.pattern(password)
         except ValidationFailure:
             raise InvalidPassword
         try:
-            cls.password_validator.validate_match(password, confirm_password)
+            cls.password_validator.match(password, confirm_password)
         except ValidationFailure:
             raise PasswordsDoNotMatch
 
         try:
-            cls.email_validator.validate_unique(email)
+            cls.email_validator.unique(email)
         except ValidationFailure:
             raise EmailAlreadyExists
         try:
-            cls.email_validator.validate_pattern(email)
+            cls.email_validator.pattern(email)
         except ValidationFailure:
             raise InvalidEmail
 
@@ -148,8 +128,8 @@ class Account:
 
         """
         try:
-            cls.username_validator.validate_unique(username, should_exist=True)
-            cls.password_validator.validate_authentication(
+            cls.username_validator.unique(username, should_exist=True)
+            cls.password_validator.authenticate(
                 password,
                 credentials.get_user_item(
                     username,
@@ -165,6 +145,28 @@ class Account:
         account.update_last_login_date()
         return account
 
+    def validate_password_data(self, data: PasswordData) -> None:
+        try:
+            self.password_validator.authenticate(
+                data.confirm_previous,
+                self.password,
+            )
+        except ValidationFailure:
+            raise AccountDoesNotExist
+
+        try:
+            self.password_validator.pattern(data.new_password)
+        except ValidationFailure:
+            raise InvalidPassword
+
+        try:
+            self.password_validator.match(
+                data.new_password,
+                data.confirm_new,
+            )
+        except ValidationFailure:
+            raise PasswordsDoNotMatch
+
     def get_value(self, result_column: str) -> str | bytes | datetime:
         """Simplify getting user values.
 
@@ -176,7 +178,9 @@ class Account:
         return credentials.get_user_item(self.user_id, "id", result_column)
 
     def set_value(
-        self, result: int | str | bytes | datetime, result_column: str
+        self,
+        result: int | str | bytes | datetime,
+        result_column: str,
     ) -> None:
         """Simplify setting user values.
 
@@ -204,6 +208,11 @@ class Account:
             )
             # expecting a sequence thus val has to be a tuple (created by the trailing comma)
             db.execute(sql, (self.user_id,))
+
+    @property
+    def user_id(self):
+        """Return database ID of the current account."""
+        return self._user_id
 
     @property
     def username(self) -> str:
@@ -245,43 +254,23 @@ class Account:
         return self.get_value("password")
 
     @password.setter
-    def password(self, password_data: PasswordData) -> None:
+    def password(self, data: PasswordData) -> None:
         """Password setter.
 
-        :param password_data: The ``NewPassword`` data storage with the new details.
+        :param data: The data container with all the necessary details.
 
         """
-        try:
-            self.password_validator.validate_authentication(
-                password_data.confirm_previous,
-                self.password,
-            )
-        except ValidationFailure:
-            raise AccountDoesNotExist
-
-        try:
-            self.password_validator.validate_pattern(password_data.new_password)
-        except ValidationFailure:
-            raise InvalidPassword
-
-        try:
-            self.password_validator.validate_match(
-                password_data.new_password,
-                password_data.confirm_new,
-            )
-        except ValidationFailure:
-            raise PasswordsDoNotMatch
-
+        self.validate_password_data(data)
         self.set_value(
-            credentials.hash_password(str(password_data.new_password)),
+            credentials.hash_password(str(data.new_password)),
             "password",
         )
 
     def reset_password(self, password: str, confirm_password: str) -> None:
         """"""
-        if not self.password_validator.validate_pattern(password):
+        if not self.password_validator.pattern(password):
             raise InvalidPassword
-        if not self.password_validator.validate_match(password, confirm_password):
+        if not self.password_validator.match(password, confirm_password):
             raise PasswordsDoNotMatch
 
         self.set_value(credentials.hash_password(password), "password")
@@ -306,11 +295,11 @@ class Account:
 
         """
         try:
-            self.email_validator.validate_pattern(value)
+            self.email_validator.pattern(value)
         except ValidationFailure:
             raise InvalidEmail
         try:
-            self.email_validator.validate_unique(value)
+            self.email_validator.unique(value)
         except ValidationFailure:
             raise EmailAlreadyExists
 
@@ -374,37 +363,19 @@ class Account:
         return self.get_value("master_password")
 
     @master_password.setter
-    def master_password(self, password_data: PasswordData) -> None:
+    def master_password(self, data: PasswordData) -> None:
         """Set a new master password.
 
-        :param password_data: The data container will all the neede information
+        :param data: The data container will all the needed information
 
         :raises AccountDoesNotExist: if the normal password is not correct
         :raises PasswordsDoNotMatch: if the master passwords do not match
         :raises InvalidPassword: if the master password doesn't meet the required pattern
 
         """
-        try:
-            self.password_validator.validate_authentication(
-                password_data.confirm_previous,
-                self.password,
-            )
-        except ValidationFailure:
-            raise AccountDoesNotExist
-        try:
-            self.password_validator.validate_pattern(password_data.new_password)
-        except ValidationFailure:
-            raise InvalidPassword
-        try:
-            self.password_validator.validate_match(
-                password_data.new_password,
-                password_data.confirm_new,
-            )
-        except ValidationFailure:
-            raise PasswordsDoNotMatch
-
+        self.validate_password_data(data)
         self.set_value(
-            credentials.hash_password(password_data.new_password),
+            credentials.hash_password(data.new_password),
             "master_password",
         )
 
@@ -438,9 +409,3 @@ class Account:
     def vault_pages_int(self) -> int:
         """Return an integer with the amount of vault pages a user has registered."""
         return sum(1 for _ in self.vault_pages)
-
-
-__all__ = ["Account"]
-
-acc = Account(54)
-print(acc)
