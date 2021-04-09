@@ -1,15 +1,25 @@
 from __future__ import annotations
 
 import contextlib
+import functools
 import itertools
-from typing import TYPE_CHECKING, Any, NamedTuple, Optional, Sequence, Iterator
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Iterator,
+    Generator,
+    Callable,
+)
 
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtGui
 
 import lightning_pass.gui.mouse_randomness as mouse_randomness
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QMainWindow, QWidget
+    from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QMenu, QMenuBar
 
     from lightning_pass.users.vaults import Vault
     from lightning_pass.gui.mouse_randomness import PasswordOptions, PwdGenerator
@@ -28,7 +38,7 @@ VAULT_WIDGET_DATA: set[WidgetItem] = {
     WidgetItem("vault_web_line", fill_method="setText", fill_args="website"),
     WidgetItem("vault_username_line", fill_method="setText", fill_args="username"),
     WidgetItem("vault_email_line", fill_method="setText", fill_args="email"),
-    WidgetItem("vault_password_line"),
+    WidgetItem("vault_password_line", fill_method="clear"),
     WidgetItem("vault_page_lcd_number", fill_method="display", fill_args="vault_index"),
 }
 
@@ -44,6 +54,13 @@ class WidgetUtil:
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"{self.__class__.__name__}({self.parent})"
+
+    @functools.cached_property
+    def font(self):
+        font = QtGui.QFont()
+        for i in ("setFamily", "Segoe UI Light"), ("setPointSize", 10):
+            getattr(font, i[0])(i[1])
+        return font
 
     def set_current_widget(self, widget: str) -> None:
         """Set a new current widget.
@@ -131,6 +148,8 @@ class WidgetUtil:
             6,
             1,
         )
+        self.parent.ui.menu_platform = QtWidgets.QMenu(self.parent.ui.menu_bar)
+        self.parent.ui.menu_platform.setTitle("platforms")
 
     @property
     def vault_stacked_widget_index(self) -> int:
@@ -139,7 +158,13 @@ class WidgetUtil:
 
     @vault_stacked_widget_index.setter
     def vault_stacked_widget_index(self, i) -> None:
-        """Set a new ``vault_stacked_widget_index``."""
+        """Set a new ``vault_stacked_widget_index``.
+
+        :raises ValueError: if there was an attempt to set wrong index
+
+        """
+        if i < 1:
+            raise ValueError
         self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
 
     def setup_vault_page(self, page: Vault | None = None) -> None:
@@ -154,17 +179,28 @@ class WidgetUtil:
         )
 
         if page:
+            if not hasattr(self.parent.ui, "menu_platform"):
+                self.setup_menu(name="menu_platform")
             for data in VAULT_WIDGET_DATA:
                 obj = getattr(self.parent.ui.vault_widget.ui, data.name)
+                method = getattr(obj, data.fill_method)
 
                 with contextlib.suppress(TypeError):
-                    method = getattr(obj, data.fill_method)
+                    # information might be missing
                     args = getattr(page, data.fill_args)
 
                 try:
                     method(args)
                 except (TypeError, UnboundLocalError):
                     method()
+
+            self.get_qaction(
+                text=page.platform_name,
+                qmenu=self.parent.ui.menu_platform,
+                event=lambda: self.parent.ui.vault_stacked_widget.setCurrentIndex(
+                    page.vault_index + 1,
+                ),
+            )
 
         self.parent.ui.vault_stacked_widget.setCurrentWidget(
             self.parent.ui.vault_widget.widget,
@@ -193,6 +229,27 @@ class WidgetUtil:
                 self.vault_stacked_widget_index - 1,
             ),
         )
+
+    def setup_menu(self, name: str) -> None:
+        setattr(
+            self.parent.ui,
+            name,
+            QtWidgets.QMenu(self.parent.ui.menu_bar),
+        )
+        self.parent.main_win.menu_bar.addAction(
+            getattr(self.parent.ui, name).menuAction(),
+        )
+
+    def get_qaction(
+        self,
+        text: str,
+        qmenu: QMenu,
+        event: Callable[[], None],
+    ) -> None:
+        setattr(self.parent.ui, text, QtWidgets.QAction(self.parent.main_win))
+        getattr(self.parent.ui, text).setText(text)
+        getattr(self.parent.ui, text).triggered.connect(event)
+        self.parent.ui.menu_platform.addAction(getattr(self.parent.ui, text))
 
 
 WIDGET_DATA = (

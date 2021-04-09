@@ -1,6 +1,7 @@
 """Module containing the Events class used for event handling."""
 from __future__ import annotations
 
+import contextlib
 import pathlib
 from typing import TYPE_CHECKING, Any, Union
 
@@ -29,7 +30,7 @@ if TYPE_CHECKING:
 
 
 class Events:
-    """Used to provide utilities to connections to the events funcs."""
+    """Used to provide logic to specific event functions."""
 
     current_user: Account | bool
     __current_token: str
@@ -37,7 +38,7 @@ class Events:
     def __init__(self, parent: QMainWindow) -> None:
         """Construct the class."""
         super().__init__()
-        self.widget_util = WidgetUtil(self.parent)
+        self.widget_util = WidgetUtil(parent)
 
         self.parent = parent
         self.current_user = False
@@ -412,6 +413,8 @@ class Events:
         )
         self.current_user.update_last_vault_unlock_date()
 
+        self.parent.ui.menu_bar.addAction(self.parent.ui.menu_platform.menuAction())
+
         self.widget_util.set_current_widget("vault")
 
         if previous_index:
@@ -467,9 +470,8 @@ class Events:
         :param index_change: Integer indicating how should the widget index be changed
 
         """
-        if (new_index := self.vault_stacked_widget_index + index_change) > 0:
-            # did not reach border, switch to new page
-            self.vault_stacked_widget_index = new_index
+        with contextlib.suppress(ValueError):
+            self.widget_util.vault_stacked_widget_index += index_change
 
     def update_vault_page_event(self) -> None:
         """Add a new vault tied to the current user.
