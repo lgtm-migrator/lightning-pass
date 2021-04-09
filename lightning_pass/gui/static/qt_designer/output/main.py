@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Form implementation generated from reading ui file 'main.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.3
@@ -9,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_lightning_pass:
+class Ui_lightning_pass(object):
     def setupUi(self, lightning_pass):
         lightning_pass.setObjectName("lightning_pass")
         lightning_pass.resize(705, 386)
@@ -1200,7 +1202,7 @@ class Ui_lightning_pass:
         self.menu_bar.addAction(self.menu_account_2.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(10)
+        self.stacked_widget.setCurrentIndex(8)
         self.vault_stacked_widget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 

@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import itertools
 import pathlib
 from typing import TYPE_CHECKING, Any, Iterator, Sequence, Union
 
@@ -28,6 +29,7 @@ from lightning_pass.util.exceptions import (
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
     VaultException,
+    ValidationFailure,
 )
 
 if TYPE_CHECKING:
@@ -122,7 +124,7 @@ class Events:
                     args = getattr(page, data.args)
 
                 try:
-                    method(str(args))
+                    method(args)
                 except (TypeError, UnboundLocalError):
                     method()
 
@@ -156,20 +158,22 @@ class Events:
         """Return ``Vault`` instantiated with the current vault widget values.
 
         Finds the new values by accessing the children objects of the current widget.
-        The indexes point to the ``line_edit`` objects containing the string values.
+        Genexpr is used to filter the correct widget types and extraxt the text.
 
         """
-        children_objects = (
-            self.parent.ui.vault_stacked_widget.currentWidget().children(),
+        children_objects = itertools.chain(
+            (self.parent.ui.vault_stacked_widget.currentWidget().children()),
         )
         return vaults.Vault(
-            self.current_user.user_id,
-            children_objects[1].text(),
-            children_objects[3].text(),
-            children_objects[6].text(),
-            children_objects[9].text(),
-            children_objects[12].text(),
-            children_objects[15].text(),
+            *(
+                self.current_user.user_id,
+                *(
+                    widget.text()
+                    for widget in children_objects
+                    if isinstance(widget, QtWidgets.QLineEdit)
+                ),
+                self.vault_stacked_widget_index - 1,
+            ),
         )
 
     @property
@@ -513,15 +517,17 @@ class Events:
             self.current_user.username,
         )
 
-        if password and self.current_user.password_validator.authenticate(
-            password,
-            self.current_user.master_password,
-        ):
-            self.current_user.vault_unlocked = True
-            self._message_box("vault_unlocked_box")
-        else:
+        try:
+            self.current_user.password_validator.authenticate(
+                password,
+                self.current_user.master_password,
+            )
+        except ValidationFailure:
             self.current_user.vault_unlocked = False
             self._message_box("invalid_login_box", "Vault")
+        else:
+            self.current_user.vault_unlocked = True
+            self._message_box("vault_unlocked_box")
 
     @decorators.login_required(page_to_access="vault")
     @decorators.master_password_required(page_to_access="vault")
@@ -562,7 +568,7 @@ class Events:
         ):
             # empty one not found -> create new one
             self._setup_vault_page()
-            self.parent.ui.vault_widget.ui.vault_page_lbl.setText(str(page))
+            self.parent.ui.vault_widget.ui.vault_page_lcd_number.display(page)
         else:
             # empty one found -> switch to it
             self.vault_stacked_widget_index = count

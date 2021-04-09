@@ -71,7 +71,7 @@ def update_vault(vault: Vault) -> None:
     # replace website value with a correct url
     vault = Vault(*vault[:2], url, *vault[3:])
 
-    if not EmailValidator.validate_pattern(vault.email):
+    if not EmailValidator.pattern(vault.email):
         raise InvalidEmail
 
     if not all(val for key, val in zip(vault._fields, vault) if key != "vault_index"):
@@ -149,7 +149,7 @@ def _update_vault(vault: Vault) -> None:
                 vault.website,
                 vault.username,
                 vault.email,
-                credentials.Password.hash_password(vault.password),
+                credentials.hash_password(vault.password),
                 vault.user_id,
                 vault.vault_index,
             ),
@@ -188,7 +188,7 @@ def _new_vault(vault: Vault) -> None:
                 vault.website,
                 vault.username,
                 vault.email,
-                credentials.Password.hash_password(vault.password),
+                credentials.hash_password(vault.password),
                 vault.vault_index,
             ),
         )

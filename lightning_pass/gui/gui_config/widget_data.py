@@ -72,7 +72,7 @@ VAULT_WIDGET_DATA: set[WidgetItem] = {
     WidgetItem("vault_username_line", "setText", "username"),
     WidgetItem("vault_email_line", "setText", "email"),
     WidgetItem("vault_password_line"),
-    WidgetItem("vault_page_lbl", "setText", "vault_index"),
+    WidgetItem("vault_page_lcd_number", "display", "vault_index"),
 }
 
 

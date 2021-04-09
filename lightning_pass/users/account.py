@@ -105,10 +105,14 @@ class Account:
             raise InvalidEmail
 
         with database.database_manager() as db:
+            # not using f-string due to SQL injection
             sql = """INSERT INTO lightning_pass.credentials (username, password, email)
-                          VALUES (%s, %s, %s)"""
-            val = (username, credentials.hash_password(password), email)
-            db.execute(sql, val)
+                          VALUES ({},{},{})""".format(
+                "%s",
+                "%s",
+                "%s",
+            )
+            db.execute(sql, (username, credentials.hash_password(password), email))
 
         return cls(credentials.get_user_item(username, "username", "id"))
 
@@ -146,6 +150,19 @@ class Account:
         return account
 
     def validate_password_data(self, data: PasswordData) -> None:
+        """Validate given password data container.
+
+        Used when validating master password or new account password.
+        Both of these operations use the same data containers.
+
+        :param data: The data container
+
+        :raises AccountDoesNotExist: If the authetication fails
+        :raises InvalidPassword: If the new password doesn't match the required pattern
+            Uses the validator of the current account
+        :raises PasswordsDoNotMatch: If the passwords do not match
+
+        """
         try:
             self.password_validator.authenticate(
                 data.confirm_previous,

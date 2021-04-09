@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # Form implementation generated from reading ui file 'vault_widget.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.3
@@ -9,7 +11,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
-class Ui_vault_widget:
+class Ui_vault_widget(object):
     def setupUi(self, vault_widget):
         vault_widget.setObjectName("vault_widget")
         vault_widget.resize(416, 353)
@@ -38,7 +40,7 @@ class Ui_vault_widget:
         font.setPointSize(10)
         self.vault_website_lbl.setFont(font)
         self.vault_website_lbl.setObjectName("vault_website_lbl")
-        self.gridLayout.addWidget(self.vault_website_lbl, 1, 0, 1, 3)
+        self.gridLayout.addWidget(self.vault_website_lbl, 1, 0, 1, 2)
         self.vault_web_line = QtWidgets.QLineEdit(vault_widget)
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -67,7 +69,7 @@ class Ui_vault_widget:
         font.setPointSize(10)
         self.vault_username_line.setFont(font)
         self.vault_username_line.setText("")
-        self.vault_username_line.setClearButtonEnabled(False)
+        self.vault_username_line.setClearButtonEnabled(True)
         self.vault_username_line.setObjectName("vault_username_line")
         self.gridLayout.addWidget(self.vault_username_line, 2, 3, 1, 1)
         self.vault_copy_username_tool_btn = QtWidgets.QToolButton(vault_widget)
@@ -114,7 +116,7 @@ class Ui_vault_widget:
         font.setPointSize(10)
         self.vault_password_lbl.setFont(font)
         self.vault_password_lbl.setObjectName("vault_password_lbl")
-        self.gridLayout.addWidget(self.vault_password_lbl, 4, 0, 1, 3)
+        self.gridLayout.addWidget(self.vault_password_lbl, 4, 0, 1, 2)
         self.vault_password_line = QtWidgets.QLineEdit(vault_widget)
         font = QtGui.QFont()
         font.setFamily("Segoe UI Light")
@@ -136,15 +138,19 @@ class Ui_vault_widget:
         self.vault_backward_tool_btn.setArrowType(QtCore.Qt.LeftArrow)
         self.vault_backward_tool_btn.setObjectName("vault_backward_tool_btn")
         self.gridLayout.addWidget(self.vault_backward_tool_btn, 5, 0, 1, 1)
-        self.vault_page_lbl = QtWidgets.QLabel(vault_widget)
+        self.vault_page_lcd_number = QtWidgets.QLCDNumber(vault_widget)
         font = QtGui.QFont()
-        font.setFamily("Segoe UI Black")
+        font.setFamily("Segoe UI Light")
         font.setPointSize(10)
-        font.setBold(True)
-        font.setWeight(75)
-        self.vault_page_lbl.setFont(font)
-        self.vault_page_lbl.setObjectName("vault_page_lbl")
-        self.gridLayout.addWidget(self.vault_page_lbl, 5, 1, 1, 1)
+        self.vault_page_lcd_number.setFont(font)
+        self.vault_page_lcd_number.setFrameShape(QtWidgets.QFrame.NoFrame)
+        self.vault_page_lcd_number.setFrameShadow(QtWidgets.QFrame.Raised)
+        self.vault_page_lcd_number.setSmallDecimalPoint(False)
+        self.vault_page_lcd_number.setDigitCount(2)
+        self.vault_page_lcd_number.setMode(QtWidgets.QLCDNumber.Dec)
+        self.vault_page_lcd_number.setSegmentStyle(QtWidgets.QLCDNumber.Flat)
+        self.vault_page_lcd_number.setObjectName("vault_page_lcd_number")
+        self.gridLayout.addWidget(self.vault_page_lcd_number, 5, 1, 1, 1)
         self.vault_forward_tool_btn = QtWidgets.QToolButton(vault_widget)
         self.vault_forward_tool_btn.setAutoRaise(True)
         self.vault_forward_tool_btn.setArrowType(QtCore.Qt.RightArrow)
@@ -172,7 +178,7 @@ class Ui_vault_widget:
             _translate("vault_widget", "Enter URL for your platform."),
         )
         self.vault_open_web_tool_btn.setStatusTip(
-            _translate("vault_widget", "Launch website"),
+            _translate("vault_widget", "Launch the website."),
         )
         self.vault_open_web_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_username_lbl.setText(_translate("vault_widget", "Username:"))
@@ -183,7 +189,7 @@ class Ui_vault_widget:
             _translate("vault_widget", "Copy username"),
         )
         self.vault_copy_username_tool_btn.setStatusTip(
-            _translate("vault_widget", "Copy username"),
+            _translate("vault_widget", "Copy the username."),
         )
         self.vault_copy_username_tool_btn.setWhatsThis(
             _translate("vault_widget", "Copy username"),
@@ -197,7 +203,7 @@ class Ui_vault_widget:
             _translate("vault_widget", "Copy email"),
         )
         self.vault_copy_email_tool_btn.setStatusTip(
-            _translate("vault_widget", "Copy email"),
+            _translate("vault_widget", "Copy the email."),
         )
         self.vault_copy_email_tool_btn.setWhatsThis(
             _translate("vault_widget", "Copy email"),
@@ -211,16 +217,12 @@ class Ui_vault_widget:
             _translate("vault_widget", "Copy password"),
         )
         self.vault_copy_password_tool_btn.setStatusTip(
-            _translate("vault_widget", "Copy password"),
+            _translate("vault_widget", "Copy the password."),
         )
         self.vault_copy_password_tool_btn.setWhatsThis(
             _translate("vault_widget", "Copy password"),
         )
         self.vault_copy_password_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_backward_tool_btn.setText(_translate("vault_widget", "..."))
-        self.vault_page_lbl.setText(_translate("vault_widget", " 0"))
         self.vault_forward_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_update_btn.setText(_translate("vault_widget", "Update"))
-
-
-__all__ = ["Ui_vault_widget"]

@@ -39,7 +39,7 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="0" colspan="3">
+   <item row="1" column="0" colspan="2">
     <widget class="QLabel" name="vault_website_lbl">
      <property name="font">
       <font>
@@ -222,7 +222,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="0" colspan="3">
+   <item row="4" column="0" colspan="2">
     <widget class="QLabel" name="vault_password_lbl">
      <property name="font">
       <font>
@@ -296,17 +296,30 @@
     </widget>
    </item>
    <item row="5" column="1">
-    <widget class="QLabel" name="vault_page_lbl">
+    <widget class="QLCDNumber" name="vault_page_lcd_number">
      <property name="font">
       <font>
-       <family>Segoe UI Black</family>
+       <family>Segoe UI Light</family>
        <pointsize>10</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
       </font>
      </property>
-     <property name="text">
-      <string> 0</string>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <property name="smallDecimalPoint">
+      <bool>false</bool>
+     </property>
+     <property name="digitCount">
+      <number>2</number>
+     </property>
+     <property name="mode">
+      <enum>QLCDNumber::Dec</enum>
+     </property>
+     <property name="segmentStyle">
+      <enum>QLCDNumber::Flat</enum>
      </property>
     </widget>
    </item>
