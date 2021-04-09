@@ -36,18 +36,18 @@ def _base_decorator(
     _box_parent_lbl: str | None = None,
     page_to_access: str | None = None,
 ) -> Callable:
-    """Create a custom decorator which can be altered at runtime.
+    """Create a custom decorator factory.
 
     Decorate to ensure that a specific condition is true in order access a specific event.
-    All additional params passed into the deco factory must be used as keyword arguments.
-    If they were passed in as positional, they would override the __function param.
+    All additional params passed into the deco factory (the actual decorator) must be used as keyword arguments.
+    If they were passed in as positional, they would override the __func param.
 
     :param __func: Will become the actual function if decorator is used without parenthesis
         Not supposed to be used manually, defaults to None
-    :param _base_obj: The parent object of the item to check
     :param _condition_object: The object to be called to check whether decorator should advance
         or show the previously defined message box
     :param _message_box: The message box to be shown if the condition check fails
+    :param _base_obj: The parent object of the item to check, must have the specified Callable signature
     :param _box_parent_lbl: The label to be shown on the message box
     :param page_to_access: The page user tried to access, used to modify the message box.
         As of right now, the only kwarg to be used with the actual decorator, defaults to None
@@ -56,7 +56,7 @@ def _base_decorator(
 
     """
 
-    def decorator(func: Callable) -> Callable:
+    def decorator(func: F) -> F:
         """Decorate the original function.
 
         :param func: Function to decorate
@@ -66,7 +66,7 @@ def _base_decorator(
         """
 
         @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> Callable | None:
+        def wrapper(*args, **kwargs) -> F | None:
             """Wrap the original function.
 
             :param args: Positional arguments, first one should be the class attribute which contains
@@ -107,7 +107,7 @@ def _func_executor(func: Callable, *args, **kwargs) -> None:
         return func(args[0])
 
 
-def _attr_checker(*, obj: any, attr: str) -> bool:
+def _attr_checker(*, obj: Any, attr: str) -> bool:
     """Check class attributes.
 
     All params must be passed in as keyword arguments.

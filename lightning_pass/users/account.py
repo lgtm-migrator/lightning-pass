@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Generator, TypeVar
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
 from lightning_pass.users.vaults import Vault
+import lightning_pass.users.vaults as vaults
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
     EmailAlreadyExists,
@@ -34,6 +35,9 @@ _V = TypeVar("_V", bound=Validator)
 
 class Account:
     """This class holds information about the currently logged in user."""
+
+    vaults = vaults
+    credentials = credentials
 
     username_validator: _V = UsernameValidator()
     password_validator: _V = PasswordValidator()
@@ -112,9 +116,9 @@ class Account:
                 "%s",
                 "%s",
             )
-            db.execute(sql, (username, credentials.hash_password(password), email))
+            db.execute(sql, (username, cls.credentials.hash_password(password), email))
 
-        return cls(credentials.get_user_item(username, "username", "id"))
+        return cls(cls.credentials.get_user_item(username, "username", "id"))
 
     @classmethod
     def login(cls, username: str, password: str) -> Account:
@@ -135,7 +139,7 @@ class Account:
             cls.username_validator.unique(username, should_exist=True)
             cls.password_validator.authenticate(
                 password,
-                credentials.get_user_item(
+                cls.credentials.get_user_item(
                     username,
                     "username",
                     "password",
@@ -144,7 +148,7 @@ class Account:
         except ValidationFailure:
             raise AccountDoesNotExist
 
-        account = cls(credentials.get_user_item(username, "username", "id"))
+        account = cls(cls.credentials.get_user_item(username, "username", "id"))
         account.last_login_date = account._last_login_date
         account.update_last_login_date()
         return account
@@ -192,7 +196,7 @@ class Account:
         :returns: the result value
 
         """
-        return credentials.get_user_item(self.user_id, "id", result_column)
+        return self.credentials.get_user_item(self.user_id, "id", result_column)
 
     def set_value(
         self,
@@ -205,7 +209,7 @@ class Account:
         :param str result_column: Column where to insert the value
 
         """
-        credentials.set_user_item(self.user_id, "id", result, result_column)
+        self.credentials.set_user_item(self.user_id, "id", result, result_column)
 
     def update_date(self, column: str) -> None:
         """Update database TIMESTAMP column with CURRENT_TIMESTAMP().
@@ -279,7 +283,7 @@ class Account:
         """
         self.validate_password_data(data)
         self.set_value(
-            credentials.hash_password(str(data.new_password)),
+            self.credentials.hash_password(str(data.new_password)),
             "password",
         )
 
@@ -290,7 +294,7 @@ class Account:
         if not self.password_validator.match(password, confirm_password):
             raise PasswordsDoNotMatch
 
-        self.set_value(credentials.hash_password(password), "password")
+        self.set_value(self.credentials.hash_password(password), "password")
 
     @property
     def email(self) -> str:
@@ -347,7 +351,7 @@ class Account:
         :returns: path to user's profile picture
 
         """
-        return str(credentials.get_profile_picture_path(self.profile_picture))
+        return str(self.credentials.get_profile_picture_path(self.profile_picture))
 
     @property
     def _last_login_date(self) -> datetime:
@@ -392,7 +396,7 @@ class Account:
         """
         self.validate_password_data(data)
         self.set_value(
-            credentials.hash_password(data.new_password),
+            self.credentials.hash_password(data.new_password),
             "master_password",
         )
 
