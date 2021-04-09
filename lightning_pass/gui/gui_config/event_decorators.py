@@ -2,30 +2,37 @@
 from __future__ import annotations
 
 import functools
-from typing import Any, Callable, TypeVar, overload
+from typing import Any, Callable, TypeVar, NewType, overload
 
 F = TypeVar("F", bound=Callable[..., Any])
+condition = NewType("condition", Callable[[str], bool])
 
 
 @overload
-def _base_decorator(__func: F) -> F:
+def _base_decorator(__func: F, _condition_object: condition, message_bpx: str) -> F:
     """Bare decorator usage."""
     ...
 
 
 @overload
-def _base_decorator(*, page_to_access: str | None = None) -> Callable[[F], F]:
+def _base_decorator(
+    __func: F,
+    *,
+    _condition_object: condition,
+    message_box: str,
+    page_to_access: str | None = None,
+) -> Callable[[F], F]:
     """Decorator with arguments."""
     ...
 
 
 def _base_decorator(
-    __func: Callable | None = None,
+    __func: F = None,
     /,
     *,
+    _condition_object: condition,
+    _message_box: str,
     _base_obj: str | None = None,
-    _condition_object: Callable | None = None,
-    _message_box: str | None = None,
     _box_parent_lbl: str | None = None,
     page_to_access: str | None = None,
 ) -> Callable:
@@ -86,6 +93,20 @@ def _base_decorator(
     return decorator
 
 
+def _func_executor(func: Callable, *args, **kwargs) -> None:
+    """Simple function execution wrapper.
+
+    :param func: The function to execute
+    :param args: Optional positional arguments
+    :param kwargs: Optional keyword arguments
+
+    """
+    try:
+        return func(*args, **kwargs)
+    except TypeError:
+        return func(args[0])
+
+
 def _attr_checker(*, obj: any, attr: str) -> bool:
     """Check class attributes.
 
@@ -103,20 +124,6 @@ def _attr_checker(*, obj: any, attr: str) -> bool:
         return False
 
 
-def _func_executor(func: Callable, *args, **kwargs) -> None:
-    """Simple function execution wrapper.
-
-    :param func: The function to execute
-    :param args: Optional positional arguments
-    :param kwargs: Optional keyword arguments
-
-    """
-    try:
-        return func(*args, **kwargs)
-    except TypeError:
-        return func(args[0])
-
-
 login_required = functools.partial(
     _base_decorator,
     _condition_object=functools.partial(_attr_checker, attr="current_user"),
@@ -125,15 +132,15 @@ login_required = functools.partial(
 )
 master_password_required = functools.partial(
     _base_decorator,
-    _base_obj="current_user",
     _condition_object=functools.partial(_attr_checker, attr="master_password"),
     _message_box="master_password_required_box",
+    _base_obj="current_user",
 )
 vault_unlock_required = functools.partial(
     _base_decorator,
-    _base_obj="current_user",
     _condition_object=functools.partial(_attr_checker, attr="vault_unlocked"),
     _message_box="vault_unlock_required_box",
+    _base_obj="current_user",
 )
 
 

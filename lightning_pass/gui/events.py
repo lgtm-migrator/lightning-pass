@@ -158,7 +158,7 @@ class Events:
         """Return ``Vault`` instantiated with the current vault widget values.
 
         Finds the new values by accessing the children objects of the current widget.
-        Genexpr is used to filter the correct widget types and extraxt the text.
+        Genexpr is used to filter the correct widget types and extract the text.
 
         """
         children_objects = itertools.chain(
@@ -267,7 +267,7 @@ class Events:
                 ):
                     # mimic waiting time
                     loop = QtCore.QEventLoop()
-                    QtCore.QTimer.singleShot(2000, loop.quit)
+                    QtCore.QTimer.singleShot(2_000, loop.quit)
                     loop.exec()
 
                 credentials.send_reset_email(email)
