@@ -5,6 +5,7 @@ import contextlib
 import pathlib
 from typing import TYPE_CHECKING, Any, Union
 
+import sip
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -32,7 +33,7 @@ if TYPE_CHECKING:
 class Events:
     """Used to provide logic to specific event functions."""
 
-    current_user: Account | bool
+    current_user: Account | None
     __current_token: str
 
     def __init__(self, parent: QMainWindow) -> None:
@@ -277,10 +278,15 @@ class Events:
             )
 
     def logout_event(self) -> None:
-        """Logout current user."""
+        """Logout current user and clear his platform ``QMenu``."""
         self.current_user.update_last_login_date()
-        # unlink current_user reference
-        del self.current_user
+
+        for menu in self.parent.ui.menu_bar.children():
+            if isinstance(menu, QtWidgets.QMenu) and menu.title() == "platforms":
+                for action in menu.children():
+                    action.setVisible(False)
+
+        self.current_user = None
         self.home_event()
 
     def edit_details_event(self) -> None:
@@ -405,16 +411,18 @@ class Events:
         for page in self.current_user.vault_pages:
             self.widget_util.setup_vault_page(page)
 
+        self.parent.ui.menu_bar.addAction(
+            getattr(self.parent.ui, "menu_platform").menuAction(),
+        )
+
         self.parent.ui.vault_username_lbl.setText(
             f"Current user: {self.current_user.username}",
         )
         self.parent.ui.vault_date_lbl.setText(
             f"Last unlock date: {str(self.current_user._last_vault_unlock_date)}",
         )
+
         self.current_user.update_last_vault_unlock_date()
-
-        self.parent.ui.menu_bar.addAction(self.parent.ui.menu_platform.menuAction())
-
         self.widget_util.set_current_widget("vault")
 
         if previous_index:
@@ -527,6 +535,16 @@ class Events:
                 )
 
             self.vault_event(previous_index=self.vault_stacked_widget_index)
+
+    def menu_platform_action_event(self, platform: str, index: int):
+        if not self.current_user.vault_unlocked:
+            self.widget_util.message_box(
+                "vault_unlock_required_box",
+                "Vault",
+                page=f"{platform} platform",
+            )
+        else:
+            self.vault_event(previous_index=index)
 
     def toggle_stylesheet_light(self, *args: Any) -> None:
         """Change stylesheet to light mode."""

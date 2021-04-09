@@ -7,11 +7,10 @@ from typing import (
     TYPE_CHECKING,
     Any,
     NamedTuple,
-    Optional,
     Sequence,
     Iterator,
-    Generator,
     Callable,
+    Union,
 )
 
 from PyQt5 import QtWidgets, QtGui
@@ -19,7 +18,7 @@ from PyQt5 import QtWidgets, QtGui
 import lightning_pass.gui.mouse_randomness as mouse_randomness
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QMenu, QMenuBar
+    from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QMenu
 
     from lightning_pass.users.vaults import Vault
     from lightning_pass.gui.mouse_randomness import PasswordOptions, PwdGenerator
@@ -148,8 +147,57 @@ class WidgetUtil:
             6,
             1,
         )
-        self.parent.ui.menu_platform = QtWidgets.QMenu(self.parent.ui.menu_bar)
-        self.parent.ui.menu_platform.setTitle("platforms")
+        if not hasattr(
+            self.parent.ui,
+            name := "menu_platform",
+        ):
+            self.setup_menu(
+                obj_name=name,
+                title="platforms",
+            )
+
+    def setup_menu(self, obj_name: str, title: str) -> QMenu:
+        """Setup a new ``QMenu`` tied to the root ``QMenuBar``.
+
+        :param obj_name: Reference to the new object
+        :param title: Text on the actual widget
+
+        :returns: The new ``QMenu`` object
+
+        """
+        setattr(
+            self.parent.ui,
+            obj_name,
+            QtWidgets.QMenu(self.parent.ui.menu_bar),
+        )
+        (menu := getattr(self.parent.ui, obj_name)).setTitle(title)
+        menu.setFont(self.font)
+        return menu
+
+    def setup_action(
+        self,
+        obj_name: str,
+        text: str,
+        event: Callable[[], None],
+        menu: str,
+    ) -> QAction:
+        """Setup a new ``QAction``.
+
+        :param obj_name: Reference to the new object
+        :param text: Text on the actual widget
+        :param event: What will happen when the ``QAction`` is triggered
+        :param menu: The root ``QMenu`` for the new action
+
+        :returns: The newly instantiated action
+
+        """
+        obj_name = f"action_{obj_name}"
+        setattr(self.parent.ui, obj_name, QtWidgets.QAction(self.parent.main_win))
+        (action := getattr(self.parent.ui, obj_name)).setText(text)
+        action.setFont(self.font)
+        action.triggered.connect(event)
+        getattr(self.parent.ui, menu).addAction(action)
+        return action
 
     @property
     def vault_stacked_widget_index(self) -> int:
@@ -179,8 +227,6 @@ class WidgetUtil:
         )
 
         if page:
-            if not hasattr(self.parent.ui, "menu_platform"):
-                self.setup_menu(name="menu_platform")
             for data in VAULT_WIDGET_DATA:
                 obj = getattr(self.parent.ui.vault_widget.ui, data.name)
                 method = getattr(obj, data.fill_method)
@@ -194,13 +240,25 @@ class WidgetUtil:
                 except (TypeError, UnboundLocalError):
                     method()
 
-            self.get_qaction(
-                text=page.platform_name,
-                qmenu=self.parent.ui.menu_platform,
-                event=lambda: self.parent.ui.vault_stacked_widget.setCurrentIndex(
-                    page.vault_index + 1,
-                ),
-            )
+            if not hasattr(self.parent.ui, f"action_{page.platform_name}"):
+                self.setup_action(
+                    obj_name=page.platform_name,
+                    text=page.platform_name,
+                    event=lambda: self.parent.events.menu_platform_action_event(
+                        page.platform_name,
+                        page.vault_index + 1,
+                    ),
+                    menu="menu_platform",
+                )
+            else:
+                with contextlib.suppress(AttributeError):
+                    for menu in self.parent.ui.menu_bar.children():
+                        if (
+                            isinstance(menu, QtWidgets.QMenu)
+                            and menu.title() == "platforms"
+                        ):
+                            for action in menu.children():
+                                action.setVisible(True)
 
         self.parent.ui.vault_stacked_widget.setCurrentWidget(
             self.parent.ui.vault_widget.widget,
@@ -226,30 +284,10 @@ class WidgetUtil:
                     for widget in children_objects
                     if isinstance(widget, QtWidgets.QLineEdit)
                 ),
+                # offset dummy page
                 self.vault_stacked_widget_index - 1,
             ),
         )
-
-    def setup_menu(self, name: str) -> None:
-        setattr(
-            self.parent.ui,
-            name,
-            QtWidgets.QMenu(self.parent.ui.menu_bar),
-        )
-        self.parent.main_win.menu_bar.addAction(
-            getattr(self.parent.ui, name).menuAction(),
-        )
-
-    def get_qaction(
-        self,
-        text: str,
-        qmenu: QMenu,
-        event: Callable[[], None],
-    ) -> None:
-        setattr(self.parent.ui, text, QtWidgets.QAction(self.parent.main_win))
-        getattr(self.parent.ui, text).setText(text)
-        getattr(self.parent.ui, text).triggered.connect(event)
-        self.parent.ui.menu_platform.addAction(getattr(self.parent.ui, text))
 
 
 WIDGET_DATA = (
@@ -360,6 +398,3 @@ class ClearPreviousWidget:
                 method(widget_item.clear_args)
             except TypeError:
                 method()
-
-
-__all__ = ["WidgetItem", "WIDGET_DATA", "ClearPreviousWidget"]
