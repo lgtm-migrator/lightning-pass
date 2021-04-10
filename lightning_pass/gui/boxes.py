@@ -83,7 +83,7 @@ class MessageBoxes(QWidget):
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__name__}({self.main_win}, {self.parent})"
+        return f"{self.__class__.__qualname__}({self.main_win}, {self.parent})"
 
     def message_box_factory(
         self,

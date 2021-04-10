@@ -130,6 +130,10 @@ class SplashScreen(QtWidgets.QWidget):
         self.timer.timeout.connect(self.increase)
         self.progress = 0
 
+    def __repr__(self) -> str:
+        """Provide information about this class."""
+        return f"{self.__class__.__qualname__}()"
+
     def show(self) -> None:
         """Show the ``SplashScreen`` and initialize loading."""
         self.widget.show()
@@ -174,7 +178,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__name__}()"
+        return f"{self.__class__.__qualname__}()"
 
     @property
     def current_index(self) -> int:
@@ -221,6 +225,10 @@ class VaultWidget(QtWidgets.QWidget):
         self.widget = QtWidgets.QWidget()
         self.ui = vault_widget.Ui_vault_widget()
         self.ui.setupUi(self.widget)
+
+    def __repr__(self) -> str:
+        """Provide information about this class."""
+        return f"{self.__class__.__qualname__}()"
 
 
 __all__ = [

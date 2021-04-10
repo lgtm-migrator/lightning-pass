@@ -104,7 +104,7 @@ class PwdGenerator:
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"""{self.__class__.__name__}({self.options})"""
+        return f"""{self.__class__.__qualname__}({self.options})"""
 
     def div_check(self) -> Generator[bool, int, bool]:
         """Generator used to check whether a character should be collected.

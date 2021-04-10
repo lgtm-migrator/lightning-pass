@@ -45,7 +45,7 @@ class Events:
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__name__}({self.parent})"
+        return f"{self.__class__.__qualname__}({self.parent})"
 
     def home_event(self) -> None:
         """Switch to home widget."""
@@ -409,7 +409,7 @@ class Events:
         self.widget_util.rebuild_vault_stacked_widget()
 
         for page in self.current_user.vault_pages:
-            self.widget_util.setup_vault_page(page)
+            self.widget_util.setup_vault_widget(page)
 
         self.parent.ui.menu_bar.addAction(
             getattr(self.parent.ui, "menu_platform").menuAction(),
@@ -439,7 +439,7 @@ class Events:
             count := self.parent.ui.vault_stacked_widget.count() - 1
         ):
             # empty one not found -> create new one
-            self.widget_util.setup_vault_page()
+            self.widget_util.setup_vault_widget()
             self.parent.ui.vault_widget.ui.vault_page_lcd_number.display(page)
         else:
             # empty one found -> switch to it

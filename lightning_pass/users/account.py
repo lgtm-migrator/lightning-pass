@@ -54,7 +54,7 @@ class Account:
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__name__}({self.user_id})"
+        return f"{self.__class__.__qualname__}({self.user_id})"
 
     @classmethod
     def register(
@@ -430,3 +430,7 @@ class Account:
     def vault_pages_int(self) -> int:
         """Return an integer with the amount of vault pages a user has registered."""
         return sum(1 for _ in self.vault_pages)
+
+
+if __name__ == "__main__":
+    ...

@@ -34,11 +34,15 @@ class Buttons:
     ) -> None:
         """Buttons constructor.
 
-        :param QMainWindow parent: Main GUI window
+        :param parent: Main GUI window
 
         """
         super().__init__(*args, **kwargs)
         self.parent = parent
+
+    def __repr__(self) -> str:
+        """Provide information about this class."""
+        return f"{self.__class__.__qualname__}({self.parent})"
 
     def setup_all(self):
         """Run all 3 funcs to setup everything."""

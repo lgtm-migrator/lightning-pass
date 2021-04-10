@@ -18,10 +18,10 @@ if TYPE_CHECKING:
 
 class WidgetItem(NamedTuple):
     name: str
-    fill_method: str | None = None
-    fill_args: str | None = None
-    clear_method: str | None = "clear"
-    clear_args: Any | None = None
+    fill_method: Union[str, None] = None
+    fill_args: Union[str, None] = None
+    clear_method: Union[str, None] = "clear"
+    clear_args: Union[Any, None] = None
 
 
 VAULT_WIDGET_DATA: set[WidgetItem] = {
@@ -44,10 +44,11 @@ class WidgetUtil:
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__name__}({self.parent})"
+        return f"{self.__class__.__qualname__}({self.parent})"
 
     @functools.cached_property
     def font(self):
+        """Return the font used for all widgets except titles."""
         font = QtGui.QFont()
         for i in ("setFamily", "Segoe UI Light"), ("setPointSize", 10):
             getattr(font, i[0])(i[1])
@@ -207,7 +208,7 @@ class WidgetUtil:
             raise ValueError
         self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
 
-    def setup_vault_page(self, page: Vault | None = None) -> None:
+    def setup_vault_widget(self, page: Vault | None = None) -> None:
         """Set up and connect a new vault page
 
         :param page: Vault object containing the data which should be shown on the current page, defaults to None
@@ -219,43 +220,64 @@ class WidgetUtil:
         )
 
         if page:
-            for data in VAULT_WIDGET_DATA:
-                obj = getattr(self.parent.ui.vault_widget.ui, data.name)
-                method = getattr(obj, data.fill_method)
-
-                with contextlib.suppress(TypeError):
-                    # information might be missing
-                    args = getattr(page, data.fill_args)
-
-                try:
-                    method(args)
-                except (TypeError, UnboundLocalError):
-                    method()
-
-            if not hasattr(self.parent.ui, f"action_{page.platform_name}"):
-                self.setup_action(
-                    obj_name=page.platform_name,
-                    text=page.platform_name,
-                    event=lambda: self.parent.events.menu_platform_action_event(
-                        page.platform_name,
-                        page.vault_index + 1,
-                    ),
-                    menu="menu_platform",
-                )
-            else:
-                with contextlib.suppress(AttributeError):
-                    for menu in self.parent.ui.menu_bar.children():
-                        if (
-                            isinstance(menu, QtWidgets.QMenu)
-                            and menu.title() == "platforms"
-                        ):
-                            for action in menu.children():
-                                action.setVisible(True)
+            self.setup_vault_page(page)
 
         self.parent.ui.vault_stacked_widget.setCurrentWidget(
             self.parent.ui.vault_widget.widget,
         )
         self.parent.buttons.setup_vault_buttons()
+
+    def setup_vault_page(self, page):
+        """Setup a single page.
+
+        Connect buttons to their corresponding events.
+        Set text on universal labels.
+
+        :param page: The data which will be used during the setup
+
+        """
+        for data in VAULT_WIDGET_DATA:
+            obj = getattr(self.parent.ui.vault_widget.ui, data.name)
+            method = getattr(obj, data.fill_method)
+
+            with contextlib.suppress(TypeError):
+                # information might be missing
+                args = getattr(page, data.fill_args)
+
+            try:
+                method(args)
+            except (TypeError, UnboundLocalError):
+                method()
+
+        self.setup_vault_page_menu(page)
+
+    def setup_vault_page_menu(self, page):
+        """Setup a ``QAction`` for the given vault page.
+
+        If the action already exists then just make it visible.
+
+        :param page: The data which will be used during the setup
+
+        """
+        if not hasattr(self.parent.ui, f"action_{page.platform_name}"):
+            self.setup_action(
+                obj_name=page.platform_name,
+                text=page.platform_name,
+                event=lambda: self.parent.events.menu_platform_action_event(
+                    page.platform_name,
+                    page.vault_index + 1,
+                ),
+                menu="menu_platform",
+            )
+        else:
+            with contextlib.suppress(AttributeError):
+                for menu in self.parent.ui.menu_bar.children():
+                    if (
+                        isinstance(menu, QtWidgets.QMenu)
+                        and menu.title() == "platforms"
+                    ):
+                        for action in menu.children():
+                            action.setVisible(True)
 
     @property
     def vault_widget_vault(self) -> Vault:
