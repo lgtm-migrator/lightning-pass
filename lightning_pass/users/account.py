@@ -8,7 +8,6 @@ from typing import TYPE_CHECKING, Generator, TypeVar
 import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
-from lightning_pass.users.vaults import Vault
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
     EmailAlreadyExists,
@@ -27,6 +26,7 @@ from lightning_pass.util.validators import (
 )
 
 if TYPE_CHECKING:
+    from lightning_pass.users.vaults import Vault
     from lightning_pass.util.credentials import PasswordData
 
 
@@ -255,11 +255,11 @@ class Account:
 
         """
         try:
-            self.username_validator.validate_pattern(value)
+            self.username_validator.pattern(value)
         except ValidationFailure:
             raise InvalidUsername
         try:
-            self.username_validator.validate_unique(value)
+            self.username_validator.unique(value)
         except ValidationFailure:
             raise UsernameAlreadyExists
 
@@ -423,8 +423,8 @@ class Account:
             db.execute(sql, (self.user_id,))
             result = db.fetchall()
 
-        # list slice first element -> database primary key
-        yield from (Vault(*vault[1:]) for vault in result if vault)
+        # slice first element -> database primary key
+        yield from (self.vaults.Vault(*vault[1:]) for vault in result if vault)
 
     @property
     def vault_pages_int(self) -> int:

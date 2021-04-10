@@ -5,7 +5,7 @@ import functools
 import itertools
 from typing import TYPE_CHECKING, Any, Callable, Iterator, NamedTuple, Sequence, Union
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 import lightning_pass.gui.mouse_randomness as mouse_randomness
 
@@ -81,6 +81,18 @@ class WidgetUtil:
         finally:
             for widget in widgets:
                 widget.setEnabled(True)
+
+    @staticmethod
+    def waiting_loop(seconds: int) -> None:
+        """Stop the application for the given amount of seconds.
+
+        :param seconds: The length of the event loop
+
+        """
+        loop = QtCore.QEventLoop()
+        # turn to milliseconds
+        QtCore.QTimer.singleShot(seconds * 1_000, loop.quit)
+        loop.exec()
 
     def message_box(self, message_box: str, *args: Any, **kwargs: Any) -> None:
         """Show a chosen message box with the given positional and keyword arguments.

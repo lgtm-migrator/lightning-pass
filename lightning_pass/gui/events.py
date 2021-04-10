@@ -6,7 +6,7 @@ import pathlib
 from typing import TYPE_CHECKING, Any, Union
 
 import qdarkstyle
-from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5 import QtGui, QtWidgets
 
 import lightning_pass.gui.gui_config.event_decorators as decorators
 from lightning_pass.gui.gui_config.widgets import WidgetUtil
@@ -105,10 +105,13 @@ class Events:
 
     def send_token_event(self) -> None:
         """Send token and switch to token page."""
-        if self.current_user.email_validator.pattern(
-            email := self.parent.ui.forgot_pass_email_line.text(),
-        ):
-            # momentarily disable the button to avoid multiple send requests
+        try:
+            self.current_user.email_validator.pattern(
+                email := self.parent.ui.forgot_pass_email_line.text(),
+            )
+        except ValidationFailure:
+            self.widget_util.message_box("invalid_email_box", "Forgot Password")
+        else:
             with self.widget_util.disable_widget(self.parent.ui.reset_token_submit_btn):
                 if not self.current_user.credentials.check_item_existence(
                     email,
@@ -116,15 +119,11 @@ class Events:
                     should_exist=True,
                 ):
                     # mimic waiting time
-                    loop = QtCore.QEventLoop()
-                    QtCore.QTimer.singleShot(2_000, loop.quit)
-                    loop.exec()
+                    self.widget_util.waiting_loop(2)
 
                 self.current_user.credentials.send_reset_email(email)
 
             self.widget_util.message_box("reset_email_sent_box", "Forgot Password")
-        else:
-            self.widget_util.message_box("invalid_email_box", "Forgot Password")
 
     def submit_reset_token_event(self) -> None:
         """If submitted token is correct, proceed to password change widget."""
@@ -449,23 +448,22 @@ class Events:
         """Remove the current vault page."""
         platform = self.widget_util.vault_widget_vault.platform_name
 
-        self.widget_util.message_box(
-            "confirm_vault_deletion_box",
+        text = self.parent.ui.input_dialogs.confirm_vault_deletion_dialog(
             "Vault",
             platform,
         )
+        if text == "CONFIRM":
+            self.current_user.vaults.delete_vault(
+                self.current_user.user_id,
+                self.widget_util.vault_stacked_widget_index - 1,
+            )
 
-        self.current_user.vaults.delete_vault(
-            self.current_user.user_id,
-            self.vault_stacked_widget_index - 1,
-        )
-
-        self.vault_event()
-        self.widget_util.message_box(
-            "vault_page_deleted_box",
-            "Vault",
-            platform,
-        )
+            self.vault_event()
+            self.widget_util.message_box(
+                "vault_page_deleted_box",
+                "Vault",
+                platform,
+            )
 
     def vault_lock_event(self) -> None:
         """Lock the vault."""
@@ -534,7 +532,7 @@ class Events:
                     self.widget_util.vault_widget_vault.platform_name,
                 )
 
-            self.vault_event(previous_index=self.vault_stacked_widget_index)
+            self.vault_event(previous_index=self.widget_util.vault_stacked_widget_index)
 
     def menu_platform_action_event(self, platform: str, index: int):
         if not self.current_user.vault_unlocked:

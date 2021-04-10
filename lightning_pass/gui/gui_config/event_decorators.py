@@ -9,7 +9,7 @@ condition = NewType("condition", Callable[[str], bool])
 
 
 @overload
-def _base_decorator(__func: F, _condition_object: condition, message_bpx: str) -> F:
+def _base_decorator(__func: F, _condition_object: condition, message_box: str) -> F:
     """Bare decorator usage."""
     ...
 

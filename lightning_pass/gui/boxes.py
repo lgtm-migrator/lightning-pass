@@ -10,6 +10,7 @@ from typing import Callable, NamedTuple, Optional, Union
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QInputDialog,
+    QLabel,
     QLineEdit,
     QMainWindow,
     QMessageBox,
@@ -48,7 +49,6 @@ def event_handler_factory(options: dict[str, Callable[[], None]]) -> Callable[[]
         """
         with contextlib.suppress(KeyError):
             event = options[btn.text()]
-            print(btn.text())
         with contextlib.suppress(UnboundLocalError):
             event()
 
@@ -133,6 +133,9 @@ class MessageBoxes(QWidget):
             box.buttonClicked.connect(event_handler)
 
         box.setTextFormat(Qt.RichText)
+        box.setFont(font := self.events.widget_util.font)
+        for btn in box.findChildren(QPushButton):
+            btn.setFont(font)
 
         return box
 
@@ -533,29 +536,6 @@ contain at least one special character."""
             informative_text=informative,
         ).exec()
 
-    def confirm_vault_deletion_box(self, parent_lbl: str, platform: str) -> None:
-        """Show a message box asking the user to confirm deletion of a vault page.
-
-        :param parent_lbl: Specifies which windows instantiated the current box
-        :param platform: The platform which will be deleted
-
-        """
-        self.message_box_factory(
-            parent_lbl,
-            f"You are about to delete {platform}.",
-            QMessageBox.Question,
-            informative_text=f"""All of the data connected to {platform} will be permanently deleted, are you sure you want to proceed?""",
-            standard_buttons=QMessageBox.Cancel | QMessageBox.Yes,
-            default_button=QMessageBox.Cancel,
-            event_handler=event_handler_factory(
-                {
-                    "Cancel": self.events.vault_event(
-                        previous_index=self.events.vault_stacked_widget_index,
-                    ),
-                },
-            ),
-        ).exec()
-
 
 class InputDialogs(QWidget):
 
@@ -601,6 +581,26 @@ class InputDialogs(QWidget):
 
         """
         return self._input_password_dialog(parent_lbl, account_username, "Password")
+
+    def confirm_vault_deletion_dialog(self, parent_lbl: str, platform: str):
+        """Show a dialog asking user to enter their master password.
+
+        :param parent_lbl: The window which instantiated the current dialog
+        :param platform: The platform which might be deleted
+
+        """
+        dialog = QInputDialog(self.main_win)
+        dialog.setInputMode(QInputDialog.TextInput)
+        dialog.setWindowTitle(parent_lbl)
+        dialog.setLabelText(
+            f'All of the data connected to {platform} will be permanently deleted.\nType in "CONFIRM" to proceed:',
+        )
+        dialog.setFont(font := self.events.widget_util.font)
+        dialog.findChild(QLabel).setFont(font)
+        for btn in dialog.findChildren(QPushButton):
+            btn.setFont(font)
+        dialog.exec()
+        return dialog.textValue()
 
 
 __all__ = [

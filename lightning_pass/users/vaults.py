@@ -5,7 +5,12 @@ from typing import NamedTuple
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
-from lightning_pass.util.exceptions import InvalidEmail, InvalidURL, VaultException
+from lightning_pass.util.exceptions import (
+    InvalidEmail,
+    InvalidURL,
+    ValidationFailure,
+    VaultException,
+)
 from lightning_pass.util.validators import EmailValidator
 
 
@@ -71,7 +76,9 @@ def update_vault(vault: Vault) -> None:
     # replace website value with a correct url
     vault = Vault(*vault[:2], url, *vault[3:])
 
-    if not EmailValidator.pattern(vault.email):
+    try:
+        EmailValidator.pattern(vault.email)
+    except ValidationFailure:
         raise InvalidEmail
 
     if not all(val for key, val in zip(vault._fields, vault) if key != "vault_index"):
