@@ -5,7 +5,6 @@ import contextlib
 import pathlib
 from typing import TYPE_CHECKING, Any, Union
 
-import sip
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -22,8 +21,8 @@ from lightning_pass.util.exceptions import (
     InvalidUsername,
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
-    VaultException,
     ValidationFailure,
+    VaultException,
 )
 
 if TYPE_CHECKING:
@@ -33,7 +32,7 @@ if TYPE_CHECKING:
 class Events:
     """Used to provide logic to specific event functions."""
 
-    current_user: Account | None
+    current_user: Union[Account, bool]
     __current_token: str
 
     def __init__(self, parent: QMainWindow) -> None:
@@ -281,12 +280,13 @@ class Events:
         """Logout current user and clear his platform ``QMenu``."""
         self.current_user.update_last_login_date()
 
+        # hide the platform QAction, will be shown later upon next vault unlock
         for menu in self.parent.ui.menu_bar.children():
             if isinstance(menu, QtWidgets.QMenu) and menu.title() == "platforms":
                 for action in menu.children():
                     action.setVisible(False)
 
-        self.current_user = None
+        self.current_user = False
         self.home_event()
 
     def edit_details_event(self) -> None:

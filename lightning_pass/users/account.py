@@ -5,10 +5,10 @@ import functools
 from datetime import datetime
 from typing import TYPE_CHECKING, Generator, TypeVar
 
+import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
 from lightning_pass.users.vaults import Vault
-import lightning_pass.users.vaults as vaults
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
     EmailAlreadyExists,

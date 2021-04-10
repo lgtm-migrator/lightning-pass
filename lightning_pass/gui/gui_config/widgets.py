@@ -3,25 +3,17 @@ from __future__ import annotations
 import contextlib
 import functools
 import itertools
-from typing import (
-    TYPE_CHECKING,
-    Any,
-    NamedTuple,
-    Sequence,
-    Iterator,
-    Callable,
-    Union,
-)
+from typing import TYPE_CHECKING, Any, Callable, Iterator, NamedTuple, Sequence, Union
 
-from PyQt5 import QtWidgets, QtGui
+from PyQt5 import QtGui, QtWidgets
 
 import lightning_pass.gui.mouse_randomness as mouse_randomness
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QMainWindow, QWidget, QAction, QMenu
+    from PyQt5.QtWidgets import QAction, QMainWindow, QMenu, QWidget
 
-    from lightning_pass.users.vaults import Vault
     from lightning_pass.gui.mouse_randomness import PasswordOptions, PwdGenerator
+    from lightning_pass.users.vaults import Vault
 
 
 class WidgetItem(NamedTuple):

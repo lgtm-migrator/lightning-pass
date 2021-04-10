@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import functools
-from typing import Any, Callable, TypeVar, NewType, overload
+from typing import Any, Callable, NewType, TypeVar, overload
 
 F = TypeVar("F", bound=Callable[..., Any])
 condition = NewType("condition", Callable[[str], bool])
