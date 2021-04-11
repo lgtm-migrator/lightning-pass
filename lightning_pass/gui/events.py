@@ -457,6 +457,7 @@ class Events:
                 self.current_user.user_id,
                 self.widget_util.vault_stacked_widget_index - 1,
             )
+            self.parent.ui
 
             self.vault_event()
             self.widget_util.message_box(

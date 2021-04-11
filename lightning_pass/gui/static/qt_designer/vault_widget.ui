@@ -56,7 +56,7 @@
     <widget class="QLineEdit" name="vault_web_line">
      <property name="font">
       <font>
-       <family>Segoe UI Light</family>
+       <family>Consolas</family>
        <pointsize>10</pointsize>
       </font>
      </property>
@@ -107,7 +107,7 @@
     <widget class="QLineEdit" name="vault_username_line">
      <property name="font">
       <font>
-       <family>Segoe UI Light</family>
+       <family>Consolas</family>
        <pointsize>10</pointsize>
       </font>
      </property>
@@ -179,7 +179,7 @@
     <widget class="QLineEdit" name="vault_email_line">
      <property name="font">
       <font>
-       <family>Segoe UI Light</family>
+       <family>Consolas</family>
        <pointsize>10</pointsize>
       </font>
      </property>
@@ -239,7 +239,7 @@
     <widget class="QLineEdit" name="vault_password_line">
      <property name="font">
       <font>
-       <family>Segoe UI Light</family>
+       <family>Consolas</family>
        <pointsize>10</pointsize>
       </font>
      </property>

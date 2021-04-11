@@ -34,12 +34,12 @@
     </property>
     <property name="font">
      <font>
-      <family>Segoe UI Light</family>
+      <family>Consolas</family>
       <pointsize>10</pointsize>
      </font>
     </property>
     <property name="currentIndex">
-     <number>8</number>
+     <number>11</number>
     </property>
     <widget class="QWidget" name="loading">
      <property name="cursor">
@@ -558,7 +558,7 @@
        <widget class="QLineEdit" name="reset_token_token_line">
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -654,6 +654,12 @@
       </item>
       <item row="3" column="0" colspan="2">
        <widget class="QPushButton" name="reset_password_confirm_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Confirm Reset Password</string>
         </property>
@@ -661,6 +667,12 @@
       </item>
       <item row="3" column="2">
        <widget class="QPushButton" name="reset_password_main_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Main Menu</string>
         </property>
@@ -685,6 +697,12 @@
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="change_password_current_pass_lbl">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Current Password:</string>
         </property>
@@ -720,7 +738,7 @@
        <widget class="QLineEdit" name="change_password_new_pass_line">
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -755,7 +773,7 @@
        <widget class="QLineEdit" name="change_password_conf_new_line">
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -1042,7 +1060,7 @@
        <widget class="QLineEdit" name="generate_pass_p2_final_pass_line">
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -1221,7 +1239,7 @@
         </property>
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -1372,7 +1390,7 @@
         </property>
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -1645,7 +1663,7 @@
        <widget class="QLineEdit" name="master_pass_current_pass_line">
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -1677,7 +1695,7 @@
        <widget class="QLineEdit" name="master_pass_master_pass_line">
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -1709,7 +1727,7 @@
        <widget class="QLineEdit" name="master_pass_conf_master_pass_line">
         <property name="font">
          <font>
-          <family>Segoe UI Light</family>
+          <family>Consolas</family>
           <pointsize>10</pointsize>
          </font>
         </property>
@@ -1726,6 +1744,12 @@
       </item>
       <item row="4" column="2">
        <widget class="QPushButton" name="master_pass_menu_btn">
+        <property name="font">
+         <font>
+          <family>Segoe UI Light</family>
+          <pointsize>10</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>Main Menu</string>
         </property>
@@ -1785,8 +1809,8 @@
    <widget class="QMenu" name="menu_users">
     <property name="font">
      <font>
-      <family>Segoe UI Light</family>
-      <pointsize>10</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>9</pointsize>
      </font>
     </property>
     <property name="title">
@@ -1806,8 +1830,8 @@
    <widget class="QMenu" name="menu_general">
     <property name="font">
      <font>
-      <family>Segoe UI Light</family>
-      <pointsize>10</pointsize>
+      <family>Segoe UI</family>
+      <pointsize>9</pointsize>
      </font>
     </property>
     <property name="title">
@@ -1816,8 +1840,8 @@
     <widget class="QMenu" name="menu_theme">
      <property name="font">
       <font>
-       <family>Segoe UI Light</family>
-       <pointsize>10</pointsize>
+       <family>Segoe UI</family>
+       <pointsize>9</pointsize>
       </font>
      </property>
      <property name="title">
@@ -1872,8 +1896,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1883,8 +1907,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1894,8 +1918,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1905,8 +1929,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1916,8 +1940,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1927,8 +1951,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1938,8 +1962,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1949,8 +1973,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1960,8 +1984,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="menuRole">
@@ -1974,8 +1998,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
   </action>
@@ -1985,8 +2009,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="shortcutContext">
@@ -2005,8 +2029,8 @@
    </property>
    <property name="font">
     <font>
-     <family>Segoe UI Light</family>
-     <pointsize>10</pointsize>
+     <family>Segoe UI</family>
+     <pointsize>9</pointsize>
     </font>
    </property>
    <property name="menuRole">

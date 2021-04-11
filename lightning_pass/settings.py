@@ -1,8 +1,8 @@
 """Module with project constants and DDLs for database."""
 from __future__ import annotations
 
+import dataclasses
 import os
-from dataclasses import dataclass
 from pathlib import Path
 
 import dotenv
@@ -30,7 +30,7 @@ LOG = parent_folder().parent / "misc/logs.log"
 dotenv.load_dotenv()
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class Credentials:
     db_host = os.getenv("DB_HOST")
     db_user = os.getenv("DB_USER")

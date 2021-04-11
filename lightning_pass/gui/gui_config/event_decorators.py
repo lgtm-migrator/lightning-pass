@@ -135,12 +135,14 @@ master_password_required = functools.partial(
     _condition_object=functools.partial(_attr_checker, attr="master_password"),
     _message_box="master_password_required_box",
     _base_obj="current_user",
+    _box_parent_lbl="Master Password",
 )
 vault_unlock_required = functools.partial(
     _base_decorator,
     _condition_object=functools.partial(_attr_checker, attr="vault_unlocked"),
     _message_box="vault_unlock_required_box",
     _base_obj="current_user",
+    _box_parent_lbl="Vault",
 )
 
 

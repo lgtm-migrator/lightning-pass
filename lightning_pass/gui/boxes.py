@@ -10,7 +10,6 @@ from typing import Callable, NamedTuple, Optional, Union
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
     QInputDialog,
-    QLabel,
     QLineEdit,
     QMainWindow,
     QMessageBox,
@@ -89,15 +88,15 @@ class MessageBoxes(QWidget):
         self,
         parent_lbl: str,
         text: str,
-        icon: Optional[QMessageBox.Icon] = QMessageBox.Warning,
+        icon: Optional[QMessageBox.Icon] = QMessageBox.NoIcon,
         # rest must be passed in as a keyword arguments
         *,
         informative_text: str = None,
         standard_buttons: Union[
             QMessageBox.StandardButtons,
             QMessageBox.StandardButton,
-        ] = None,
-        default_button: QMessageBox.StandardButton = None,
+        ] = QMessageBox.Ok,
+        default_button: QMessageBox.StandardButton = QMessageBox.Ok,
         event_handler: Callable = None,
     ) -> QMessageBox:
         """Return a message box initialized with the given params.
@@ -125,17 +124,11 @@ class MessageBoxes(QWidget):
         }
 
         for operation in operations:
-            # suppress TypeError if this information is missing
-            with contextlib.suppress(TypeError):
-                getattr(box, operation.func)(operation.args)
-
-        if event_handler:
+            getattr(box, operation.func)(operation.args)
+        with contextlib.suppress(TypeError):
             box.buttonClicked.connect(event_handler)
 
         box.setTextFormat(Qt.RichText)
-        box.setFont(font := self.events.widget_util.font)
-        for btn in box.findChildren(QPushButton):
-            btn.setFont(font)
 
         return box
 
@@ -236,6 +229,7 @@ contain at least one special character."""
         box(
             parent_lbl,
             "This token is invalid",
+            QMessageBox.Warning,
             informative_text="Would you like to generate a token?",
         ).exec()
 
@@ -277,6 +271,7 @@ contain at least one special character."""
         self.message_box_factory(
             parent_lbl,
             f"{item} don't match.",
+            QMessageBox.Warning,
             informative_text="Please try again.",
         ).exec()
 
@@ -300,6 +295,7 @@ contain at least one special character."""
         box(
             parent_lbl,
             text,
+            QMessageBox.Warning,
             informative_text="Would you like to move to the login page?",
         ).exec()
 
@@ -317,6 +313,7 @@ contain at least one special character."""
         box(
             parent_lbl,
             "Could not authenticate an account with the given credentials.",
+            QMessageBox.Warning,
             informative_text="Forgot password?",
         ).exec()
 
@@ -329,6 +326,7 @@ contain at least one special character."""
         self.message_box_factory(
             parent_lbl,
             "The vault details can't contain empty fields.",
+            QMessageBox.Warning,
         ).exec()
 
     def account_creation_box(self, parent_lbl: Optional[str] = "Register") -> None:
@@ -363,7 +361,6 @@ contain at least one special character."""
         self.message_box_factory(
             parent_lbl,
             f"Your {detail} has been successfully updated!",
-            None,
         ).exec()
 
     def reset_email_sent_box(self, parent_lbl: str) -> None:
@@ -396,7 +393,7 @@ contain at least one special character."""
         box(
             parent_lbl,
             "Password can't be generate without a single parameter.",
-            QMessageBox.Question,
+            QMessageBox.Warning,
             informative_text="Would you like to reset the values?",
         ).exec()
 
@@ -425,6 +422,7 @@ contain at least one special character."""
         box(
             parent_lbl,
             text,
+            QMessageBox.Warning,
             informative_text="Would you like to move to the master password page?",
         ).exec()
 
@@ -453,6 +451,7 @@ contain at least one special character."""
         box(
             parent_lbl,
             text,
+            QMessageBox.Warning,
             informative_text="Would you like to unlock it?",
         ).exec()
 
@@ -483,7 +482,6 @@ contain at least one special character."""
         self.message_box_factory(
             parent_lbl,
             f"Vault page for {platform} created.",
-            None,
         ).exec()
 
     def vault_page_deleted_box(
@@ -500,7 +498,6 @@ contain at least one special character."""
         self.message_box_factory(
             parent_lbl,
             f"Vault page for {platform} deleted.",
-            None,
         ).exec()
 
     def vault_updated_box(
@@ -517,8 +514,7 @@ contain at least one special character."""
 
         """
         try:
-            # capitalize first character of the first element
-            updated_values[0] = updated_values[0][0].upper() + updated_values[0][1:]
+            updated_values[0] = updated_values[0].capitalize()
         except IndexError:
             # first element/character did not exist, return without showing anything
             return
@@ -532,7 +528,6 @@ contain at least one special character."""
         self.message_box_factory(
             parent_lbl,
             f"Vault page for {platform} updated.",
-            None,
             informative_text=informative,
         ).exec()
 
@@ -546,14 +541,14 @@ class InputDialogs(QWidget):
         super().__init__(parent)
         self.events = parent.events
         self.main_win = child
-        self.title = "Lightning Pass"
+        self.title = child.windowTitle()
 
     def _input_password_dialog(
         self,
         parent_lbl: str,
         account_username: str,
         password_type: str,
-    ) -> Union[str, bool]:
+    ) -> str:
         """Show a general password input dialog.
 
         :param parent_lbl: Specifies which windows instantiated the current box
@@ -567,7 +562,7 @@ class InputDialogs(QWidget):
             f"{password_type} for {account_username}:",
             QLineEdit.Password,
         )
-        return password if i else False
+        return password if i else ""
 
     def master_password_dialog(
         self,
@@ -595,10 +590,6 @@ class InputDialogs(QWidget):
         dialog.setLabelText(
             f'All of the data connected to {platform} will be permanently deleted.\nType in "CONFIRM" to proceed:',
         )
-        dialog.setFont(font := self.events.widget_util.font)
-        dialog.findChild(QLabel).setFont(font)
-        for btn in dialog.findChildren(QPushButton):
-            btn.setFont(font)
         dialog.exec()
         return dialog.textValue()
 

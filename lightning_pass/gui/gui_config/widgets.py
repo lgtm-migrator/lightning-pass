@@ -17,6 +17,8 @@ if TYPE_CHECKING:
 
 
 class WidgetItem(NamedTuple):
+    """Store data about widget."""
+
     name: str
     fill_method: Union[str, None] = None
     fill_args: Union[str, None] = None
@@ -50,7 +52,7 @@ class WidgetUtil:
     def font(self):
         """Return the font used for all widgets except titles."""
         font = QtGui.QFont()
-        for i in ("setFamily", "Segoe UI Light"), ("setPointSize", 10):
+        for i in ("setFamily", "Consolas"), ("setPointSize", 10):
             getattr(font, i[0])(i[1])
         return font
 
