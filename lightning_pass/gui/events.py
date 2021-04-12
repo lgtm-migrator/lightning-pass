@@ -276,15 +276,9 @@ class Events:
             )
 
     def logout_event(self) -> None:
-        """Logout current user and clear his platform ``QMenu``."""
+        """Logout current user."""
+        self.widget_util.clear_platform_actions()
         self.current_user.update_last_login_date()
-
-        # hide the platform QAction, will be shown later upon next vault unlock
-        for menu in self.parent.ui.menu_bar.children():
-            if isinstance(menu, QtWidgets.QMenu) and menu.title() == "platforms":
-                for action in menu.children():
-                    action.setVisible(False)
-
         self.current_user = False
         self.home_event()
 
@@ -457,7 +451,8 @@ class Events:
                 self.current_user.user_id,
                 self.widget_util.vault_stacked_widget_index - 1,
             )
-            self.parent.ui
+            getattr(self.parent.ui, f"action_{platform}").deleteLater()
+            self.parent.events.widget_util.rebuild_vault_stacked_widget()
 
             self.vault_event()
             self.widget_util.message_box(
@@ -469,6 +464,7 @@ class Events:
     def vault_lock_event(self) -> None:
         """Lock the vault."""
         self.current_user.vault_unlocked = False
+        self.widget_util.clear_platform_actions()
         self.account_event()
 
     def change_vault_page_event(self, index_change: int) -> None:
@@ -536,6 +532,7 @@ class Events:
             self.vault_event(previous_index=self.widget_util.vault_stacked_widget_index)
 
     def menu_platform_action_event(self, platform: str, index: int):
+        """"""
         if not self.current_user.vault_unlocked:
             self.widget_util.message_box(
                 "vault_unlock_required_box",

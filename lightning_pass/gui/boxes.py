@@ -575,7 +575,11 @@ class InputDialogs(QWidget):
         :param account_username: The username of the current user
 
         """
-        return self._input_password_dialog(parent_lbl, account_username, "Password")
+        return self._input_password_dialog(
+            parent_lbl,
+            account_username,
+            "Master Password",
+        )
 
     def confirm_vault_deletion_dialog(self, parent_lbl: str, platform: str):
         """Show a dialog asking user to enter their master password.

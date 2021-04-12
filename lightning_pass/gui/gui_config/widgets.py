@@ -154,6 +154,7 @@ class WidgetUtil:
             6,
             1,
         )
+        self.clear_platform_actions()
         if not hasattr(
             self.parent.ui,
             name := "menu_platform",
@@ -316,6 +317,13 @@ class WidgetUtil:
                 self.vault_stacked_widget_index - 1,
             ),
         )
+
+    def clear_platform_actions(self) -> None:
+        """Clear the current ``Qactions`` connected to the current vault platforms."""
+        for menu in self.parent.ui.menu_bar.children():
+            if isinstance(menu, QtWidgets.QMenu) and menu.title() == "platforms":
+                for action in menu.children():
+                    action.setVisible(False)
 
 
 WIDGET_DATA = (
