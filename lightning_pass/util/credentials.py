@@ -276,7 +276,7 @@ class Token:
         return token
 
     @staticmethod
-    def check_token_existence(token: str) -> Optional[bool]:
+    def validate_token(token: str) -> Optional[bool]:
         """Check if it's possible to use the entered token.
 
         If token is valid, delete it from the database and proceed

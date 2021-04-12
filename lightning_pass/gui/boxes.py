@@ -1,4 +1,4 @@
-"""Module containing the MessageBoxes and InputDialogs classes
+"""Module containing the MessageBoxes and InputDialogs classes.
 
 Used for showing information to the user.
 
@@ -197,10 +197,9 @@ class MessageBoxes(QWidget):
 
         """
         box = self._invalid_item_box(item, parent_lbl)
-        item = item[0].upper() + item[1::1]
         box(
             informative_text=(
-                f"""{item} must be at least 8 characters long,
+                f"""{item.capitalize()} must be at least 8 characters long,
 contain at least 1 capital letter,
 contain at least 1 number and
 contain at least one special character."""

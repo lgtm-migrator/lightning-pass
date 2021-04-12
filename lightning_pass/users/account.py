@@ -85,32 +85,33 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        try:
-            cls.username_validator.unique(username)
-        except ValidationFailure:
-            raise UsernameAlreadyExists
-        try:
-            cls.username_validator.pattern(username)
-        except ValidationFailure:
-            raise InvalidUsername
+        checks = {
+            functools.partial(
+                cls.username_validator.unique,
+                username,
+            ): UsernameAlreadyExists,
+            functools.partial(
+                cls.username_validator.pattern,
+                username,
+            ): InvalidUsername,
+            functools.partial(
+                cls.password_validator.pattern,
+                password,
+            ): InvalidPassword,
+            functools.partial(
+                cls.password_validator.match,
+                password,
+                confirm_password,
+            ): PasswordsDoNotMatch,
+            functools.partial(cls.email_validator.unique, email): EmailAlreadyExists,
+            functools.partial(cls.email_validator.pattern, email): InvalidEmail,
+        }
 
-        try:
-            cls.password_validator.pattern(password)
-        except ValidationFailure:
-            raise InvalidPassword
-        try:
-            cls.password_validator.match(password, confirm_password)
-        except ValidationFailure:
-            raise PasswordsDoNotMatch
-
-        try:
-            cls.email_validator.unique(email)
-        except ValidationFailure:
-            raise EmailAlreadyExists
-        try:
-            cls.email_validator.pattern(email)
-        except ValidationFailure:
-            raise InvalidEmail
+        for func, exc in checks.items():
+            try:
+                func()
+            except ValidationFailure:
+                raise exc
 
         with database.database_manager() as db:
             # not using f-string due to SQL injection
@@ -130,10 +131,10 @@ class Account:
 
         Stores old last login date and updates new last login date
 
-        :param str username: User's username
-        :param str password: User's password
+        :param username: User's username
+        :param password: User's password
 
-        :returns: Account object instantiated with current user id
+        :returns: ``Account`` object instantiated with current user id
 
         :raises AccountDoesNotExist: if username wasn't found in the database
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
@@ -165,32 +166,34 @@ class Account:
 
         :param data: The data container
 
-        :raises AccountDoesNotExist: If the authetication fails
+        :raises AccountDoesNotExist: If the authentication fails
         :raises InvalidPassword: If the new password doesn't match the required pattern
             Uses the validator of the current account
         :raises PasswordsDoNotMatch: If the passwords do not match
 
         """
-        try:
-            self.password_validator.authenticate(
+        checks = {
+            functools.partial(
+                self.password_validator.authenticate,
                 data.confirm_previous,
                 self.password,
-            )
-        except ValidationFailure:
-            raise AccountDoesNotExist
-
-        try:
-            self.password_validator.pattern(data.new_password)
-        except ValidationFailure:
-            raise InvalidPassword
-
-        try:
-            self.password_validator.match(
+            ): AccountDoesNotExist,
+            functools.partial(
+                self.password_validator.pattern,
+                data.new_password,
+            ): InvalidPassword,
+            functools.partial(
+                self.password_validator.match,
                 data.new_password,
                 data.confirm_new,
-            )
-        except ValidationFailure:
-            raise PasswordsDoNotMatch
+            ): PasswordsDoNotMatch,
+        }
+
+        for func, exc in checks.items():
+            try:
+                func()
+            except ValidationFailure:
+                raise exc
 
     def get_value(self, result_column: str) -> str | bytes | datetime:
         """Simplify getting user values.
@@ -258,14 +261,19 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        try:
-            self.username_validator.pattern(value)
-        except ValidationFailure:
-            raise InvalidUsername
-        try:
-            self.username_validator.unique(value)
-        except ValidationFailure:
-            raise UsernameAlreadyExists
+        checks = {
+            functools.partial(self.username_validator.pattern, value): InvalidUsername,
+            functools.partial(
+                self.username_validator.unique,
+                value,
+            ): UsernameAlreadyExists,
+        }
+
+        for func, exc in checks.items():
+            try:
+                func()
+            except ValidationFailure:
+                raise exc
 
         self.set_value(value, "username")
 
@@ -286,6 +294,7 @@ class Account:
 
         """
         self.validate_password_data(data)
+
         self.set_value(
             self.credentials.hash_password(str(data.new_password)),
             "password",
@@ -293,9 +302,13 @@ class Account:
 
     def reset_password(self, password: str, confirm_password: str) -> None:
         """"""
-        if not self.password_validator.pattern(password):
+        try:
+            self.password_validator.pattern(password)
+        except ValidationFailure:
             raise InvalidPassword
-        if not self.password_validator.match(password, confirm_password):
+        try:
+            self.password_validator.match(password, confirm_password)
+        except ValidationFailure:
             raise PasswordsDoNotMatch
 
         self.set_value(self.credentials.hash_password(password), "password")

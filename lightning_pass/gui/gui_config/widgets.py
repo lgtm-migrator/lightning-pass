@@ -423,14 +423,14 @@ class ClearPreviousWidget:
         """Clear the previous widget."""
         widget_item: WidgetItem | None
 
-        for widget_item in WIDGET_DATA[self.previous_index]:
-            if not widget_item:
+        for item in WIDGET_DATA[self.previous_index]:
+            if not item:
                 break
 
-            obj = getattr(self.parent.ui, widget_item.name)
-            method = getattr(obj, widget_item.clear_method)
+            obj = getattr(self.parent.ui, item.name)
+            method = getattr(obj, item.clear_method)
 
             try:
-                method(widget_item.clear_args)
+                method(item.clear_args)
             except TypeError:
                 method()

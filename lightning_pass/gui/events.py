@@ -132,7 +132,7 @@ class Events:
                     "email",
                     should_exist=True,
                 ):
-                    # mimic waiting time
+                    # mimic waiting time to send the email
                     self.widget_util.waiting_loop(2)
 
                 self.current_user.credentials.send_reset_email(email)
@@ -141,7 +141,7 @@ class Events:
 
     def submit_reset_token_event(self) -> None:
         """If submitted token is correct, proceed to password change widget."""
-        if self.current_user.credentials.Token.check_token_existence(
+        if self.current_user.credentials.Token.validate_token(
             token := self.parent.ui.reset_token_token_line.text(),
         ):
             self.__current_token = token
@@ -172,11 +172,12 @@ class Events:
             )
             del self.__current_token
 
-    @decorators.login_required
+    @decorators.login_required(page_to_access="change password")
     def change_password_event(self) -> None:
         """Change password for current user."""
         self.widget_util.set_current_widget("change_password")
 
+    @decorators.login_required(page_to_access="change password")
     def submit_change_password_event(self) -> None:
         """Change user's password.
 
@@ -274,6 +275,8 @@ class Events:
         )
 
         self.widget_util.set_current_widget("account")
+
+    decorators.login_required(page_to_access="account")
 
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
@@ -483,7 +486,7 @@ class Events:
             )
 
     def vault_lock_event(self) -> None:
-        """Lock the vault."""
+        """Lock the vault of the current user."""
         self.current_user.vault_unlocked = False
         self.widget_util.clear_platform_actions()
         self.account_event()
@@ -553,7 +556,12 @@ class Events:
             self.vault_event(previous_index=self.widget_util.vault_stacked_widget_index)
 
     def menu_platform_action_event(self, platform: str, index: int):
-        """"""
+        """Handle changes on the vault stacked widget,
+
+        :param platform: The platform to access
+        :param index: The index to access
+
+        """
         if not self.current_user.vault_unlocked:
             self.widget_util.message_box(
                 "vault_unlock_required_box",
