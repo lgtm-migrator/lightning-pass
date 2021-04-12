@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -46,16 +46,14 @@ def _ord(day: int) -> str:
 class Events:
     """Used to provide logic to specific event functions."""
 
-    current_user: Union[Account, bool]
+    current_user: Account
     __current_token: str
 
     def __init__(self, parent: QMainWindow) -> None:
         """Construct the class."""
         super().__init__()
         self.widget_util = WidgetUtil(parent)
-
         self.parent = parent
-        self.current_user = False
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -120,14 +118,14 @@ class Events:
     def send_token_event(self) -> None:
         """Send token and switch to token page."""
         try:
-            self.current_user.email_validator.pattern(
+            Account.email_validator.pattern(
                 email := self.parent.ui.forgot_pass_email_line.text(),
             )
         except ValidationFailure:
             self.widget_util.message_box("invalid_email_box", "Forgot Password")
         else:
             with self.widget_util.disable_widget(self.parent.ui.reset_token_submit_btn):
-                if not self.current_user.credentials.check_item_existence(
+                if not Account.credentials.check_item_existence(
                     email,
                     "email",
                     should_exist=True,
@@ -135,13 +133,13 @@ class Events:
                     # mimic waiting time to send the email
                     self.widget_util.waiting_loop(2)
 
-                self.current_user.credentials.send_reset_email(email)
+                Account.credentials.send_reset_email(email)
 
             self.widget_util.message_box("reset_email_sent_box", "Forgot Password")
 
     def submit_reset_token_event(self) -> None:
         """If submitted token is correct, proceed to password change widget."""
-        if self.current_user.credentials.Token.validate_token(
+        if Account.credentials.Token.validate_token(
             token := self.parent.ui.reset_token_token_line.text(),
         ):
             self.__current_token = token
@@ -156,7 +154,9 @@ class Events:
     def reset_password_submit_event(self) -> None:
         """Change user's password."""
         try:
-            self.current_user.reset_password(
+            # everything after the token hex is the user's database primary key
+            # refer to the token generation for more information
+            Account(int(self.__current_token[30:])).reset_password(
                 self.parent.ui.reset_password_new_pass_line.text(),
                 self.parent.ui.reset_password_conf_new_pass_line.text(),
             )
@@ -300,7 +300,7 @@ class Events:
     def logout_event(self) -> None:
         """Logout current user."""
         self.widget_util.clear_platform_actions()
-        self.current_user = False
+        del self.current_user
         self.home_event()
 
     def edit_details_event(self) -> None:
