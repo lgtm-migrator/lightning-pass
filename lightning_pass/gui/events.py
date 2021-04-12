@@ -29,6 +29,20 @@ if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow
 
 
+def _ord(day: int) -> str:
+    """Return given day in a human readable string.
+
+    :param day: The day to convert to the human readable form
+
+    """
+    suffix = ("th", "st", "nd", "rd")
+
+    if (div := day % 10) in (1, 2, 3) and day not in (11, 12, 13):
+        return suffix[div]
+    else:
+        return suffix[0]
+
+
 class Events:
     """Used to provide logic to specific event functions."""
 
@@ -247,9 +261,14 @@ class Events:
         """Switch to account widget and set current user values."""
         self.parent.ui.account_username_line.setText(self.current_user.username)
         self.parent.ui.account_email_line.setText(self.current_user.email)
-        self.parent.ui.account_last_log_date.setText(
-            f"Last login date: {self.current_user.last_login_date}",
-        )
+
+        date = self.current_user.current_login_date
+        try:
+            text = f"Last login date: {date:%d}{_ord(date.day)} {date:%b. %Y, %H:%M}"
+        except TypeError:
+            text = f"Last login date: None"
+        self.parent.ui.account_last_log_date.setText(text)
+
         self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
             QtGui.QPixmap(self.current_user.profile_picture_path),
         )
@@ -278,7 +297,6 @@ class Events:
     def logout_event(self) -> None:
         """Logout current user."""
         self.widget_util.clear_platform_actions()
-        self.current_user.update_last_login_date()
         self.current_user = False
         self.home_event()
 
@@ -400,10 +418,8 @@ class Events:
 
         """
         self.widget_util.rebuild_vault_stacked_widget()
-
         for page in self.current_user.vault_pages:
             self.widget_util.setup_vault_widget(page)
-
         self.parent.ui.menu_bar.addAction(
             getattr(self.parent.ui, "menu_platform").menuAction(),
         )
@@ -411,13 +427,15 @@ class Events:
         self.parent.ui.vault_username_lbl.setText(
             f"Current user: {self.current_user.username}",
         )
-        self.parent.ui.vault_date_lbl.setText(
-            f"Last unlock date: {str(self.current_user._last_vault_unlock_date)}",
-        )
 
-        self.current_user.update_last_vault_unlock_date()
+        date = self.current_user.current_vault_unlock_date
+        try:
+            text = f"Last unlock date: {date:%d}{_ord(date.day)} {date:%b. %Y, %H:%M}"
+        except TypeError:
+            text = f"Last unlock date: None"
+        self.parent.ui.vault_date_lbl.setText(text)
+
         self.widget_util.set_current_widget("vault")
-
         if previous_index:
             self.parent.ui.vault_stacked_widget.setCurrentIndex(previous_index)
 
@@ -436,17 +454,20 @@ class Events:
             self.parent.ui.vault_widget.ui.vault_page_lcd_number.display(page)
         else:
             # empty one found -> switch to it
-            self.vault_stacked_widget_index = count
+            self.widget_util.vault_stacked_widget_index = count
 
     def remove_vault_page_event(self) -> None:
         """Remove the current vault page."""
-        platform = self.widget_util.vault_widget_vault.platform_name
+        if self.current_user.vault_pages_int < 1:
+            # no eligible page to remove
+            return
 
+        platform = self.widget_util.vault_widget_vault.platform_name
         text = self.parent.ui.input_dialogs.confirm_vault_deletion_dialog(
             "Vault",
             platform,
         )
-        if text == "CONFIRM":
+        if text == "CONFIRM" and self.current_user.vault_pages_int >= 1:
             self.current_user.vaults.delete_vault(
                 self.current_user.user_id,
                 self.widget_util.vault_stacked_widget_index - 1,

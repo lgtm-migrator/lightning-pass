@@ -50,7 +50,11 @@ class Account:
 
         """
         self._user_id = user_id
-        self.vault_unlocked = False
+
+        self._current_login_date = self.get_value("last_login_date")
+
+        self._vault_unlocked = False
+        self._current_vault_unlock_date = self.get_value("last_vault_unlock_date")
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -149,8 +153,8 @@ class Account:
             raise AccountDoesNotExist
 
         account = cls(cls.credentials.get_user_item(username, "username", "id"))
-        account.last_login_date = account._last_login_date
-        account.update_last_login_date()
+        account._current_login_date = account.get_value("last_login_date")
+        account.update_date("last_login_date")
         return account
 
     def validate_password_data(self, data: PasswordData) -> None:
@@ -339,7 +343,7 @@ class Account:
     def profile_picture(self, filename: str) -> None:
         """Set new profile picture.
 
-        :param str filename: Filename of the new profile picture
+        :param filename: Filename of the new profile picture
 
         """
         self.set_value(filename, "profile_picture")
@@ -354,17 +358,9 @@ class Account:
         return str(self.credentials.get_profile_picture_path(self.profile_picture))
 
     @property
-    def _last_login_date(self) -> datetime:
-        """Last login date property.
-
-        :returns: last time the current account was accessed
-
-        """
-        return self.get_value("last_login_date")
-
-    def update_last_login_date(self) -> None:
-        """Update last login date."""
-        self.update_date("last_login_date")
+    def current_login_date(self) -> datetime:
+        """Return the 'previous' date when the current user has been logged in."""
+        return self._current_login_date
 
     @functools.cached_property
     def register_date(self) -> datetime:
@@ -373,7 +369,7 @@ class Account:
         Lru caching the register date to avoid unnecessary database queries,
         (register_date needs to be collected only once, it is not possible to change it.)
 
-        :returns: register date of current user
+        :returns: the register date of current user
 
         """
         return self.get_value("register_date")
@@ -401,13 +397,22 @@ class Account:
         )
 
     @property
-    def _last_vault_unlock_date(self) -> datetime:
-        """Return last vault unlock timestamp."""
-        return self.get_value("last_vault_unlock_date")
+    def vault_unlocked(self) -> bool:
+        """Return the current state of vault."""
+        return self._vault_unlocked
 
-    def update_last_vault_unlock_date(self) -> None:
-        """Update the last vault unlock date."""
-        self.update_date("last_vault_unlock_date")
+    @vault_unlocked.setter
+    def vault_unlocked(self, value: bool) -> None:
+        """Unlock the vault and set a new vault unlock date."""
+        if value is True:
+            self._current_vault_unlock_date = self.get_value("last_vault_unlock_date")
+            self.update_date("last_vault_unlock_date")
+        self._vault_unlocked = value
+
+    @property
+    def current_vault_unlock_date(self) -> datetime:
+        """Return the 'previous' date when the vault of the current user has been unlocked."""
+        return self._current_vault_unlock_date
 
     @property
     def vault_pages(self) -> Generator[Vault, None, None]:
@@ -433,4 +438,4 @@ class Account:
 
 
 if __name__ == "__main__":
-    ...
+    import timeit

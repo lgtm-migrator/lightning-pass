@@ -186,6 +186,10 @@ def hash_password(password: str) -> bytes:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
 
 
+def human_date_suffix(day: int):
+    ...
+
+
 def send_reset_email(email: str) -> None:
     """Send a email with instructions on how to reset a password.
 
