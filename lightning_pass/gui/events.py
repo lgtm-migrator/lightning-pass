@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Union
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -512,14 +512,6 @@ class Events:
             self.widget_util.vault_widget_vault.vault_index,
         )
 
-        hashed = self.current_user.pwd_hashing.encrypt_vault_password(
-            self.current_user.pwd_hashing.pbkdf3hmac_key(
-                "Register123+",
-                self.current_user.hashed_vault_credentials.salt,
-            ),
-            self.widget_util.vault_widget_vault.password,
-        )
-
         try:
             self.current_user.vaults.update_vault(
                 (
@@ -529,7 +521,9 @@ class Events:
                         self.widget_util.vault_widget_vault.website,
                         self.widget_util.vault_widget_vault.username,
                         self.widget_util.vault_widget_vault.email,
-                        hashed,
+                        self.current_user.encrypt_vault_password(
+                            self.widget_util.vault_widget_vault.password,
+                        ),
                         int(self.widget_util.vault_widget_vault.vault_index),
                     )
                 ),
@@ -541,8 +535,6 @@ class Events:
         except VaultException:
             self.widget_util.message_box("invalid_vault_box", "Vault")
         else:
-            self.parent.ui.vault_widget.ui.vault_password_line.clear()  #:todo:
-
             if previous_vault:
                 self.widget_util.message_box(
                     "vault_updated_box",

@@ -458,9 +458,8 @@ class Account:
         # slice first element -> database primary key
         yield from (
             self.vaults.Vault(
-                *vault[1:],
-                self.pwd_hashing.decrypt_vault_password(
-                    self.hashed_vault_credentials.hash,
+                *vault[1:6],
+                self.decrypt_vault_password(
                     vault[6],
                 ),
                 *vault[7:],
@@ -473,6 +472,36 @@ class Account:
     def vault_pages_int(self) -> int:
         """Return an integer with the amount of vault pages a user has registered."""
         return sum(1 for _ in self.vault_pages)
+
+    @property
+    def vault_key(self) -> bytes:
+        """Return the current key derived from the master password."""
+        return self.pwd_hashing.pbkdf3hmac_key(
+            "Register123+",  # todo: dynamic master password
+            self.hashed_vault_credentials.salt,
+        )
+
+    def encrypt_vault_password(self, password: bytes) -> Union[bytes, bool]:
+        """Return encrypted password with the current ``vault_key``.
+
+        :param password: The password to encrypt
+
+        """
+        return self.pwd_hashing.encrypt_vault_password(
+            self.vault_key,
+            password,
+        )
+
+    def decrypt_vault_password(self, password: bytes) -> str:
+        """Decrypt given vault password and return it.
+
+        :param password: The password to decrypt
+
+        """
+        if pwd := self.pwd_hashing.decrypt_vault_password(self.vault_key, password):
+            return pwd
+        else:
+            return ""
 
 
 if __name__ == "__main__":

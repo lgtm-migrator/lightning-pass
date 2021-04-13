@@ -24,6 +24,40 @@ if TYPE_CHECKING:
     from lightning_pass.users.vaults import Vault
 
 
+class ClearPreviousWidget:
+    """Handle clearing the previous widget by accessing the WIDGET_DATA dict."""
+
+    __slots__ = "parent", "previous_index"
+
+    def __init__(self, parent):
+        """Context manager constructor.
+
+        :param parent: The parent where the widget is located
+
+        """
+        self.parent = parent
+        self.previous_index = parent.current_index
+
+    def __enter__(self):
+        """Do nothing on enter."""
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Clear the previous widget."""
+        widget_item: WidgetItem | None
+
+        for item in WIDGET_DATA[self.previous_index]:
+            if not item:
+                break
+
+            obj = getattr(self.parent.ui, item.name)
+            method = getattr(obj, item.clear_method)
+
+            try:
+                method(item.clear_args)
+            except TypeError:
+                method()
+
+
 class WidgetItem(NamedTuple):
     """Store data about widget."""
 
@@ -39,7 +73,6 @@ VAULT_WIDGET_DATA: set[WidgetItem] = {
     WidgetItem("vault_web_line", fill_method="setText", fill_args="website"),
     WidgetItem("vault_username_line", fill_method="setText", fill_args="username"),
     WidgetItem("vault_email_line", fill_method="setText", fill_args="email"),
-    WidgetItem("vault_password_line", fill_method="setText", fill_args="password"),
     WidgetItem("vault_page_lcd_number", fill_method="display", fill_args="vault_index"),
 }
 
@@ -60,7 +93,7 @@ class WidgetUtil:
     def font(self):
         """Return the font used for all widgets except titles."""
         font = QtGui.QFont()
-        for i in ("setFamily", "Consolas"), ("setPointSize", 10):
+        for i in ("setFamily", "Segoe UI Light"), ("setPointSize", 10):
             getattr(font, i[0])(i[1])
         return font
 
@@ -272,6 +305,9 @@ class WidgetUtil:
             except (TypeError, UnboundLocalError):
                 method()
 
+        self.parent.ui.vault_widget.ui.vault_password_line.setText(
+            page.password,
+        )
         self.setup_vault_page_menu(page)
 
     def setup_vault_page_menu(self, page):
@@ -408,37 +444,3 @@ WIDGET_DATA = (
         WidgetItem("master_pass_conf_master_pass_line"),
     },
 )
-
-
-class ClearPreviousWidget:
-    """Handle clearing the previous widget by accessing the WIDGET_DATA dict."""
-
-    __slots__ = ("parent", "previous_index")
-
-    def __init__(self, parent):
-        """Context manager constructor.
-
-        :param parent: The parent where the widget is located
-
-        """
-        self.parent = parent
-        self.previous_index = parent.current_index
-
-    def __enter__(self):
-        """Do nothing on enter."""
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Clear the previous widget."""
-        widget_item: WidgetItem | None
-
-        for item in WIDGET_DATA[self.previous_index]:
-            if not item:
-                break
-
-            obj = getattr(self.parent.ui, item.name)
-            method = getattr(obj, item.clear_method)
-
-            try:
-                method(item.clear_args)
-            except TypeError:
-                method()

@@ -1,3 +1,4 @@
+"""Module containing everything connected to password hashing for secure storage in database."""
 import base64
 from typing import NamedTuple, Union
 
@@ -8,11 +9,9 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
 
 def hash_password(password: Union[str, bytes]) -> bytes:
-    """Hash password with bcrypt.
+    """Hash and return password with bcrypt.
 
     :param str password: Password to hash
-
-    :returns: the password hash
 
     """
     if isinstance(password, str):
@@ -21,11 +20,19 @@ def hash_password(password: Union[str, bytes]) -> bytes:
 
 
 class HashedVaultCredentials(NamedTuple):
+    """Store the credentials."""
+
     hash: bytes
     salt: bytes
 
 
 def pbkdf3hmac_key(password: Union[str, bytes], salt: bytes):
+    """Derive and return a new key from the given password.
+
+    :param password: The password which will be tied to the key
+    :param salt: Make it possible to derive the same key again
+
+    """
     if isinstance(password, str):
         password = password.encode("utf-8")
     kdf = PBKDF2HMAC(
@@ -38,39 +45,51 @@ def pbkdf3hmac_key(password: Union[str, bytes], salt: bytes):
 
 
 def hash_master_password(password: str) -> HashedVaultCredentials:
+    """Return hashed master password key with the used salt.
+
+    :param password: The password to be used while hashing
+
+    """
     salt = bcrypt.gensalt()
     key = pbkdf3hmac_key(password, salt)
     return HashedVaultCredentials(bcrypt.hashpw(key, bcrypt.gensalt()), salt)
 
 
 def auth_derived_key(password: str, stored: HashedVaultCredentials) -> bool:
+    """Authenticate whether the given password matches the stored set of values.
+
+    :param password: The password to evaluate
+    :param stored: The stored data
+
+    """
     key = pbkdf3hmac_key(password, stored.salt)
     return bcrypt.checkpw(key, stored.hash)
 
 
 def encrypt_vault_password(key: bytes, password: Union[str, bytes]) -> bytes:
+    """Encrypt and return the given vault password.
+
+    :param key: The key to be used during the encryption
+    :param password: The password to encrypt
+
+    """
     if isinstance(password, str):
         password = password.encode("utf-8")
     f = Fernet(key)
     return f.encrypt(password)
 
 
-def decrypt_vault_password(key: bytes, password: bytes) -> Union[str, bool]:
+def decrypt_vault_password(key: bytes, password: Union[str, bytes]) -> Union[str, bool]:
+    """Decrypt and return the given vault password.
+
+    :param key: The key to be used during the decryption
+    :param password: The password to decrypt
+
+    """
+    if isinstance(password, str):
+        password = password.encode("utf-8")
     f = Fernet(key)
     try:
         return f.decrypt(password).decode()
     except InvalidToken:
         return False
-
-
-master_password = "master_password"
-data = hash_master_password(master_password)
-print(auth_derived_key("master", data))
-print(auth_derived_key("master_password", data))
-encrypted = encrypt_vault_password(pbkdf3hmac_key("aa", data.salt), "i am stored")
-print(encrypted)
-decrypted = decrypt_vault_password(
-    pbkdf3hmac_key(master_password, data.salt),
-    encrypted,
-)
-print(decrypted)
