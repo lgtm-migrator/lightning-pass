@@ -52,7 +52,7 @@ class Buttons:
 
     def setup_buttons(self) -> None:
         """Connect all buttons on all widgets"""
-        buttons_set = {
+        buttons = (
             # home
             Clickable("home_login_btn", "login_event"),
             Clickable("home_register_btn", "register_event"),
@@ -97,9 +97,9 @@ class Buttons:
             # master_password
             Clickable("master_pass_menu_btn", "home_event"),
             Clickable("master_pass_save_btn", "master_password_submit_event"),
-        }
+        )
 
-        for button in buttons_set:
+        for button in buttons:
             getattr(self.parent.ui, button.widget).clicked.connect(
                 getattr(self.parent.events, button.action),
             )
@@ -113,7 +113,7 @@ class Buttons:
 
     def setup_menu_bar(self) -> None:
         """Connect all menu bar actions."""
-        menu_bar_set = {
+        menu_bar = (
             # menu_general
             Clickable("action_main_menu", "home_event"),
             # menu_password
@@ -128,14 +128,14 @@ class Buttons:
             Clickable("action_change_password", "change_password_event"),
             Clickable("action_vault", "vault_event"),
             Clickable("action_master_password", "master_password_event"),
-        }
+        )
 
-        for button in menu_bar_set:
+        for button in menu_bar:
             getattr(self.parent.ui, button.widget).triggered.connect(
                 getattr(self.parent.events, button.action),
             )
 
-        menu_theme_set = {
+        menu_theme = (
             # menu_general > themes
             Clickable(
                 "action_light",
@@ -145,9 +145,9 @@ class Buttons:
                 "action_dark",
                 getattr(self.parent.events, "toggle_stylesheet_dark"),
             ),
-        }
+        )
 
-        for action in menu_theme_set:
+        for action in menu_theme:
             getattr(self.parent.ui, action.widget).triggered.connect(
                 # since lambda has a default > dump the first bool passed in by the widget parent
                 lambda _, sheet=action.action: sheet(),
@@ -155,7 +155,7 @@ class Buttons:
 
     def data_validation(self) -> None:
         """Disable whitespaces in some input fields."""
-        validator_lines = {
+        lines_to_validate = {
             "reg_username_line",
             "reg_password_line",
             "reg_conf_pass_line",
@@ -170,7 +170,7 @@ class Buttons:
             "master_pass_conf_master_pass_line",
         }
 
-        for line in validator_lines:
+        for line in lines_to_validate:
             getattr(self.parent.ui, line).setValidator(
                 QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+")),
             )
@@ -179,7 +179,7 @@ class Buttons:
         """Connect all buttons on a new vault widget."""
 
         # tool buttons for copying vault items
-        vault_copy_tool_buttons_set = {
+        vault_copy_tool_buttons = (
             VaultToolButton(
                 "vault_copy_username_tool_btn",
                 "username",
@@ -191,7 +191,7 @@ class Buttons:
                 "password",
                 "vault_password_line",
             ),
-        }
+        )
 
         parent = self.parent.ui.vault_widget.ui
         events = self.parent.events
@@ -199,7 +199,7 @@ class Buttons:
         parent.vault_open_web_tool_btn.clicked.connect(
             lambda: webbrowser.get().open(parent.vault_web_line.text(), new=2),
         )
-        for button in vault_copy_tool_buttons_set:
+        for button in vault_copy_tool_buttons:
             getattr(parent, button.widget).clicked.connect(
                 # since lambda has a default > dump the first bool passed in by the widget parent
                 lambda _, line=getattr(parent, button.source): _copy_text(line),

@@ -152,7 +152,7 @@ class Events:
         self.widget_util.set_current_widget("reset_password")
 
     def reset_password_submit_event(self) -> None:
-        """Change user's password."""
+        """Reset user's password."""
         try:
             # everything after the token hex is the user's database primary key
             # refer to the token generation for more information
@@ -512,6 +512,14 @@ class Events:
             self.widget_util.vault_widget_vault.vault_index,
         )
 
+        hashed = self.current_user.pwd_hashing.encrypt_vault_password(
+            self.current_user.pwd_hashing.pbkdf3hmac_key(
+                "Register123+",
+                self.current_user.hashed_vault_credentials.salt,
+            ),
+            self.widget_util.vault_widget_vault.password,
+        )
+
         try:
             self.current_user.vaults.update_vault(
                 (
@@ -521,7 +529,7 @@ class Events:
                         self.widget_util.vault_widget_vault.website,
                         self.widget_util.vault_widget_vault.username,
                         self.widget_util.vault_widget_vault.email,
-                        self.widget_util.vault_widget_vault.password,
+                        hashed,
                         int(self.widget_util.vault_widget_vault.vault_index),
                     )
                 ),

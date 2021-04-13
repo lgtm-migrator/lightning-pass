@@ -3,7 +3,15 @@ from __future__ import annotations
 import contextlib
 import functools
 import itertools
-from typing import TYPE_CHECKING, Any, Callable, Iterator, NamedTuple, Sequence, Union
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Iterator,
+    NamedTuple,
+    Optional,
+    Sequence,
+)
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
@@ -20,10 +28,10 @@ class WidgetItem(NamedTuple):
     """Store data about widget."""
 
     name: str
-    fill_method: Union[str, None] = None
-    fill_args: Union[str, None] = None
-    clear_method: Union[str, None] = "clear"
-    clear_args: Union[Any, None] = None
+    fill_method: Optional[str] = None
+    fill_args: Optional[str] = None
+    clear_method: Optional[str] = "clear"
+    clear_args: Optional[Any] = None
 
 
 VAULT_WIDGET_DATA: set[WidgetItem] = {
@@ -31,7 +39,7 @@ VAULT_WIDGET_DATA: set[WidgetItem] = {
     WidgetItem("vault_web_line", fill_method="setText", fill_args="website"),
     WidgetItem("vault_username_line", fill_method="setText", fill_args="username"),
     WidgetItem("vault_email_line", fill_method="setText", fill_args="email"),
-    WidgetItem("vault_password_line", fill_method="clear"),
+    WidgetItem("vault_password_line", fill_method="setText", fill_args="password"),
     WidgetItem("vault_page_lcd_number", fill_method="display", fill_args="vault_index"),
 }
 
@@ -319,7 +327,7 @@ class WidgetUtil:
         )
 
     def clear_platform_actions(self) -> None:
-        """Clear the current ``Qactions`` connected to the current vault platforms."""
+        """Clear the current ``QActions`` connected to the current vault platforms."""
         for menu in self.parent.ui.menu_bar.children():
             if isinstance(menu, QtWidgets.QMenu) and menu.title() == "platforms":
                 for action in menu.children():

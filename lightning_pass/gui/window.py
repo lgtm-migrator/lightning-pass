@@ -180,10 +180,6 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}()"
 
-    @property
-    def current_index(self) -> int:
-        return self.ui.stacked_widget.currentIndex()
-
     def show(self) -> None:
         """Show main window."""
         self.main_win.show()
@@ -201,6 +197,10 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
+    @property
+    def current_index(self) -> int:
+        return self.ui.stacked_widget.currentIndex()
+
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_position_changed(self, pos: QtCore.QPoint) -> None:
         """Handle changes in mouse position over connected label.
@@ -208,7 +208,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         :param pos: Mouse position
 
         """
-        if self.pass_progress > 1000:
+        if self.pass_progress > 1_000:
             return
 
         if self.gen.div_check.send(self.pass_progress) and self.pass_progress != 0:

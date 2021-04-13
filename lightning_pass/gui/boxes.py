@@ -5,7 +5,7 @@ Used for showing information to the user.
 """
 import contextlib
 import functools
-from typing import Callable, NamedTuple, Optional, Union
+from typing import Any, Callable, NamedTuple, Optional, Union
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -18,7 +18,7 @@ from PyQt5.QtWidgets import (
 )
 
 
-def partial_factory(func: Callable, *args: Optional[any], **kwargs: Optional[any]):
+def partial_factory(func: Callable, *args: Optional[Any], **kwargs: Optional[Any]):
     """Return a new partial function.
 
     :param func: The function which will be made partial
@@ -115,7 +115,10 @@ class MessageBoxes(QWidget):
         box = QMessageBox(self.main_win)
 
         operations = {
-            MessageBoxOperation("setWindowTitle", f"{self.title} - {parent_lbl}"),
+            MessageBoxOperation(
+                "setWindowTitle",
+                f"{self.title} - {parent_lbl.capitalize()}",
+            ),
             MessageBoxOperation("setText", text),
             MessageBoxOperation("setIcon", icon),
             MessageBoxOperation("setInformativeText", informative_text),

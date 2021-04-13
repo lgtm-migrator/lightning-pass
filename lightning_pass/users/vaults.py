@@ -1,7 +1,7 @@
 """Module containing the Vault class."""
 from __future__ import annotations
 
-from typing import NamedTuple
+from typing import NamedTuple, Union
 
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
@@ -20,7 +20,7 @@ class Vault(NamedTuple):
     website: str
     username: str
     email: str
-    password: str | bytes
+    password: Union[str, bytes]
     vault_index: int
 
 
@@ -156,7 +156,7 @@ def _update_vault(vault: Vault) -> None:
                 vault.website,
                 vault.username,
                 vault.email,
-                credentials.hash_password(vault.password),
+                vault.password,
                 vault.user_id,
                 vault.vault_index,
             ),
@@ -195,7 +195,7 @@ def _new_vault(vault: Vault) -> None:
                 vault.website,
                 vault.username,
                 vault.email,
-                credentials.hash_password(vault.password),
+                vault.password,
                 vault.vault_index,
             ),
         )

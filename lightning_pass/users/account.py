@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import TYPE_CHECKING, Generator, TypeVar
+from typing import TYPE_CHECKING, Generator, TypeVar, Union
 
+import lightning_pass.users.password_hashing as pwd_hashing
 import lightning_pass.users.vaults as vaults
 import lightning_pass.util.credentials as credentials
 import lightning_pass.util.database as database
@@ -26,6 +27,7 @@ from lightning_pass.util.validators import (
 )
 
 if TYPE_CHECKING:
+    from lightning_pass.users.password_hashing import HashedVaultCredentials
     from lightning_pass.users.vaults import Vault
     from lightning_pass.util.credentials import PasswordData
 
@@ -36,8 +38,9 @@ _V = TypeVar("_V", bound=Validator)
 class Account:
     """This class holds information about the currently logged in user."""
 
-    vaults = vaults
     credentials = credentials
+    pwd_hashing = pwd_hashing
+    vaults = vaults
 
     username_validator: _V = UsernameValidator()
     password_validator: _V = PasswordValidator()
@@ -121,7 +124,7 @@ class Account:
                 "%s",
                 "%s",
             )
-            db.execute(sql, (username, cls.credentials.hash_password(password), email))
+            db.execute(sql, (username, cls.pwd_hashing.hash_password(password), email))
 
         return cls(cls.credentials.get_user_item(username, "username", "id"))
 
@@ -157,6 +160,29 @@ class Account:
         account._current_login_date = account.get_value("last_login_date")
         account.update_date("last_login_date")
         return account
+
+    def get_value(self, result_column: str) -> Union[str, bytes, datetime]:
+        """Simplify getting user values.
+
+        :param str result_column: Column from which we're collecting the value
+
+        :returns: the result value
+
+        """
+        return self.credentials.get_user_item(self.user_id, "id", result_column)
+
+    def set_value(
+        self,
+        result: Union[int, str, bytes, datetime],
+        result_column: str,
+    ) -> None:
+        """Simplify setting user values.
+
+        :param str result: Value which we're inserting
+        :param str result_column: Column where to insert the value
+
+        """
+        self.credentials.set_user_item(self.user_id, "id", result, result_column)
 
     def validate_password_data(self, data: PasswordData) -> None:
         """Validate given password data container.
@@ -194,29 +220,6 @@ class Account:
                 func()
             except ValidationFailure:
                 raise exc
-
-    def get_value(self, result_column: str) -> str | bytes | datetime:
-        """Simplify getting user values.
-
-        :param str result_column: Column from which we're collecting the value
-
-        :returns: the result value
-
-        """
-        return self.credentials.get_user_item(self.user_id, "id", result_column)
-
-    def set_value(
-        self,
-        result: int | str | bytes | datetime,
-        result_column: str,
-    ) -> None:
-        """Simplify setting user values.
-
-        :param str result: Value which we're inserting
-        :param str result_column: Column where to insert the value
-
-        """
-        self.credentials.set_user_item(self.user_id, "id", result, result_column)
 
     def update_date(self, column: str) -> None:
         """Update database TIMESTAMP column with CURRENT_TIMESTAMP().
@@ -296,12 +299,12 @@ class Account:
         self.validate_password_data(data)
 
         self.set_value(
-            self.credentials.hash_password(str(data.new_password)),
+            self.pwd_hashing.hash_password(str(data.new_password)),
             "password",
         )
 
     def reset_password(self, password: str, confirm_password: str) -> None:
-        """"""
+        """Reset user's password."""
         try:
             self.password_validator.pattern(password)
         except ValidationFailure:
@@ -311,7 +314,7 @@ class Account:
         except ValidationFailure:
             raise PasswordsDoNotMatch
 
-        self.set_value(self.credentials.hash_password(password), "password")
+        self.set_value(self.pwd_hashing.hash_password(password), "password")
 
     @property
     def email(self) -> str:
@@ -394,7 +397,7 @@ class Account:
 
     @master_password.setter
     def master_password(self, data: PasswordData) -> None:
-        """Set a new master password.
+        """Set a new master password, vault key hash and vault salt.
 
         :param data: The data container will all the needed information
 
@@ -405,8 +408,19 @@ class Account:
         """
         self.validate_password_data(data)
         self.set_value(
-            self.credentials.hash_password(data.new_password),
+            self.pwd_hashing.hash_password(data.new_password),
             "master_password",
+        )
+
+        data = self.pwd_hashing.hash_master_password(data.new_password)
+        self.set_value(data.hash, "vault_key")
+        self.set_value(data.salt, "vault_salt")
+
+    @property
+    def hashed_vault_credentials(self) -> HashedVaultCredentials:
+        return self.pwd_hashing.HashedVaultCredentials(
+            self.get_value("vault_key").encode("utf-8"),
+            self.get_value("vault_salt").encode("utf-8"),
         )
 
     @property
@@ -442,7 +456,18 @@ class Account:
             result = db.fetchall()
 
         # slice first element -> database primary key
-        yield from (self.vaults.Vault(*vault[1:]) for vault in result if vault)
+        yield from (
+            self.vaults.Vault(
+                *vault[1:],
+                self.pwd_hashing.decrypt_vault_password(
+                    self.hashed_vault_credentials.hash,
+                    vault[6],
+                ),
+                *vault[7:],
+            )
+            for vault in result
+            if vault
+        )
 
     @property
     def vault_pages_int(self) -> int:
