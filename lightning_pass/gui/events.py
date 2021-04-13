@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Any, Union
+from typing import TYPE_CHECKING, Any
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -555,21 +555,13 @@ class Events:
 
             self.vault_event(previous_index=self.widget_util.vault_stacked_widget_index)
 
-    def menu_platform_action_event(self, platform: str, index: int):
+    def menu_platform_action_event(self, index: int):
         """Handle changes on the vault stacked widget,
 
-        :param platform: The platform to access
         :param index: The index to access
 
         """
-        if not self.current_user.vault_unlocked:
-            self.widget_util.message_box(
-                "vault_unlock_required_box",
-                "Vault",
-                page=f"{platform} platform",
-            )
-        else:
-            self.vault_event(previous_index=index)
+        self.vault_event(previous_index=index)
 
     def toggle_stylesheet_light(self, *args: Any) -> None:
         """Change stylesheet to light mode."""

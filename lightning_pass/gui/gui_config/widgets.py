@@ -323,8 +323,9 @@ class WidgetUtil:
                 obj_name=page.platform_name,
                 text=page.platform_name,
                 event=lambda: self.parent.events.menu_platform_action_event(
-                    page.platform_name,
-                    page.vault_index + 1,
+                    # offset dummy page
+                    page.vault_index
+                    + 1,
                 ),
                 menu="menu_platform",
             )

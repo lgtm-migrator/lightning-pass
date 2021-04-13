@@ -59,7 +59,7 @@ def _copy(self: Path, target: Path) -> None:
 Path.copy = _copy  # type: ignore
 
 
-_CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
+_CREDENTIALS_DDL = """CREATE TABLE `credentials` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `password` char(60) NOT NULL,
@@ -67,42 +67,45 @@ _CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
   `profile_picture` varchar(255) NOT NULL DEFAULT 'default.png',
   `last_login_date` timestamp NULL DEFAULT NULL,
   `register_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `vault_existence` tinyint NOT NULL DEFAULT '0',
   `master_password` varchar(255) DEFAULT NULL,
+  `last_vault_unlock_date` timestamp NULL DEFAULT NULL,
+  `vault_key` char(60) DEFAULT NULL,
+  `vault_salt` char(29) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """
 
-_TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
+_TOKENS_DDL = """CREATE TABLE `tokens` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `token` varchar(255) NOT NULL,
   `creation_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`user_id`),
+  PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `user_id_UNIQUE` (`user_id`),
   UNIQUE KEY `token_UNIQUE` (`token`),
   KEY `id_idx` (`user_id`),
   CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """
 
-_VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
+_VAULTS_DDL = """CREATE TABLE `vaults` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `platform_name` varchar(255) NOT NULL,
   `website` varchar(512) NOT NULL,
   `username` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` char(60) NOT NULL,
+  `password` char(100) NOT NULL,
   `vault_index` int NOT NULL DEFAULT '0',
-  PRIMARY KEY (`user_id`),
+  PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
-  CONSTRAINT `id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+  KEY `id_idx` (`user_id`),
+  CONSTRAINT `id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """
 
 with database.database_manager() as db:

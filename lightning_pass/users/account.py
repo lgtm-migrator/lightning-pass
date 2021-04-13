@@ -418,6 +418,7 @@ class Account:
 
     @property
     def hashed_vault_credentials(self) -> HashedVaultCredentials:
+        """Return the storage of vault hashing credentials."""
         return self.pwd_hashing.HashedVaultCredentials(
             self.get_value("vault_key").encode("utf-8"),
             self.get_value("vault_salt").encode("utf-8"),
