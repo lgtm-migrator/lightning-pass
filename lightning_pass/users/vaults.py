@@ -49,7 +49,7 @@ def get_vault(user_id: int, vault_index: int) -> Vault | bool:
             result[3],
             result[4],
             result[5],
-            ...,  #:todo:
+            result[6],
             result[7],
         )
     except TypeError:

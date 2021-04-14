@@ -464,7 +464,6 @@ class Account:
         self.validate_password_data(data)
 
         data = self.pwd_hashing.hash_master_password(data.new_password)
-        # todo: rehash
         self.set_value(data.hash, "master_key")
         self.set_value(data.salt, "master_salt")
 
@@ -495,3 +494,12 @@ class Account:
 
         """
         return self.pwd_hashing.decrypt_vault_password(self.master_key, password)
+
+
+if __name__ == "__main__":
+    acc = Account(54)
+    acc._master_key_str = "Register123+"
+
+    enc = acc.encrypt_vault_password(b"test")
+    print(enc)
+    print(acc.decrypt_vault_password(enc))

@@ -5,7 +5,7 @@ Used for showing information to the user.
 """
 import contextlib
 import functools
-from typing import Any, Callable, NamedTuple, Optional, Union
+from typing import Any, Callable, MutableSequence, NamedTuple, Optional, Union
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -506,13 +506,13 @@ contain at least one special character."""
         self,
         parent_lbl: str,
         platform: str,
-        updated_values: list[str],
+        updated_values: MutableSequence[str],
     ) -> None:
         """Show a message box indicating that a new vault page has been updated.
 
         :param parent_lbl: Specifies which windows instantiated the current box
         :param platform: The platform affected by this change
-        :param updated_values: A ``list`` containing the values that have been updated
+        :param updated_values: Values that have been updated
 
         """
         try:

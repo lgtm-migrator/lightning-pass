@@ -355,6 +355,7 @@ class Events:
         :raises PasswordsDoNotMatch: If the 2 master passwords do not match
 
         """
+        key = self.current_user.master_key
         try:
             self.current_user.master_key = self.current_user.credentials.PasswordData(
                 self.current_user.password,
@@ -377,6 +378,9 @@ class Events:
                 item="Master passwords",
             )
         else:
+            for vault in self.current_user.vault_pages:
+                print(self.current_user.decrypt_vault_password(vault.password))
+
             self.widget_util.message_box(
                 "detail_updated_box",
                 "Master Password",
@@ -509,6 +513,10 @@ class Events:
             self.widget_util.vault_widget_vault.vault_index,
         )
 
+        previous_pass = self.current_user.decrypt_vault_password(
+            previous_vault.password,
+        )
+
         try:
             self.current_user.vaults.update_vault(
                 (
@@ -519,7 +527,7 @@ class Events:
                         self.widget_util.vault_widget_vault.username,
                         self.widget_util.vault_widget_vault.email,
                         self.current_user.encrypt_vault_password(
-                            self.widget_util.vault_widget_vault.password,
+                            new_pass := self.widget_util.vault_widget_vault.password,
                         ),
                         int(self.widget_util.vault_widget_vault.vault_index),
                     )
@@ -533,15 +541,21 @@ class Events:
             self.widget_util.message_box("invalid_vault_box", "Vault")
         else:
             if previous_vault:
+
+                updated_details = [
+                    key
+                    for key, val in zip(previous_vault._fields, previous_vault)
+                    # password check has to be done separately
+                    if not key == "password" and not getattr(new_vault, str(key)) == val
+                ]
+                if previous_pass != new_pass:
+                    updated_details.append("password")
+
                 self.widget_util.message_box(
                     "vault_updated_box",
                     "Vault",
                     self.widget_util.vault_widget_vault.platform_name,
-                    [
-                        key
-                        for key, val in zip(previous_vault._fields, previous_vault)
-                        if not getattr(new_vault, str(key)) == val
-                    ],
+                    updated_details,
                 )
             else:
                 self.widget_util.message_box(
