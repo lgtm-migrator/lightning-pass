@@ -1,7 +1,7 @@
 """Module containing classes used for operations with mouse randomness generation."""
 import random
 import string
-from typing import Generator, NamedTuple, Optional, Union
+from typing import Generator, NamedTuple, Optional
 
 from PyQt5 import QtCore, QtWidgets
 
@@ -115,11 +115,7 @@ class PwdGenerator:
         return f"""{self.__class__.__qualname__}({self.options})"""
 
     def coro_div_check(self) -> Generator[bool, int, bool]:
-        """Generator used to check whether a character should be collected.
-
-        Used to make password generation look smooth since characters are shown on the fly.
-
-        """
+        """Coroutine used to check whether a character should be collected."""
         # stops yielding if length has been reached
         while len(self.password) <= self.options.length:
             try:
@@ -130,21 +126,18 @@ class PwdGenerator:
         return False
 
     def get_character(self, x: int, y: int) -> Optional[str]:
-        """Get a eligible password character by generating a random seed from the mouse position tuple.
+        """Get a eligible password character by generating a random seed from the mouse position axis.
 
-        Chooses an item from the string.printable property based on the calculated index.
+        Chooses an item from the ``chars`` attribute based on the calculated index.
 
         :param x: The x axis mouse position
         :param y: The y axis mouse position
-
-        :returns: Generated password if it reached the wanted length
 
         """
         if len(self.password) > self.options.length:
             return
 
-        sd = x + 1j * y
-        random.seed(sd)
+        random.seed(x + 1j * y)
         flt = random.random()
         div = 1 / self.chars.length
 

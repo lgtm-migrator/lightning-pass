@@ -370,6 +370,28 @@ class WidgetUtil:
                 for action in menu.children():
                     action.setVisible(False)
 
+    def rehash_vault_password(self, vault: Vault):
+        """Replace password in the given vault by a new one hashed with current master key.
+
+        :param vault: The data container with the information about the vault
+
+        """
+        user = self.parent.events.current_user
+
+        enc = user.encrypt_vault_password(vault.password)
+
+        db = user.database
+        with db.EnableDBSafeMode(), db.database_manager() as db:
+            sql = """UPDATE lightning_pass.vaults
+                        SET password = {}
+                      WHERE user_id = {}
+                        AND vault_index = {}""".format(
+                "%s",
+                "%s",
+                "%s",
+            )
+            db.execute(sql, (enc, vault.user_id, vault.vault_index))
+
 
 WIDGET_DATA = (
     # index: 0

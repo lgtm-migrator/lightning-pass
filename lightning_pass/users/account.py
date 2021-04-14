@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import TYPE_CHECKING, Generator, TypeVar, Union
+from typing import TYPE_CHECKING, Generator, Optional, TypeVar, Union
 
 import lightning_pass.users.password_hashing as pwd_hashing
 import lightning_pass.users.vaults as vaults
@@ -39,6 +39,7 @@ class Account:
     """This class holds information about the currently logged in user."""
 
     credentials = credentials
+    database = database
     pwd_hashing = pwd_hashing
     vaults = vaults
 
@@ -64,6 +65,9 @@ class Account:
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}({self.user_id})"
+
+    def __bool__(self):
+        return bool(self.get_value("id"))
 
     @classmethod
     def register(
@@ -118,7 +122,7 @@ class Account:
             except ValidationFailure:
                 raise exc
 
-        with database.database_manager() as db:
+        with cls.database.database_manager() as db:
             # not using f-string due to SQL injection
             sql = """INSERT INTO lightning_pass.credentials (username, password, email)
                           VALUES ({},{},{})""".format(
@@ -231,7 +235,7 @@ class Account:
         :param column: Which column to update
 
         """
-        with database.database_manager() as db:
+        with self.database.database_manager() as db:
             # not using f-string due to SQL injection
             sql = """UPDATE lightning_pass.credentials
                         SET {} = CURRENT_TIMESTAMP()
@@ -410,10 +414,13 @@ class Account:
         """Return the 'previous' date when the vault of the current user has been unlocked."""
         return self._current_vault_unlock_date
 
-    @property
-    def vault_pages(self) -> Generator[Vault, None, None]:
-        """Yield registered vault pages tied to the current account."""
-        with database.database_manager() as db:
+    def vault_pages(self, key: Optional[bytes] = None) -> Generator[Vault, None, None]:
+        """Yield registered vault pages tied to the current account.
+
+        :param key: Optional argument to decrypt the password with a different key
+
+        """
+        with self.database.database_manager() as db:
             # not using f-string due to SQL injection
             sql = """SELECT *
                        FROM lightning_pass.vaults
@@ -430,6 +437,7 @@ class Account:
                 *vault[1:6],
                 self.decrypt_vault_password(
                     vault[6],
+                    key if key else self.master_key,
                 ),
                 *vault[7:],
             )
@@ -440,7 +448,7 @@ class Account:
     @property
     def vault_pages_int(self) -> int:
         """Return an integer with the amount of vault pages a user has registered."""
-        return sum(1 for _ in self.vault_pages)
+        return sum(1 for _ in self.vault_pages())
 
     @property
     def master_key(self) -> bytes:
@@ -479,25 +487,38 @@ class Account:
             # if there are no results, encoding NoneType will result in the error
             return False
 
-    def encrypt_vault_password(self, password: bytes) -> Union[bytes, bool]:
+    def encrypt_vault_password(self, password: str | bytes) -> Union[bytes, bool]:
         """Return encrypted password with the current ``vault_key``.
 
         :param password: The password to encrypt
 
         """
+        if isinstance(password, str):
+            password = password.encode("utf-8")
         return self.pwd_hashing.encrypt_vault_password(self.master_key, password)
 
-    def decrypt_vault_password(self, password: bytes) -> str:
+    def decrypt_vault_password(
+        self,
+        password: str | bytes,
+        key: Optional[bytes] = None,
+    ) -> str:
         """Decrypt given vault password and return it.
 
         :param password: The password to decrypt
+        :param key: Optional argument to decrypt the password with a different key
 
         """
-        return self.pwd_hashing.decrypt_vault_password(self.master_key, password)
+        if isinstance(password, str):
+            password = password.encode("utf-8")
+        return self.pwd_hashing.decrypt_vault_password(
+            key if key else self.master_key,
+            password,
+        )
 
 
 if __name__ == "__main__":
     acc = Account(54)
+
     acc._master_key_str = "Register123+"
 
     enc = acc.encrypt_vault_password(b"test")

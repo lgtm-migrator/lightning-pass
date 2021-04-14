@@ -5,7 +5,6 @@ from datetime import datetime
 from pathlib import Path
 from typing import NamedTuple, Optional, Union
 
-import bcrypt
 import validator_collection
 import yagmail
 

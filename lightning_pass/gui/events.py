@@ -35,7 +35,7 @@ def _ord(day: int) -> str:
     :param day: The day to convert to the human readable form
 
     """
-    suffix = ("th", "st", "nd", "rd")
+    suffix = "th", "st", "nd", "rd"
 
     if (div := day % 10) in (1, 2, 3) and day not in (11, 12, 13):
         return suffix[div]
@@ -355,7 +355,7 @@ class Events:
         :raises PasswordsDoNotMatch: If the 2 master passwords do not match
 
         """
-        key = self.current_user.master_key
+        prev_key = self.current_user.master_key
         try:
             self.current_user.master_key = self.current_user.credentials.PasswordData(
                 self.current_user.password,
@@ -378,8 +378,9 @@ class Events:
                 item="Master passwords",
             )
         else:
-            for vault in self.current_user.vault_pages:
-                print(self.current_user.decrypt_vault_password(vault.password))
+            # need to rehash currently saved vault passwords so they can be recognized by the new master key
+            for vault in self.current_user.vault_pages(key=prev_key):
+                self.widget_util.rehash_vault_password(vault)
 
             self.widget_util.message_box(
                 "detail_updated_box",
@@ -422,7 +423,7 @@ class Events:
 
         """
         self.widget_util.rebuild_vault_stacked_widget()
-        for page in self.current_user.vault_pages:
+        for page in self.current_user.vault_pages():
             self.widget_util.setup_vault_widget(page)
         self.parent.ui.menu_bar.addAction(
             getattr(self.parent.ui, "menu_platform").menuAction(),
@@ -513,10 +514,6 @@ class Events:
             self.widget_util.vault_widget_vault.vault_index,
         )
 
-        previous_pass = self.current_user.decrypt_vault_password(
-            previous_vault.password,
-        )
-
         try:
             self.current_user.vaults.update_vault(
                 (
@@ -541,11 +538,14 @@ class Events:
             self.widget_util.message_box("invalid_vault_box", "Vault")
         else:
             if previous_vault:
+                previous_pass = self.current_user.decrypt_vault_password(
+                    previous_vault.password,
+                )
 
                 updated_details = [
                     key
                     for key, val in zip(previous_vault._fields, previous_vault)
-                    # password check has to be done separately
+                    # password check done separately, decryption needed
                     if not key == "password" and not getattr(new_vault, str(key)) == val
                 ]
                 if previous_pass != new_pass:
