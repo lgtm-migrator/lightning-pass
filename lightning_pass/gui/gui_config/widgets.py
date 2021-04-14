@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import contextlib
 import functools
-import itertools
+import itertools as it
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -347,7 +347,7 @@ class WidgetUtil:
         Genexpr is used to filter the correct widget types and extract the text.
 
         """
-        children_objects = itertools.chain(
+        children_objects = it.chain(
             (self.parent.ui.vault_stacked_widget.currentWidget().children()),
         )
         return self.parent.events.current_user.vaults.Vault(

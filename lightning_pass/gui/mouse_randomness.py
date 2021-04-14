@@ -60,7 +60,7 @@ class PasswordOptions(NamedTuple):
 
 
 class Chars(NamedTuple):
-    chars: tuple
+    chars: str
     length: int
 
 
@@ -70,16 +70,22 @@ def printable_options(options: PasswordOptions) -> Chars:
     :param options: The given options
 
     """
-    final = ()
-
-    if options.numbers:
-        final += tuple(string.digits)
-    if options.lowercase:
-        final += tuple(string.ascii_lowercase)
-    if options.uppercase:
-        final += tuple(string.ascii_uppercase)
-    if options.symbols:
-        final += tuple(string.punctuation)
+    final = "".join(
+        (
+            chars
+            for option, chars in zip(
+                # not using first integer value
+                options[1:],
+                (
+                    string.digits,
+                    string.punctuation,
+                    string.ascii_lowercase,
+                    string.ascii_uppercase,
+                ),
+            )
+            if option
+        ),
+    )
 
     return Chars(final, len(final))
 
@@ -87,9 +93,11 @@ def printable_options(options: PasswordOptions) -> Chars:
 class PwdGenerator:
     """Holds user's chosen parameters for password generation and contains the password generation functionality.
 
-    :param options: The NamedTuple containing the password options chosen by the user
+    :param options: The ``NamedTuple`` containing the password options chosen by the user
 
     """
+
+    __slots__ = "options", "chars", "password", "div", "coro"
 
     def __init__(self, options: PasswordOptions) -> None:
         """Construct the class."""
@@ -98,15 +106,15 @@ class PwdGenerator:
         self.password = ""
 
         self.div = int(1_000 // self.options.length)
-        self.div_check = self.div_check()
-        # prepare generator for receiving values
-        next(self.div_check)
+        self.coro = self.coro_div_check()
+        # advance the generator to the first yield
+        next(self.coro)
 
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"""{self.__class__.__qualname__}({self.options})"""
 
-    def div_check(self) -> Generator[bool, int, bool]:
+    def coro_div_check(self) -> Generator[bool, int, bool]:
         """Generator used to check whether a character should be collected.
 
         Used to make password generation look smooth since characters are shown on the fly.
@@ -141,25 +149,8 @@ class PwdGenerator:
         div = 1 / self.chars.length
 
         index = int(flt // div)
-        char = self.chars.chars[index]
 
-        self.collect_char(char)
-
-    def collect_char(self, char: Union[int, str]) -> None:
-        """Collect a password character.
-
-        Password generation is based on the chosen parameters in the GUI.
-
-        :param char: character to evaluate and potentially add to the current password.
-
-        """
-        if (
-            (char.islower() and self.options.lowercase)
-            or (char.isupper() and self.options.uppercase)
-            or (char.isdecimal() and self.options.numbers)
-            or (not char.isalnum() and self.options.symbols)
-        ):
-            self.password += char
+        self.password += self.chars.chars[index]
 
 
 __all__ = [

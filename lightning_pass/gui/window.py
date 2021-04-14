@@ -211,7 +211,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         if self.pass_progress > 1_000:
             return
 
-        if self.gen.div_check.send(self.pass_progress) and self.pass_progress != 0:
+        if self.gen.coro.send(self.pass_progress) and self.pass_progress != 0:
             self.gen.get_character(pos.x(), pos.y())
 
         self.ui.generate_pass_p2_final_pass_line.setText(self.gen.password)

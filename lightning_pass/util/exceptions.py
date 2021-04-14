@@ -21,7 +21,7 @@ class InvalidEmail(ValidationFailure):
     """Raised when an email doesn't meet a required email pattern."""
 
 
-class InvalidToken(ValidationFailure):
+class InvalidResetToken(ValidationFailure):
     """Raised when a token is invalid."""
 
 

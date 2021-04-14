@@ -11,12 +11,12 @@ from lightning_pass.util import database
 
 
 def parent_folder() -> Path:
-    """Return a Path to the parent folder of the settings script."""
+    """Return a ``Path`` to the parent folder of the settings script."""
     return Path(__file__).parent
 
 
 def static_folder() -> Path:
-    """Return a Path to the static folder located in the gui folder."""
+    """Return a ``Path`` to the static folder located in the gui folder."""
     return parent_folder() / "gui/static"
 
 
@@ -59,7 +59,7 @@ def _copy(self: Path, target: Path) -> None:
 Path.copy = _copy  # type: ignore
 
 
-_CREDENTIALS_DDL = """CREATE TABLE `credentials` (
+_CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
   `id` int NOT NULL AUTO_INCREMENT,
   `username` varchar(255) NOT NULL,
   `password` char(60) NOT NULL,
@@ -78,7 +78,7 @@ _CREDENTIALS_DDL = """CREATE TABLE `credentials` (
 ) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """
 
-_TOKENS_DDL = """CREATE TABLE `tokens` (
+_TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `token` varchar(255) NOT NULL,
@@ -92,7 +92,7 @@ _TOKENS_DDL = """CREATE TABLE `tokens` (
 ) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """
 
-_VAULTS_DDL = """CREATE TABLE `vaults` (
+_VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
   `id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `platform_name` varchar(255) NOT NULL,

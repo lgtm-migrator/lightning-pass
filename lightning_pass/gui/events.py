@@ -356,13 +356,11 @@ class Events:
 
         """
         try:
-            self.current_user.master_password = (
-                self.current_user.credentials.PasswordData(
-                    self.current_user.password,
-                    self.parent.ui.master_pass_current_pass_line.text(),
-                    self.parent.ui.master_pass_master_pass_line.text(),
-                    self.parent.ui.master_pass_conf_master_pass_line.text(),
-                )
+            self.current_user.master_key = self.current_user.credentials.PasswordData(
+                self.current_user.password,
+                self.parent.ui.master_pass_current_pass_line.text(),
+                self.parent.ui.master_pass_master_pass_line.text(),
+                self.parent.ui.master_pass_conf_master_pass_line.text(),
             )
         except AccountDoesNotExist:
             self.widget_util.message_box("invalid_login_box", "Master Password")
@@ -399,16 +397,15 @@ class Events:
             self.current_user.username,
         )
 
-        try:
-            self.current_user.password_validator.authenticate(
-                password,
-                self.current_user.master_password,
-            )
-        except ValidationFailure:
+        if not self.current_user.pwd_hashing.auth_derived_key(
+            password,
+            self.current_user.hashed_vault_credentials,
+        ):
             self.current_user.vault_unlocked = False
             self.widget_util.message_box("invalid_login_box", "Vault")
         else:
             self.current_user.vault_unlocked = True
+            self.current_user._master_key_str = password
             self.widget_util.message_box("vault_unlocked_box")
 
     @decorators.login_required(page_to_access="vault")

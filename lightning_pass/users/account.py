@@ -59,6 +59,8 @@ class Account:
         self._vault_unlocked = False
         self._current_vault_unlock_date = self.get_value("last_vault_unlock_date")
 
+        self._master_key_str = ""
+
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}({self.user_id})"
@@ -391,40 +393,6 @@ class Account:
         return self.get_value("register_date")
 
     @property
-    def master_password(self) -> str:
-        """Return current master password."""
-        return self.get_value("master_password")
-
-    @master_password.setter
-    def master_password(self, data: PasswordData) -> None:
-        """Set a new master password, vault key hash and vault salt.
-
-        :param data: The data container will all the needed information
-
-        :raises AccountDoesNotExist: if the normal password is not correct
-        :raises PasswordsDoNotMatch: if the master passwords do not match
-        :raises InvalidPassword: if the master password doesn't meet the required pattern
-
-        """
-        self.validate_password_data(data)
-        self.set_value(
-            self.pwd_hashing.hash_password(data.new_password),
-            "master_password",
-        )
-
-        data = self.pwd_hashing.hash_master_password(data.new_password)
-        self.set_value(data.hash, "vault_key")
-        self.set_value(data.salt, "vault_salt")
-
-    @property
-    def hashed_vault_credentials(self) -> HashedVaultCredentials:
-        """Return the storage of vault hashing credentials."""
-        return self.pwd_hashing.HashedVaultCredentials(
-            self.get_value("vault_key").encode("utf-8"),
-            self.get_value("vault_salt").encode("utf-8"),
-        )
-
-    @property
     def vault_unlocked(self) -> bool:
         """Return the current state of vault."""
         return self._vault_unlocked
@@ -475,12 +443,42 @@ class Account:
         return sum(1 for _ in self.vault_pages)
 
     @property
-    def vault_key(self) -> bytes:
+    def master_key(self) -> bytes:
         """Return the current key derived from the master password."""
         return self.pwd_hashing.pbkdf3hmac_key(
-            "Register123+",  # todo: dynamic master password
+            self._master_key_str,
             self.hashed_vault_credentials.salt,
         )
+
+    @master_key.setter
+    def master_key(self, data: PasswordData) -> None:
+        """Set a new master key and it's salt.
+
+        :param data: The data container will all the needed information
+
+        :raises AccountDoesNotExist: if the normal password is not correct
+        :raises PasswordsDoNotMatch: if the master passwords do not match
+        :raises InvalidPassword: if the master password doesn't meet the required pattern
+
+        """
+        self.validate_password_data(data)
+
+        data = self.pwd_hashing.hash_master_password(data.new_password)
+        # todo: rehash
+        self.set_value(data.hash, "master_key")
+        self.set_value(data.salt, "master_salt")
+
+    @property
+    def hashed_vault_credentials(self) -> bool | HashedVaultCredentials:
+        """Return the storage of vault hashing credentials."""
+        try:
+            return self.pwd_hashing.HashedVaultCredentials(
+                self.get_value("master_key").encode("utf-8"),
+                self.get_value("master_salt").encode("utf-8"),
+            )
+        except AttributeError:
+            # if there are no results, encoding NoneType will result in the error
+            return False
 
     def encrypt_vault_password(self, password: bytes) -> Union[bytes, bool]:
         """Return encrypted password with the current ``vault_key``.
@@ -488,10 +486,7 @@ class Account:
         :param password: The password to encrypt
 
         """
-        return self.pwd_hashing.encrypt_vault_password(
-            self.vault_key,
-            password,
-        )
+        return self.pwd_hashing.encrypt_vault_password(self.master_key, password)
 
     def decrypt_vault_password(self, password: bytes) -> str:
         """Decrypt given vault password and return it.
@@ -499,11 +494,4 @@ class Account:
         :param password: The password to decrypt
 
         """
-        if pwd := self.pwd_hashing.decrypt_vault_password(self.vault_key, password):
-            return pwd
-        else:
-            return ""
-
-
-if __name__ == "__main__":
-    import timeit
+        return self.pwd_hashing.decrypt_vault_password(self.master_key, password)
