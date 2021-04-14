@@ -5,7 +5,7 @@ Used for showing information to the user.
 """
 import contextlib
 import functools
-from typing import Any, Callable, MutableSequence, NamedTuple, Optional, Union
+from typing import Callable, MutableSequence, NamedTuple, Optional, Union
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -16,19 +16,6 @@ from PyQt5.QtWidgets import (
     QPushButton,
     QWidget,
 )
-
-
-def partial_factory(func: Callable, *args: Optional[Any], **kwargs: Optional[Any]):
-    """Return a new partial function.
-
-    :param func: The function which will be made partial
-    :param args: Optional positional arguments
-    :param kwargs: Optional keyword arguments
-
-    :returns: the partial function
-
-    """
-    return functools.partial(func, *args, **kwargs)
 
 
 def event_handler_factory(options: dict[str, Callable[[], None]]) -> Callable[[], None]:
@@ -114,10 +101,12 @@ class MessageBoxes(QWidget):
         """
         box = QMessageBox(self.main_win)
 
+        parent_lbl = " ".join(text.capitalize() for text in parent_lbl.split(sep=" "))
+
         operations = {
             MessageBoxOperation(
                 "setWindowTitle",
-                f"{self.title} - {parent_lbl.capitalize()}",
+                f"{self.title} - {parent_lbl}",
             ),
             MessageBoxOperation("setText", text),
             MessageBoxOperation("setIcon", icon),
@@ -142,10 +131,10 @@ class MessageBoxes(QWidget):
         :param str parent_lbl: Specifies which window instantiated current box
 
         """
-        return partial_factory(
+        return functools.partial(
             self.message_box_factory,
             parent_lbl,
-            f"This {item} is invalid.",
+            f"This {item.casefold()} is invalid.",
             QMessageBox.Warning,
         )
 
@@ -159,7 +148,8 @@ class MessageBoxes(QWidget):
         :param str parent_lbl: Specifies which window instantiated current box
 
         """
-        return partial_factory(
+        item = item.casefold()
+        return functools.partial(
             self.message_box_factory,
             parent_lbl,
             f"This {item} already exists. Please use different {item}.",
@@ -173,7 +163,7 @@ class MessageBoxes(QWidget):
         :param handler: Event handler for click on the two yes | no buttons
 
         """
-        return partial_factory(
+        return functools.partial(
             self.message_box_factory,
             standard_buttons=QMessageBox.Yes | QMessageBox.No,
             default_button=getattr(QMessageBox, default_btn),
@@ -272,7 +262,7 @@ contain at least one special character."""
         """
         self.message_box_factory(
             parent_lbl,
-            f"{item} don't match.",
+            f"{item.capitalize()} don't match.",
             QMessageBox.Warning,
             informative_text="Please try again.",
         ).exec()
@@ -285,7 +275,7 @@ contain at least one special character."""
 
         """
         text = (
-            f"Please log in to access the {page} page."
+            f"Please log in to access the {page.casefold()} page."
             if page
             else "Please log in to access that page."
         )
@@ -561,7 +551,7 @@ class InputDialogs(QWidget):
         password, i = QInputDialog.getText(
             self.main_win,
             parent_lbl,
-            f"{password_type} for {account_username}:",
+            f"{password_type.capitalize()} for {account_username}:",
             QLineEdit.Password,
         )
         return password if i else ""
