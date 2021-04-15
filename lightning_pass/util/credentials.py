@@ -192,7 +192,7 @@ def send_reset_email(email: str) -> None:
         contents=f"""You have requested to reset your password in Lightning Pass.
 Please enter the reset token below into the application.
 
-{Token.generate_reset_token(get_user_item(email, "email", "id"))}
+{generate_reset_token(get_user_item(email, "email", "id"))}
 
 If you did not make this request, ignore this email and no changes will be made to your account.""",
     )
@@ -225,62 +225,56 @@ def get_profile_picture_path(profile_picture: str) -> Path:
     return PFP_FOLDER / profile_picture
 
 
-class Token:
-    """This class holds various utils connected to token generation and checking."""
+def generate_reset_token(user_id: int) -> str:
+    """Clear all tokens older than 30 minutes. Insert new user's token into database and return it.
 
-    __slots__ = ()
+    Database (un)safe mode is used for the first query where the search is not based on the primary key.
 
-    @staticmethod
-    def generate_reset_token(user_id: int) -> str:
-        """Clear all tokens older than 30 minutes. Insert new user's token into database and return it.
+    :param int user_id: Used to create a reference between the user and his token.
 
-        Database (un)safe mode is used for the first query where the search is not based on the primary key.
+    :returns: generated token
 
-        :param int user_id: Used to create a reference between the user and his token.
+    """
+    token = secrets.token_hex(15) + str(user_id)
 
-        :returns: generated token
+    with database.EnableDBSafeMode(), database.database_manager() as db:
+        sql = """DELETE FROM lightning_pass.tokens
+                       WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"""
+        db.execute(sql)
 
-        """
-        token = secrets.token_hex(15) + str(user_id)
+    with database.database_manager() as db:
+        # not using f-string due to SQL injection
+        sql = """INSERT INTO lightning_pass.tokens (user_id, token)
+                      VALUES ({}, {})""".format(
+            "%s",
+            "%s",
+        )
+        db.execute(sql, (user_id, token))
 
-        with database.EnableDBSafeMode(), database.database_manager() as db:
-            sql = """DELETE FROM lightning_pass.tokens
-                           WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"""
-            db.execute(sql)
+    return token
 
+
+def validate_token(token: str) -> Optional[bool]:
+    """Check if it's possible to use the entered token.
+
+    If token is valid, delete it from the database and proceed
+
+    :param str token: The token to evaluate
+
+    :returns: True if everything went correctly, False if token is invalid
+
+    """
+    if check_item_existence(token, "token", "tokens", should_exist=True):
         with database.database_manager() as db:
             # not using f-string due to SQL injection
-            sql = """INSERT INTO lightning_pass.tokens (user_id, token)
-                          VALUES ({}, {})""".format(
-                "%s",
+            sql = """DELETE FROM lightning_pass.tokens
+                           WHERE token = {}""".format(
                 "%s",
             )
-            db.execute(sql, (user_id, token))
-
-        return token
-
-    @staticmethod
-    def validate_token(token: str) -> Optional[bool]:
-        """Check if it's possible to use the entered token.
-
-        If token is valid, delete it from the database and proceed
-
-        :param str token: The token to evaluate
-
-        :returns: True if everything went correctly, False if token is invalid
-
-        """
-        if check_item_existence(token, "token", "tokens", should_exist=True):
-            with database.database_manager() as db:
-                # not using f-string due to SQL injection
-                sql = """DELETE FROM lightning_pass.tokens
-                               WHERE token = {}""".format(
-                    "%s",
-                )
-                # query expecting a sequence thus val has to be a tuple (created by the trailing comma)
-                db.execute(sql, (token,))
-            return True
-        return False
+            # query expecting a sequence thus val has to be a tuple (created by the trailing comma)
+            db.execute(sql, (token,))
+        return True
+    return False
 
 
 def validate_url(url: str) -> Union[str, bool]:

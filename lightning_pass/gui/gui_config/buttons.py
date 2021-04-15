@@ -42,7 +42,7 @@ class Buttons:
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__}({self.parent})"
+        return f"{self.__class__.__qualname__}({self.parent!r})"
 
     def setup_all(self):
         """Run all 3 funcs to setup everything."""

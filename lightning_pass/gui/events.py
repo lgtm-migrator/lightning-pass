@@ -46,7 +46,6 @@ def _ord(day: int) -> str:
 class Events:
     """Used to provide logic to specific event functions."""
 
-    current_user: Account
     __current_token: str
 
     def __init__(self, parent: QMainWindow) -> None:
@@ -55,9 +54,11 @@ class Events:
         self.widget_util = WidgetUtil(parent)
         self.parent = parent
 
+        self.current_user = Account(0)
+
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__}({self.parent})"
+        return f"{self.__class__.__qualname__}({self.parent!r})"
 
     def home_event(self) -> None:
         """Switch to home widget."""
@@ -339,8 +340,23 @@ class Events:
 
     @decorators.login_required(page_to_access="master password")
     def master_password_event(self) -> None:
-        """Switch to master password widget."""
-        self.widget_util.set_current_widget("master_password")
+        """Switch to master password widget.
+
+        If master password already exists, user is required to unlock vault to access this page.
+        By unlocking the vault, access to the master key is provided.
+        The key will be used while rehashing the saved vault passwords (if master password is changed).
+
+        """
+        if not self.current_user.master_key:
+            self.widget_util.set_current_widget("master_password")
+        elif self.current_user.vault_unlocked and self.current_user.vault_pages():
+            self.widget_util.set_current_widget("master_password")
+        else:
+            self.widget_util.message_box(
+                "vault_unlock_required_box",
+                "master password",
+                page="master password",
+            )
 
     def master_password_submit_event(self) -> None:
         """Try to change or add a master password to a user account.
@@ -387,14 +403,14 @@ class Events:
                 "Master Password",
                 detail="Master password",
             )
-            self.master_password_event()
+            self.account_event()
 
     @decorators.login_required
     @decorators.master_password_required
     def master_password_dialog_event(self) -> None:
         """Show an input dialog asking the user to enter their current master password.
 
-        Either locks or unlocks the vault depending on the result
+        Either locks or unlocks the vault depending on the result.
 
         """
         password = self.parent.ui.input_dialogs.master_password_dialog(

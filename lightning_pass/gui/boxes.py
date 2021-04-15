@@ -69,7 +69,7 @@ class MessageBoxes(QWidget):
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__}({self.main_win}, {self.parent})"
+        return f"{self.__class__.__qualname__}({self.main_win!r}, {self.parent!r})"
 
     def message_box_factory(
         self,
@@ -434,7 +434,7 @@ contain at least one special character."""
         )
 
         text = (
-            f"Please unlock your vault to access the {page} page."
+            f"Please unlock your vault to access the {page.casefold()} page."
             if page
             else "Please unlock your vault to access that page."
         )
@@ -595,5 +595,4 @@ __all__ = [
     "MessageBoxOperation",
     "MessageBoxes",
     "event_handler_factory",
-    "partial_factory",
 ]

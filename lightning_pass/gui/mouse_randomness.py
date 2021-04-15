@@ -24,6 +24,10 @@ class MouseTracker(QtCore.QObject):
         self.widget.setMouseTracking(True)
         self.widget.installEventFilter(self)
 
+    def __repr__(self):
+        """Provide information about this class."""
+        return f"{self.__class__.__qualname__}({self.widget!r})"
+
     def eventFilter(
         self,
         label: QtWidgets.QLabel,
@@ -52,6 +56,8 @@ class MouseTracker(QtCore.QObject):
 
 
 class PasswordOptions(NamedTuple):
+    """Store the chosen password options."""
+
     length: int
     numbers: bool
     symbols: bool
@@ -60,6 +66,8 @@ class PasswordOptions(NamedTuple):
 
 
 class Chars(NamedTuple):
+    """Store the characters that should be used while password generation."""
+
     chars: str
     length: int
 
@@ -74,7 +82,7 @@ def printable_options(options: PasswordOptions) -> Chars:
         (
             chars
             for option, chars in zip(
-                # not using first integer value
+                # not using first length value
                 options[1:],
                 (
                     string.digits,
@@ -93,7 +101,7 @@ def printable_options(options: PasswordOptions) -> Chars:
 class PwdGenerator:
     """Holds user's chosen parameters for password generation and contains the password generation functionality.
 
-    :param options: The ``NamedTuple`` containing the password options chosen by the user
+    :param options: The data container containing the password options chosen by the user
 
     """
 
@@ -112,7 +120,7 @@ class PwdGenerator:
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"""{self.__class__.__qualname__}({self.options})"""
+        return f"{self.__class__.__qualname__}({self.options!r})"
 
     def coro_div_check(self) -> Generator[bool, int, bool]:
         """Coroutine used to check whether a character should be collected."""

@@ -87,7 +87,7 @@ class WidgetUtil:
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__}({self.parent})"
+        return f"{self.__class__.__qualname__}({self.parent!r})"
 
     @functools.cached_property
     def font(self):
@@ -305,9 +305,13 @@ class WidgetUtil:
             except (TypeError, UnboundLocalError):
                 method()
 
-        self.parent.ui.vault_widget.ui.vault_password_line.setText(
-            page.password,
-        )
+        try:
+            (w := self.parent.ui.vault_widget.ui.vault_password_line).setText(
+                page.password,
+            )
+        except TypeError:
+            w.clear()
+
         self.setup_vault_page_menu(page)
 
     def setup_vault_page_menu(self, page):

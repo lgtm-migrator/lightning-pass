@@ -60,11 +60,11 @@ class Account:
         self._vault_unlocked = False
         self._current_vault_unlock_date = self.get_value("last_vault_unlock_date")
 
-        self._master_key_str = ""
+        self._master_key_str = r""
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__}({self.user_id})"
+        return f"{self.__class__.__qualname__}({self.user_id!r})"
 
     def __bool__(self):
         return bool(self.get_value("id"))
@@ -436,7 +436,8 @@ class Account:
             self.vaults.Vault(
                 *vault[1:6],
                 self.decrypt_vault_password(
-                    vault[6],
+                    # need raw string for decryption
+                    vault[6].encode("unicode_escape"),
                     key if key else self.master_key,
                 ),
                 *vault[7:],
@@ -451,12 +452,15 @@ class Account:
         return sum(1 for _ in self.vault_pages())
 
     @property
-    def master_key(self) -> bytes:
+    def master_key(self) -> bool | bytes:
         """Return the current key derived from the master password."""
-        return self.pwd_hashing.pbkdf3hmac_key(
-            self._master_key_str,
-            self.hashed_vault_credentials.salt,
-        )
+        try:
+            return self.pwd_hashing.pbkdf3hmac_key(
+                self._master_key_str,
+                self.hashed_vault_credentials.salt,
+            )
+        except AttributeError:
+            return False
 
     @master_key.setter
     def master_key(self, data: PasswordData) -> None:
@@ -518,9 +522,4 @@ class Account:
 
 if __name__ == "__main__":
     acc = Account(54)
-
-    acc._master_key_str = "Register123+"
-
-    enc = acc.encrypt_vault_password(b"test")
-    print(enc)
-    print(acc.decrypt_vault_password(enc))
+    print(acc.master_key)

@@ -59,7 +59,7 @@ class UsernameValidator(PublicValidator):
             # length
             or len(username) < 5
             # special char
-            or len(username) - len(re.findall(r"[A-Za-z0-9_]", username)) > 0
+            or (len(username) - len(re.findall(r"[A-Za-z0-9_]", username))) > 0
         ):
             raise ValidationFailure
         return True
