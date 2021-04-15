@@ -226,3 +226,8 @@ class Ui_vault_widget(object):
         self.vault_backward_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_forward_tool_btn.setText(_translate("vault_widget", "..."))
         self.vault_update_btn.setText(_translate("vault_widget", "Update"))
+
+
+__all__ = [
+    "Ui_vault_widget",
+]

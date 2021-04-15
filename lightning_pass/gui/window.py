@@ -199,6 +199,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
     @property
     def current_index(self) -> int:
+        """Return the current index of the main stacked widget."""
         return self.ui.stacked_widget.currentIndex()
 
     @QtCore.pyqtSlot(QtCore.QPoint)
@@ -220,6 +221,8 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
 
 class VaultWidget(QtWidgets.QWidget):
+    """The widget to be displayed on the left side of the vault page."""
+
     def __init__(self):
         super().__init__()
         self.widget = QtWidgets.QWidget()
@@ -234,5 +237,11 @@ class VaultWidget(QtWidgets.QWidget):
 __all__ = [
     "LightningPassWindow",
     "SplashScreen",
+    "VaultWidget",
+    "logger",
     "run",
+    "run_main_window",
+    "run_splash_screen",
+    "setup_tray_icon",
+    "window_runner",
 ]

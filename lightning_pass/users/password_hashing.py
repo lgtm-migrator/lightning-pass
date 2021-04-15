@@ -93,3 +93,14 @@ def decrypt_vault_password(key: bytes, password: Union[str, bytes]) -> Union[str
         return f.decrypt(password).decode()
     except InvalidToken:
         return False
+
+
+__all__ = [
+    "HashedVaultCredentials",
+    "auth_derived_key",
+    "decrypt_vault_password",
+    "encrypt_vault_password",
+    "hash_master_password",
+    "hash_password",
+    "pbkdf3hmac_key",
+]

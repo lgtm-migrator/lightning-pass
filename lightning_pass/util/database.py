@@ -61,4 +61,7 @@ class EnableDBSafeMode(contextlib.ContextDecorator):
             db.execute(sql)
 
 
-__all__ = ["database_manager", "EnableDBSafeMode"]
+__all__ = [
+    "EnableDBSafeMode",
+    "database_manager",
+]

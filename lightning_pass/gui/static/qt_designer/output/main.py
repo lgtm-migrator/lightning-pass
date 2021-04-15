@@ -1461,3 +1461,8 @@ class Ui_lightning_pass(object):
         self.action_change_password.setText(
             _translate("lightning_pass", "change_password"),
         )
+
+
+__all__ = [
+    "Ui_lightning_pass",
+]

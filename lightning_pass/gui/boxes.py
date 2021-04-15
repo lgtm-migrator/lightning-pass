@@ -1,8 +1,4 @@
-"""Module containing the MessageBoxes and InputDialogs classes.
-
-Used for showing information to the user.
-
-"""
+"""Module containing the MessageBoxes and InputDialogs classes."""
 import contextlib
 import functools
 from typing import Callable, MutableSequence, NamedTuple, Optional, Union
@@ -42,6 +38,8 @@ def event_handler_factory(options: dict[str, Callable[[], None]]) -> Callable[[]
 
 
 class MessageBoxOperation(NamedTuple):
+    """Store data connected to ways how to setup a part of a message box."""
+
     func: str
     args: Optional[
         Union[
@@ -57,7 +55,7 @@ class MessageBoxOperation(NamedTuple):
 class MessageBoxes(QWidget):
     """This class holds the functionality to show various message boxes."""
 
-    __slots__ = ("main_win", "parent", "events", "title")
+    __slots__ = "main_win", "parent", "events", "title"
 
     def __init__(self, child: QMainWindow, parent: QMainWindow) -> None:
         """Class constructor."""
@@ -525,6 +523,8 @@ contain at least one special character."""
 
 
 class InputDialogs(QWidget):
+
+    """Show input dialog to the user."""
 
     __slots__ = ("events", "main_win", "title")
 

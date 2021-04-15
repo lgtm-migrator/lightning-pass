@@ -168,6 +168,8 @@ def check_item_existence(
 
 
 class PasswordData(NamedTuple):
+    """Store data connected to a new password."""
+
     previous_password: bytes
     confirm_previous: str
     new_password: Optional[str] = None
@@ -295,3 +297,17 @@ def validate_url(url: str) -> Union[str, bool]:
     ):
         return url
     return False
+
+
+__all__ = [
+    "PasswordData",
+    "check_item_existence",
+    "generate_reset_token",
+    "get_profile_picture_path",
+    "get_user_item",
+    "save_picture",
+    "send_reset_email",
+    "set_user_item",
+    "validate_token",
+    "validate_url",
+]

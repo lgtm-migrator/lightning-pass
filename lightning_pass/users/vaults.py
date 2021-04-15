@@ -15,6 +15,8 @@ from lightning_pass.util.validators import EmailValidator
 
 
 class Vault(NamedTuple):
+    """Store all of the data connected to one vault."""
+
     user_id: int
     platform_name: str
     website: str
@@ -201,4 +203,9 @@ def _new_vault(vault: Vault) -> None:
         )
 
 
-__all__ = ["Vault"]
+__all__ = [
+    "Vault",
+    "delete_vault",
+    "get_vault",
+    "update_vault",
+]

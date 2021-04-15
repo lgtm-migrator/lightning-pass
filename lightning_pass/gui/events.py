@@ -268,7 +268,7 @@ class Events:
         try:
             text = f"Last login date: {date:%d}{_ord(date.day)} {date:%b. %Y, %H:%M}"
         except TypeError:
-            text = f"Last login date: None"
+            text = "Last login date: None"
         self.parent.ui.account_last_log_date.setText(text)
 
         self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
@@ -453,7 +453,7 @@ class Events:
         try:
             text = f"Last unlock date: {date:%d}{_ord(date.day)} {date:%b. %Y, %H:%M}"
         except TypeError:
-            text = f"Last unlock date: None"
+            text = "Last unlock date: None"
         self.parent.ui.vault_date_lbl.setText(text)
 
         self.widget_util.set_current_widget("vault")

@@ -520,6 +520,6 @@ class Account:
         )
 
 
-if __name__ == "__main__":
-    acc = Account(54)
-    print(acc.master_key)
+__all__ = [
+    "Account",
+]

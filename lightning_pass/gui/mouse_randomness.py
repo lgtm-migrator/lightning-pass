@@ -155,6 +155,9 @@ class PwdGenerator:
 
 
 __all__ = [
+    "Chars",
     "MouseTracker",
+    "PasswordOptions",
     "PwdGenerator",
+    "printable_options",
 ]

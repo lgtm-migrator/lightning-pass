@@ -79,6 +79,8 @@ VAULT_WIDGET_DATA: set[WidgetItem] = {
 
 class WidgetUtil:
 
+    """Various utilities to be used with event handling or account management."""
+
     mouse_randomness = mouse_randomness
 
     def __init__(self, parent: QMainWindow):
@@ -471,3 +473,11 @@ WIDGET_DATA = (
         WidgetItem("master_pass_conf_master_pass_line"),
     },
 )
+
+
+__all__ = [
+    "ClearPreviousWidget",
+    "WIDGET_DATA",
+    "WidgetItem",
+    "WidgetUtil",
+]

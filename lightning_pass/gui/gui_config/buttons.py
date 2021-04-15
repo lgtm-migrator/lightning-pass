@@ -11,11 +11,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Clickable(NamedTuple):
+    """Store data on how to connect a clickable widget (``pushButton`` or ``QAction``)>."""
+
     widget: str
     action: str
 
 
 class VaultToolButton(NamedTuple):
+    """Store information about connecting a ``toolButton`` in the vault."""
+
     widget: str
     item: str
     source: str
@@ -223,4 +227,6 @@ def _copy_text(obj: QtWidgets.QLineEdit):
 
 __all__ = [
     "Buttons",
+    "Clickable",
+    "VaultToolButton",
 ]

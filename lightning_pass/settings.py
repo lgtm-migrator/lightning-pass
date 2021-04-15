@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import dataclasses
 import os
+import shutil
 from pathlib import Path
 
 import dotenv
@@ -32,6 +33,8 @@ dotenv.load_dotenv()
 
 @dataclasses.dataclass(frozen=True)
 class Credentials:
+    """Store the credentials to be used while using a database and an email account."""
+
     db_host = os.getenv("DB_HOST")
     db_user = os.getenv("DB_USER")
     db_password = os.getenv("DB_PASS")
@@ -48,8 +51,6 @@ def _copy(self: Path, target: Path) -> None:
     :param Path target: Where to copy self
 
     """
-    import shutil
-
     assert self.is_file()
     shutil.copy(self, target)
 
