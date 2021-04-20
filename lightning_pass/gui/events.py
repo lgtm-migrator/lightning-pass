@@ -480,7 +480,7 @@ class Events:
 
     def remove_vault_page_event(self) -> None:
         """Remove the current vault page."""
-        if self.current_user.vault_pages_int < 1:
+        if (pages := self.current_user.vault_pages_int()) < 1:
             # no eligible page to remove
             return
 
@@ -489,7 +489,7 @@ class Events:
             "Vault",
             platform,
         )
-        if text == "CONFIRM" and self.current_user.vault_pages_int >= 1:
+        if text == "CONFIRM" and pages >= 1:
             self.current_user.vaults.delete_vault(
                 self.current_user.user_id,
                 self.widget_util.vault_stacked_widget_index - 1,

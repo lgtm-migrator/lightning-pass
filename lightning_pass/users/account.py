@@ -3,7 +3,17 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import TYPE_CHECKING, Generator, Optional, TypeVar, Union
+from typing import (
+    TYPE_CHECKING,
+    Callable,
+    Generator,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Type,
+    TypeVar,
+    Union,
+)
 
 import lightning_pass.users.password_hashing as pwd_hashing
 import lightning_pass.users.vaults as vaults
@@ -17,7 +27,6 @@ from lightning_pass.util.exceptions import (
     InvalidUsername,
     PasswordsDoNotMatch,
     UsernameAlreadyExists,
-    ValidationFailure,
 )
 from lightning_pass.util.validators import (
     EmailValidator,
@@ -30,9 +39,31 @@ if TYPE_CHECKING:
     from lightning_pass.users.password_hashing import HashedVaultCredentials
     from lightning_pass.users.vaults import Vault
     from lightning_pass.util.credentials import PasswordData
+    from lightning_pass.util.exceptions import AccountException
 
 
 _V = TypeVar("_V", bound=Validator)
+
+
+class Check(NamedTuple):
+    """Store data connected to one validation operation."""
+
+    func: Callable
+    args: Sequence
+    exc: Type[AccountException]
+
+
+def checks_executor(checks: Sequence[Check]) -> None:
+    """Execute the given checks in Sequence.
+
+    :param checks: All of the checks to execute
+
+    :raises AccountException: if any of the given checks fail
+
+    """
+    for check in checks:
+        if not check.func(*check.args):
+            raise check.exc
 
 
 class Account:
@@ -94,34 +125,24 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        ### map
-        checks = {
-            functools.partial(
-                cls.username_validator.unique,
-                username,
-            ): UsernameAlreadyExists,
-            functools.partial(
-                cls.username_validator.pattern,
-                username,
-            ): InvalidUsername,
-            functools.partial(
-                cls.password_validator.pattern,
-                password,
-            ): InvalidPassword,
-            functools.partial(
-                cls.password_validator.match,
-                password,
-                confirm_password,
-            ): PasswordsDoNotMatch,
-            functools.partial(cls.email_validator.unique, email): EmailAlreadyExists,
-            functools.partial(cls.email_validator.pattern, email): InvalidEmail,
-        }
-
-        for func, exc in checks.items():
-            try:
-                func()
-            except ValidationFailure as e:
-                raise exc from e
+        checks_executor(
+            (
+                Check(
+                    cls.username_validator.unique,
+                    (username,),
+                    UsernameAlreadyExists,
+                ),
+                Check(cls.username_validator.pattern, (username,), InvalidUsername),
+                Check(cls.password_validator.pattern, (password,), InvalidPassword),
+                Check(
+                    cls.password_validator.match,
+                    (password, confirm_password),
+                    PasswordsDoNotMatch,
+                ),
+                Check(cls.email_validator.unique, (email,), EmailAlreadyExists),
+                Check(cls.email_validator.pattern, (email,), InvalidUsername),
+            ),
+        )
 
         with cls.database.database_manager() as db:
             # not using f-string due to SQL injection
@@ -150,18 +171,18 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        try:
-            cls.username_validator.unique(username, should_exist=True)
-            cls.password_validator.authenticate(
-                password,
-                cls.credentials.get_user_item(
-                    username,
-                    "username",
-                    "password",
-                ),
-            )
-        except ValidationFailure as e:
-            raise AccountDoesNotExist from e
+        if not cls.username_validator.unique(
+            username,
+            should_exist=True,
+        ) or not cls.password_validator.authenticate(
+            password,
+            cls.credentials.get_user_item(
+                username,
+                "username",
+                "password",
+            ),
+        ):
+            raise AccountDoesNotExist
 
         account = cls(cls.credentials.get_user_item(username, "username", "id"))
         account._current_login_date = account.get_value("last_login_date")
@@ -205,28 +226,25 @@ class Account:
         :raises PasswordsDoNotMatch: If the passwords do not match
 
         """
-        checks = {
-            functools.partial(
-                self.password_validator.authenticate,
-                data.confirm_previous,
-                self.password,
-            ): AccountDoesNotExist,
-            functools.partial(
-                self.password_validator.pattern,
-                data.new_password,
-            ): InvalidPassword,
-            functools.partial(
-                self.password_validator.match,
-                data.new_password,
-                data.confirm_new,
-            ): PasswordsDoNotMatch,
-        }
-
-        for func, exc in checks.items():
-            try:
-                func()
-            except ValidationFailure as e:
-                raise exc from e
+        checks_executor(
+            (
+                Check(
+                    self.password_validator.authenticate,
+                    (data.confirm_previous, self.password),
+                    AccountDoesNotExist,
+                ),
+                Check(
+                    self.password_validator.pattern,
+                    (data.new_password,),
+                    AccountDoesNotExist,
+                ),
+                Check(
+                    self.password_validator.match,
+                    (data.new_password, data.confirm_new),
+                    AccountDoesNotExist,
+                ),
+            ),
+        )
 
     def update_date(self, column: str) -> None:
         """Update database TIMESTAMP column with CURRENT_TIMESTAMP().
@@ -271,19 +289,12 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        checks = {
-            functools.partial(self.username_validator.pattern, value): InvalidUsername,
-            functools.partial(
-                self.username_validator.unique,
-                value,
-            ): UsernameAlreadyExists,
-        }
-
-        for func, exc in checks.items():
-            try:
-                func()
-            except ValidationFailure as e:
-                raise exc from e
+        checks_executor(
+            (
+                Check(self.username_validator.pattern, (value,), InvalidUsername),
+                Check(self.username_validator.unique, (value,), UsernameAlreadyExists),
+            ),
+        )
 
         self.set_value(value, "username")
 
@@ -312,14 +323,16 @@ class Account:
 
     def reset_password(self, password: str, confirm_password: str) -> None:
         """Reset user's password."""
-        try:
-            self.password_validator.pattern(password)
-        except ValidationFailure as e:
-            raise InvalidPassword from e
-        try:
-            self.password_validator.match(password, confirm_password)
-        except ValidationFailure as e:
-            raise PasswordsDoNotMatch from e
+        checks_executor(
+            (
+                Check(self.password_validator.pattern, (password,), InvalidPassword),
+                Check(
+                    self.password_validator.match,
+                    (password, confirm_password),
+                    PasswordsDoNotMatch,
+                ),
+            ),
+        )
 
         self.set_value(self.pwd_hashing.hash_password(password), "password")
 
@@ -342,14 +355,16 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        try:
-            self.email_validator.pattern(value)
-        except ValidationFailure as e:
-            raise InvalidEmail from e
-        try:
-            self.email_validator.unique(value)
-        except ValidationFailure as e:
-            raise EmailAlreadyExists from e
+        checks_executor(
+            (
+                Check(self.email_validator.pattern, (value,), InvalidEmail),
+                Check(
+                    self.email_validator.unique,
+                    (value,),
+                    PasswordsDoNotMatch,
+                ),
+            ),
+        )
 
         self.set_value(value, "email")
 
@@ -405,7 +420,7 @@ class Account:
     @vault_unlocked.setter
     def vault_unlocked(self, value: bool) -> None:
         """Unlock the vault and set a new vault unlock date."""
-        if value is True:
+        if value:
             self._current_vault_unlock_date = self.get_value("last_vault_unlock_date")
             self.update_date("last_vault_unlock_date")
         self._vault_unlocked = value
@@ -432,9 +447,9 @@ class Account:
             db.execute(sql, (self.user_id,))
             result = db.fetchall()
 
-        # slice first element -> database primary key
         yield from (
             self.vaults.Vault(
+                # slice first element -> database primary key
                 *vault[1:6],
                 self.decrypt_vault_password(
                     # need raw string for decryption
@@ -447,7 +462,6 @@ class Account:
             if vault
         )
 
-    @property
     def vault_pages_int(self) -> int:
         """Return an integer with the amount of vault pages a user has registered."""
         return sum(1 for _ in self.vault_pages())

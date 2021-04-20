@@ -19,7 +19,7 @@ class Validator(ABC):
 
     @classmethod
     @abstractmethod
-    def validate(cls, item) -> None:
+    def validate(cls, item: Union[str, bytes]) -> None:
         """Perform every validation of the child class.
 
         :param item: The item to be validate
@@ -32,7 +32,7 @@ class Validator(ABC):
 
     @staticmethod
     @abstractmethod
-    def pattern(item) -> bool:
+    def pattern(item: Union[str, bytes]) -> bool:
         """Validate pattern for the given item.
 
         :param item: The item to validate
@@ -159,9 +159,9 @@ class PasswordValidator(Validator):
 
         Password must contain at least:
             1) 8 characters
-            2) 1 lowercase letter
-            2) 1 uppercase letter
-            3) 1 number
+            2) 1 lowercase character
+            2) 1 uppercase character
+            3) 1 digit
             4) 1 special character
 
         :param password: Password to check
@@ -170,7 +170,7 @@ class PasswordValidator(Validator):
 
         """
         if not re.match(
-            #   numbers   lowercase  uppercase  special   length
+            #    digits   lowercase  uppercase  special   length
             r"^(?=.+[\d])(?=.+[a-z])(?=.+[A-Z])(?=.+[^\w]).{8,}$",
             password,
         ):
