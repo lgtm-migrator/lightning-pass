@@ -11,47 +11,65 @@ from lightning_pass.util.exceptions import ValidationFailure
 
 
 class Validator(ABC):
-    def __init__(self, item) -> None:
-        self.item = item
+    """Base class for validation of account data."""
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__qualname__}({self.item})"
-
-    def __str__(self) -> str:
-        return self.item
+        """Provide information about this class."""
+        return f"{self.__class__.__qualname__}()"
 
     @classmethod
     @abstractmethod
-    def validate(cls, item):
-        cls.pattern(item)
+    def validate(cls, item) -> None:
+        """Perform every validation of the child class.
+
+        :param item: The item to be validate
+
+        :raises ValidationFailure: if the validation fails
+
+        """
+        if not cls.pattern(item):
+            raise ValidationFailure
 
     @staticmethod
     @abstractmethod
-    def pattern(item):
-        pass
+    def pattern(item) -> bool:
+        """Validate pattern for the given item.
+
+        :param item: The item to validate
+
+        """
 
 
 class UsernameValidator(Validator):
+    """Validator for username."""
+
     @classmethod
-    def validate(cls, username: str):
-        cls.pattern(username)
-        cls.unique(username)
+    def validate(cls, username: str) -> None:
+        """Perform all validation checks for the given username.
+
+        :param username: The username to be validated.
+
+        :raises ValidationFailure: if the validation fails
+
+        """
+        if not cls.pattern(username) or not cls.unique(username):
+            raise ValidationFailure
 
     @staticmethod
     def pattern(username: str) -> bool:
         """Check whether a given username matches a required pattern.
 
         Username pattern:
-            1) must be at least 5 characters long
-            2) mustn't contain special characters
+            1) 5 characters
+            2) No special characters
 
         :param str username: Username to check
 
-        :returns: True or False depending on the result
+        :returns: True if the validation is passed, False otherwise
 
         """
-        if not re.match(r"^\w{5,}$", username):
-            raise ValidationFailure
+        if not re.match(r"^[\w]{5,}$", username):
+            return False
         return True
 
     @staticmethod
@@ -61,7 +79,9 @@ class UsernameValidator(Validator):
         :param username: Username to check
         :param should_exist: Influences the checking approach, defaults to False
 
-        :returns: True or False depending on the result
+        :returns: True if the validation if passed, False otherwise
+
+        :raises ValidationFailure: if validation fails
 
         """
         if not credentials.check_item_existence(
@@ -69,28 +89,35 @@ class UsernameValidator(Validator):
             "username",
             should_exist=should_exist,
         ):
-            raise ValidationFailure
+            return False
         return True
 
 
 class EmailValidator(Validator):
+    """Validator for email addresses."""
+
     @classmethod
     def validate(cls, email: str):
-        cls.pattern(email)
-        cls.unique(email)
+        """Perform all validation checks for the given email.
+
+        :param email: The email to be validated
+
+        :raises ValidationFailure: if any validation fails
+
+        """
+        if not cls.pattern(email) or not cls.unique(email):
+            raise ValidationFailure
 
     @staticmethod
     def pattern(email: str) -> bool:
         """Check whether a given email passes the email check.
 
-        :param email: Username to check
+        :param email: Email to check
 
-        :returns: True or False depending on the result
+        :returns: True if the pattern validation is passed, False otherwise
 
         """
-        if not checkers.is_email(email):
-            raise ValidationFailure
-        return True
+        return checkers.is_email(email)
 
     @staticmethod
     def unique(email: str, should_exist: Optional[bool] = False) -> bool:
@@ -99,7 +126,7 @@ class EmailValidator(Validator):
         :param email: Email to check
         :param should_exist: Influences the checking approach, defaults to False
 
-        :returns: True or False depending on the result
+        :returns: True if the validation is passed, False otherwise
 
         """
         if not credentials.check_item_existence(
@@ -107,17 +134,27 @@ class EmailValidator(Validator):
             "email",
             should_exist=should_exist,
         ):
-            raise ValidationFailure
+            return False
         return True
 
 
 class PasswordValidator(Validator):
+    """Validator for password."""
+
     @classmethod
-    def validate(cls, password):
-        cls.pattern(password)
+    def validate(cls, email: str):
+        """Perform all validation checks.
+
+        :param email: The password to validate
+
+        :raises ValidationFailure: if the validation fails
+
+        """
+        if not cls.pattern(email):
+            raise ValidationFailure
 
     @staticmethod
-    def pattern(password: str):
+    def pattern(password: str) -> bool:
         """Check whether password matches a required pattern.
 
         Password must contain at least:
@@ -129,7 +166,7 @@ class PasswordValidator(Validator):
 
         :param password: Password to check
 
-        :returns: True or False depending on the pattern check
+        :returns: True if the validation is passed, False otherwise
 
         """
         if not re.match(
@@ -137,13 +174,21 @@ class PasswordValidator(Validator):
             r"^(?=.+[\d])(?=.+[a-z])(?=.+[A-Z])(?=.+[^\w]).{8,}$",
             password,
         ):
-            raise ValidationFailure
+            return False
         return True
 
     @staticmethod
     def match(first: Union[str, bytes], second: Union[str, bytes]) -> bool:
+        """Check whether the first and second parameters match.
+
+        :param first: The first parameter
+        :param second: The second parameter
+
+        :returns: True if the first and second parameters match, False otherwise
+
+        """
         if not secrets.compare_digest(str(first), str(second)):
-            raise ValidationFailure
+            return False
         return True
 
     @staticmethod
@@ -151,11 +196,19 @@ class PasswordValidator(Validator):
         password: Union[str, bytes],
         stored: Union[str, bytes],
     ) -> bool:
+        """Check whether the first parameter is the same as the second hashed parameter.
+
+        :param password: The password in a string format
+        :param stored: The password hash
+
+        :returns: True if the the first and second parameters match, False otherwise
+
+        """
         if not bcrypt.checkpw(
             password.encode("utf-8"),
             stored.encode("utf-8"),
         ):
-            raise ValidationFailure
+            return False
         return True
 
 

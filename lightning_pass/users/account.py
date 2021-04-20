@@ -94,6 +94,7 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
+        ### map
         checks = {
             functools.partial(
                 cls.username_validator.unique,
