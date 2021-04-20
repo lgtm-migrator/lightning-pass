@@ -4,13 +4,22 @@ from abc import ABC, abstractmethod
 from typing import Optional, Union
 
 import bcrypt
-import validator_collection
+from validator_collection import checkers
 
 import lightning_pass.util.credentials as credentials
 from lightning_pass.util.exceptions import ValidationFailure
 
 
 class Validator(ABC):
+    def __init__(self, item) -> None:
+        self.item = item
+
+    def __repr__(self) -> str:
+        return f"{self.__class__.__qualname__}({self.item})"
+
+    def __str__(self) -> str:
+        return self.item
+
     @classmethod
     @abstractmethod
     def validate(cls, item):
@@ -22,20 +31,7 @@ class Validator(ABC):
         pass
 
 
-class PublicValidator(Validator):
-    @classmethod
-    @abstractmethod
-    def validate(cls, item):
-        cls.pattern(item)
-        cls.unique(item)
-
-    @staticmethod
-    @abstractmethod
-    def unique(item):
-        pass
-
-
-class UsernameValidator(PublicValidator):
+class UsernameValidator(Validator):
     @classmethod
     def validate(cls, username: str):
         cls.pattern(username)
@@ -54,13 +50,7 @@ class UsernameValidator(PublicValidator):
         :returns: True or False depending on the result
 
         """
-        if (
-            not username
-            # length
-            or len(username) < 5
-            # special char
-            or (len(username) - len(re.findall(r"[A-Za-z0-9_]", username))) > 0
-        ):
+        if not re.match(r"^\w{5,}$", username):
             raise ValidationFailure
         return True
 
@@ -98,7 +88,7 @@ class EmailValidator(Validator):
         :returns: True or False depending on the result
 
         """
-        if not validator_collection.checkers.is_email(email):
+        if not checkers.is_email(email):
             raise ValidationFailure
         return True
 
@@ -130,26 +120,22 @@ class PasswordValidator(Validator):
     def pattern(password: str):
         """Check whether password matches a required pattern.
 
-        Password pattern:
-            1) must be at least 8 characters long
-            2) must contain at least 1 capital letter
-            3) must contain at least 1 number
-            4) must contain at least 1 special character
+        Password must contain at least:
+            1) 8 characters
+            2) 1 lowercase letter
+            2) 1 uppercase letter
+            3) 1 number
+            4) 1 special character
 
         :param password: Password to check
 
         :returns: True or False depending on the pattern check
 
         """
-        if (
-            # length
-            len(password) < 8
-            # capital letters
-            or len(re.findall(r"[A-Z]", password)) <= 0
-            # numbers
-            or len(re.findall(r"[0-9]", password)) <= 0
-            # special chars
-            or len(password) - len(re.findall(r"[A-Za-z0-9]", password)) <= 0
+        if not re.match(
+            #   numbers   lowercase  uppercase  special   length
+            r"^(?=.+[\d])(?=.+[a-z])(?=.+[A-Z])(?=.+[^\w]).{8,}$",
+            password,
         ):
             raise ValidationFailure
         return True
@@ -176,7 +162,6 @@ class PasswordValidator(Validator):
 __all__ = [
     "EmailValidator",
     "PasswordValidator",
-    "PublicValidator",
     "UsernameValidator",
     "Validator",
 ]
