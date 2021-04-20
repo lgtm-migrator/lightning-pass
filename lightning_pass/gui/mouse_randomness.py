@@ -127,7 +127,7 @@ class PwdGenerator:
         # stops yielding if length has been reached
         while len(self.password) <= self.options.length:
             try:
-                # waits for sent value
+                # wait for sent value
                 yield True if (yield) % self.div == 0 else False
             except (ZeroDivisionError, TypeError):
                 yield False

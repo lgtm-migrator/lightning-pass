@@ -84,7 +84,7 @@ class Account:
         :param str confirm_password: User's confirmed password
         :param str email: User's email
 
-        :returns: Account object instantiated with current user id
+        :returns: ``Account`` object instantiated with current user id
 
         :raises UsernameAlreadyExists: if username is already registered in the database
         :raises InvalidUsername: if username doesn't match the required pattern
@@ -119,8 +119,8 @@ class Account:
         for func, exc in checks.items():
             try:
                 func()
-            except ValidationFailure:
-                raise exc
+            except ValidationFailure as e:
+                raise exc from e
 
         with cls.database.database_manager() as db:
             # not using f-string due to SQL injection
@@ -159,8 +159,8 @@ class Account:
                     "password",
                 ),
             )
-        except ValidationFailure:
-            raise AccountDoesNotExist
+        except ValidationFailure as e:
+            raise AccountDoesNotExist from e
 
         account = cls(cls.credentials.get_user_item(username, "username", "id"))
         account._current_login_date = account.get_value("last_login_date")
@@ -224,8 +224,8 @@ class Account:
         for func, exc in checks.items():
             try:
                 func()
-            except ValidationFailure:
-                raise exc
+            except ValidationFailure as e:
+                raise exc from e
 
     def update_date(self, column: str) -> None:
         """Update database TIMESTAMP column with CURRENT_TIMESTAMP().
@@ -281,8 +281,8 @@ class Account:
         for func, exc in checks.items():
             try:
                 func()
-            except ValidationFailure:
-                raise exc
+            except ValidationFailure as e:
+                raise exc from e
 
         self.set_value(value, "username")
 
@@ -313,12 +313,12 @@ class Account:
         """Reset user's password."""
         try:
             self.password_validator.pattern(password)
-        except ValidationFailure:
-            raise InvalidPassword
+        except ValidationFailure as e:
+            raise InvalidPassword from e
         try:
             self.password_validator.match(password, confirm_password)
-        except ValidationFailure:
-            raise PasswordsDoNotMatch
+        except ValidationFailure as e:
+            raise PasswordsDoNotMatch from e
 
         self.set_value(self.pwd_hashing.hash_password(password), "password")
 
@@ -343,12 +343,12 @@ class Account:
         """
         try:
             self.email_validator.pattern(value)
-        except ValidationFailure:
-            raise InvalidEmail
+        except ValidationFailure as e:
+            raise InvalidEmail from e
         try:
             self.email_validator.unique(value)
-        except ValidationFailure:
-            raise EmailAlreadyExists
+        except ValidationFailure as e:
+            raise EmailAlreadyExists from e
 
         self.set_value(value, "email")
 

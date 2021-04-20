@@ -39,8 +39,7 @@ def _ord(day: int) -> str:
 
     if (div := day % 10) in (1, 2, 3) and day not in (11, 12, 13):
         return suffix[div]
-    else:
-        return suffix[0]
+    return suffix[0]
 
 
 class Events:
@@ -140,7 +139,7 @@ class Events:
 
     def submit_reset_token_event(self) -> None:
         """If submitted token is correct, proceed to password change widget."""
-        if Account.credentials.Token.validate_token(
+        if Account.credentials.validate_token(
             token := self.parent.ui.reset_token_token_line.text(),
         ):
             self.__current_token = token
@@ -231,9 +230,11 @@ class Events:
                 self.parent.on_position_changed,
             )
 
-        # exclude length by the generator expression
         if not any(
-            val for val in self.widget_util.password_options if isinstance(val, bool)
+            # exclude length
+            val
+            for val in self.widget_util.password_options
+            if isinstance(val, bool)
         ):
             self.widget_util.message_box("no_options_generate_box", "Generator")
         else:

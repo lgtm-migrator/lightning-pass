@@ -80,8 +80,8 @@ def update_vault(vault: Vault) -> None:
 
     try:
         EmailValidator.pattern(vault.email)
-    except ValidationFailure:
-        raise InvalidEmail
+    except ValidationFailure as e:
+        raise InvalidEmail from e
 
     if not all(val for key, val in zip(vault._fields, vault) if key != "vault_index"):
         raise VaultException

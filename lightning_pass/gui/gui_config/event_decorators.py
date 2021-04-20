@@ -79,11 +79,11 @@ def _base_decorator(
             self = args[0]
             if _condition_object(obj=getattr(self, _base_obj) if _base_obj else self):
                 return _func_executor(func, *args, **kwargs)
-            else:
-                getattr(self.parent.ui.message_boxes, _message_box)(
-                    _box_parent_lbl,
-                    page=page_to_access,
-                )
+
+            getattr(self.parent.ui.message_boxes, _message_box)(
+                _box_parent_lbl,
+                page=page_to_access,
+            )
 
         return wrapper
 

@@ -61,7 +61,7 @@ def window_runner(func) -> Callable:
 
 def run() -> None:
     """Run the application with everything."""
-    # run_splash_screen()
+    run_splash_screen()
     run_main_window()
 
 

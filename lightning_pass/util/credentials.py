@@ -105,8 +105,7 @@ def set_user_item(
             )
             db.execute(sql, (result, user_identifier))
         return True
-    else:
-        return False
+    return False
 
 
 def check_item_existence(
