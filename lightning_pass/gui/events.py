@@ -555,9 +555,6 @@ class Events:
             self.widget_util.message_box("invalid_vault_box", "Vault")
         else:
             if previous_vault:
-                previous_pass = self.current_user.decrypt_vault_password(
-                    previous_vault.password,
-                )
 
                 updated_details = [
                     key
@@ -565,6 +562,10 @@ class Events:
                     # password check done separately, decryption needed
                     if not key == "password" and not getattr(new_vault, str(key)) == val
                 ]
+
+                previous_pass = self.current_user.decrypt_vault_password(
+                    previous_vault.password,
+                )
                 if previous_pass != new_pass:
                     updated_details.append("password")
 

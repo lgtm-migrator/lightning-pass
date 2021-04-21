@@ -22,13 +22,11 @@ class Validator(ABC):
     def validate(cls, item: Union[str, bytes]) -> None:
         """Perform every validation of the child class.
 
-        :param item: The item to be validate
+        :param item: The item to validate
 
         :raises ValidationFailure: if the validation fails
 
         """
-        if not cls.pattern(item):
-            raise ValidationFailure
 
     @staticmethod
     @abstractmethod

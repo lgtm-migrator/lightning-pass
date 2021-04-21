@@ -42,9 +42,6 @@ if TYPE_CHECKING:
     from lightning_pass.util.exceptions import AccountException
 
 
-_V = TypeVar("_V", bound=Validator)
-
-
 class Check(NamedTuple):
     """Store data connected to one validation operation."""
 
@@ -53,7 +50,7 @@ class Check(NamedTuple):
     exc: Type[AccountException]
 
 
-def checks_executor(checks: Sequence[Check]) -> None:
+def checks_executor(checks: Generator[Check, None, None]) -> None:
     """Execute the given checks in Sequence.
 
     :param checks: All of the checks to execute
@@ -64,6 +61,9 @@ def checks_executor(checks: Sequence[Check]) -> None:
     for check in checks:
         if not check.func(*check.args):
             raise check.exc
+
+
+_V = TypeVar("_V", bound=Validator)
 
 
 class Account:
@@ -125,24 +125,19 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        checks_executor(
+        checks = (
+            (cls.username_validator.unique, (username,), UsernameAlreadyExists),
+            (cls.username_validator.pattern, (username,), InvalidUsername),
+            (cls.password_validator.pattern, (password,), InvalidPassword),
             (
-                Check(
-                    cls.username_validator.unique,
-                    (username,),
-                    UsernameAlreadyExists,
-                ),
-                Check(cls.username_validator.pattern, (username,), InvalidUsername),
-                Check(cls.password_validator.pattern, (password,), InvalidPassword),
-                Check(
-                    cls.password_validator.match,
-                    (password, confirm_password),
-                    PasswordsDoNotMatch,
-                ),
-                Check(cls.email_validator.unique, (email,), EmailAlreadyExists),
-                Check(cls.email_validator.pattern, (email,), InvalidUsername),
+                cls.password_validator.match,
+                (password, confirm_password),
+                PasswordsDoNotMatch,
             ),
+            (cls.email_validator.unique, (email,), EmailAlreadyExists),
+            (cls.email_validator.pattern, (email,), InvalidEmail),
         )
+        checks_executor((Check(*values) for values in checks))
 
         with cls.database.database_manager() as db:
             # not using f-string due to SQL injection
@@ -226,25 +221,24 @@ class Account:
         :raises PasswordsDoNotMatch: If the passwords do not match
 
         """
-        checks_executor(
+        checks = (
             (
-                Check(
-                    self.password_validator.authenticate,
-                    (data.confirm_previous, self.password),
-                    AccountDoesNotExist,
-                ),
-                Check(
-                    self.password_validator.pattern,
-                    (data.new_password,),
-                    AccountDoesNotExist,
-                ),
-                Check(
-                    self.password_validator.match,
-                    (data.new_password, data.confirm_new),
-                    AccountDoesNotExist,
-                ),
+                self.password_validator.authenticate,
+                (data.confirm_previous, self.password),
+                AccountDoesNotExist,
+            ),
+            (
+                self.password_validator.pattern,
+                (data.new_password,),
+                AccountDoesNotExist,
+            ),
+            (
+                self.password_validator.match,
+                (data.new_password, data.confirm_new),
+                AccountDoesNotExist,
             ),
         )
+        checks_executor((Check(*values) for values in checks))
 
     def update_date(self, column: str) -> None:
         """Update database TIMESTAMP column with CURRENT_TIMESTAMP().
@@ -289,12 +283,11 @@ class Account:
         :raises InvalidUsername: if username doesn't match the required pattern
 
         """
-        checks_executor(
-            (
-                Check(self.username_validator.pattern, (value,), InvalidUsername),
-                Check(self.username_validator.unique, (value,), UsernameAlreadyExists),
-            ),
+        checks = (
+            (Check(self.username_validator.pattern, (value,), InvalidUsername)),
+            (Check(self.username_validator.unique, (value,), UsernameAlreadyExists)),
         )
+        checks_executor((Check(*values) for values in checks))
 
         self.set_value(value, "username")
 
@@ -323,16 +316,15 @@ class Account:
 
     def reset_password(self, password: str, confirm_password: str) -> None:
         """Reset user's password."""
-        checks_executor(
+        checks = (
+            (self.password_validator.pattern, (password,), InvalidPassword),
             (
-                Check(self.password_validator.pattern, (password,), InvalidPassword),
-                Check(
-                    self.password_validator.match,
-                    (password, confirm_password),
-                    PasswordsDoNotMatch,
-                ),
+                self.password_validator.match,
+                (password, confirm_password),
+                PasswordsDoNotMatch,
             ),
         )
+        checks_executor((Check(*values) for values in checks))
 
         self.set_value(self.pwd_hashing.hash_password(password), "password")
 
@@ -355,16 +347,11 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        checks_executor(
-            (
-                Check(self.email_validator.pattern, (value,), InvalidEmail),
-                Check(
-                    self.email_validator.unique,
-                    (value,),
-                    PasswordsDoNotMatch,
-                ),
-            ),
+        checks = (
+            (self.email_validator.pattern, (value,), InvalidEmail),
+            (self.email_validator.unique, (value,), PasswordsDoNotMatch),
         )
+        checks_executor(Check(*values) for values in checks)
 
         self.set_value(value, "email")
 
