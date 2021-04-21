@@ -182,9 +182,9 @@ class PasswordValidator(Validator):
         return True
 
     @staticmethod
-    def unique(password: str, should_exist: Optional[bool] = False) -> bool:
-        """Return False since unique validation for passwords is not possible."""
-        return False
+    def unique(password: str, should_exist: bool = False) -> bool:
+        """Return True since unique validation for passwords is not possible."""
+        return True
 
     @staticmethod
     def match(first: Union[str, bytes], second: Union[str, bytes]) -> bool:
