@@ -37,6 +37,16 @@ class Validator(ABC):
 
         """
 
+    @staticmethod
+    @abstractmethod
+    def unique(item: Union[str, bytes], should_exist: bool = False) -> bool:
+        """Validate that the given item does not already exist.
+
+        :param item: The item to validate
+        :param should_exist: Whether the item should already be present in the database or not
+
+        """
+
 
 class UsernameValidator(Validator):
     """Validator for username."""
@@ -82,13 +92,11 @@ class UsernameValidator(Validator):
         :raises ValidationFailure: if validation fails
 
         """
-        if not credentials.check_item_existence(
+        return credentials.check_item_existence(
             username,
             "username",
             should_exist=should_exist,
-        ):
-            return False
-        return True
+        )
 
 
 class EmailValidator(Validator):
@@ -127,13 +135,11 @@ class EmailValidator(Validator):
         :returns: True if the validation is passed, False otherwise
 
         """
-        if not credentials.check_item_existence(
+        return credentials.check_item_existence(
             email,
             "email",
             should_exist=should_exist,
-        ):
-            return False
-        return True
+        )
 
 
 class PasswordValidator(Validator):
@@ -168,12 +174,17 @@ class PasswordValidator(Validator):
 
         """
         if not re.match(
-            #    digits   lowercase  uppercase  special   length
-            r"^(?=.+[\d])(?=.+[a-z])(?=.+[A-Z])(?=.+[^\w]).{8,}$",
+            #   lowercase  uppercase   digits    special  length
+            r"^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[^\w])\S{8,}$",
             password,
         ):
             return False
         return True
+
+    @staticmethod
+    def unique(password: str, should_exist: Optional[bool] = False) -> bool:
+        """Return False since unique validation for passwords is not possible."""
+        return False
 
     @staticmethod
     def match(first: Union[str, bytes], second: Union[str, bytes]) -> bool:
@@ -185,9 +196,7 @@ class PasswordValidator(Validator):
         :returns: True if the first and second parameters match, False otherwise
 
         """
-        if not secrets.compare_digest(str(first), str(second)):
-            return False
-        return True
+        return secrets.compare_digest(str(first), str(second))
 
     @staticmethod
     def authenticate(
@@ -202,12 +211,7 @@ class PasswordValidator(Validator):
         :returns: True if the the first and second parameters match, False otherwise
 
         """
-        if not bcrypt.checkpw(
-            password.encode("utf-8"),
-            stored.encode("utf-8"),
-        ):
-            return False
-        return True
+        return bcrypt.checkpw(password.encode("utf-8"), stored.encode("utf-8"))
 
 
 __all__ = [

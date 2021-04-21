@@ -74,14 +74,14 @@ class Account:
     pwd_hashing = pwd_hashing
     vaults = vaults
 
-    username_validator: _V = UsernameValidator()
-    password_validator: _V = PasswordValidator()
-    email_validator: _V = EmailValidator()
+    username_validator: _V = UsernameValidator
+    password_validator: _V = PasswordValidator
+    email_validator: _V = EmailValidator
 
     def __init__(self, user_id: int) -> None:
         """Construct the class.
 
-        :param int user_id: Database primary key ``id`` of the account
+        :param user_id: Database primary key ``id`` of the account
 
         """
         self._user_id = user_id

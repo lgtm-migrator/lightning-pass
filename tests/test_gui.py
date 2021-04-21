@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import pytest
-from PyQt6 import QtCore
+from PyQt5 import QtCore
 from pytestqt.qtbot import QtBot
 
 from lightning_pass.gui.window import LightningPassWindow
