@@ -1,10 +1,9 @@
 """Module containing the main GUI classes."""
 from __future__ import annotations
 
-import functools
 import logging
 import sys
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -33,58 +32,24 @@ def logger():
     return log
 
 
-def window_runner(func) -> Callable:
-    """Decorate a function to run a window without the Qt boilerplate.
+def run_main_window(splash: bool = True) -> None:
+    """Execute the main window.
 
-    :param func: The functions to decorate
-
-    """
-
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs) -> None:
-        """Wrap the function.
-
-        :param args: Optional positional arguments
-        :param kwargs: Optional keyword arguments
-
-        """
-        QtCore.QCoreApplication.setApplicationName("Lightning Pass")
-        app = QtWidgets.QApplication(sys.argv)
-
-        win = func(app, *args, **kwargs)
-        win.show()
-
-        app.exec()
-
-    return wrapper
-
-
-def run() -> None:
-    """Run the application with everything."""
-    run_splash_screen()
-    run_main_window()
-
-
-@window_runner
-def run_splash_screen(_) -> SplashScreen:
-    """Return ``SplashScreen`` window.
-
-    Dump the ``app`` arg passed in by the decorator.
+    :param splash: Enable splash screen on startup, defaults to True
 
     """
-    return SplashScreen()
+    QtCore.QCoreApplication.setApplicationName("Lightning Pass")
+    app = QtWidgets.QApplication(sys.argv)
 
-
-@window_runner
-def run_main_window(app) -> LightningPassWindow:
-    """Return ``LightningPassWindow`` window.
-
-    :param app: The current ``QApplication`` instance
-
-    """
     main_window = LightningPassWindow()
     setup_tray_icon(app, main_window)
-    return main_window
+
+    if splash:
+        main_window.load()
+    else:
+        main_window.show()
+
+    app.exec()
 
 
 def setup_tray_icon(app: QApplication, main_window: LightningPassWindow) -> None:
@@ -113,11 +78,12 @@ def setup_tray_icon(app: QApplication, main_window: LightningPassWindow) -> None
 
 
 class SplashScreen(QtWidgets.QWidget):
-    """Splash Screen."""
+    """Lightning Pass splash screen."""
 
     def __init__(self, parent=None) -> None:
         """Widget constructor."""
         super().__init__(parent)
+        self.parent = parent
 
         self.widget = QtWidgets.QWidget()
         self.widget.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
@@ -132,7 +98,7 @@ class SplashScreen(QtWidgets.QWidget):
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__}()"
+        return f"{self.__class__.__qualname__}({self.parent!r})"
 
     def show(self) -> None:
         """Show the ``SplashScreen`` and initialize loading."""
@@ -140,16 +106,30 @@ class SplashScreen(QtWidgets.QWidget):
         self.timer.start(30)
 
     def increase(self) -> None:
-        """Increase loading bar progress by 1 point and close widget if 100% has been reached."""
-        self.ui.loading_progress_bar.setValue(self.progress)
-        if self.progress > 100:
+        """Increase loading bar progress by 1 point and close widget if 100% has been reached.
+
+        Show parent windows if exists.
+
+        """
+        if self.progress == 0:
+            self.ui.loading_progress_bar.setFormat(f"%p% - Interface")
+        elif self.progress == 65:
+            self.ui.loading_progress_bar.setFormat(f"%p% - Database")
+        elif self.progress == 95:
+            self.ui.loading_progress_bar.setFormat(f"%p% - Done")
+        elif self.progress > 100:
             self.timer.stop()
             self.widget.close()
+
+            if p := self.parent:
+                p.show()
+
+        self.ui.loading_progress_bar.setValue(self.progress)
         self.progress += 1
 
 
 class LightningPassWindow(QtWidgets.QMainWindow):
-    """Main Window."""
+    """Main Lightning Pass window."""
 
     def __init__(self, parent=None) -> None:
         """Construct the class."""
@@ -159,22 +139,16 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.ui = main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
-        self.ui.vault_widget_obj = VaultWidget
+        self.ui.vault_widget_inst = lambda: VaultWidget()
 
         self.events = events.Events(self)
         self.buttons = buttons.Buttons(self)
         self.buttons.setup_all()
 
-        self.ui.message_boxes = boxes.MessageBoxes(
-            child=self.main_win,
-            parent=self,
-        )
-        self.ui.input_dialogs = boxes.InputDialogs(
-            child=self.main_win,
-            parent=self,
-        )
+        self.ui.message_boxes = boxes.MessageBoxes(self)
+        self.ui.input_dialogs = boxes.InputDialogs(self)
 
-        self.general_setup()
+        self.extras()
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -184,8 +158,18 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         """Show main window."""
         self.main_win.show()
 
-    def general_setup(self) -> None:
-        """Move function __init__ function call into a function for simplicity."""
+    def load(self) -> None:
+        """Show the window with the loading screen as well.
+
+        Main window is then shown after loading is finished.
+
+        """
+        splash = SplashScreen(self)
+        splash.show()
+
+    def extras(self) -> None:
+        """Additional setup for the window."""
+        self.main_win.setWindowIcon(QtGui.QIcon(str(TRAY_ICON)))
         self.events.toggle_stylesheet_dark()  # Dark mode is the default theme.
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
@@ -239,9 +223,6 @@ __all__ = [
     "SplashScreen",
     "VaultWidget",
     "logger",
-    "run",
     "run_main_window",
-    "run_splash_screen",
     "setup_tray_icon",
-    "window_runner",
 ]

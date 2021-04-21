@@ -272,9 +272,8 @@ class WidgetUtil:
         :param page: Vault object containing the data which should be shown on the current page, defaults to None
 
         """
-        self.parent.ui.vault_widget = self.parent.ui.vault_widget_obj()
         self.parent.ui.vault_stacked_widget.addWidget(
-            self.parent.ui.vault_widget.widget,
+            self.parent.ui.vault_widget_inst,
         )
 
         if page:

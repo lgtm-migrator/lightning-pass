@@ -23,7 +23,7 @@ def static_folder() -> Path:
 
 LIGHT_STYLESHEET = static_folder() / "light.qss"
 DARK_STYLESHEET = static_folder() / "dark.qss"
-TRAY_ICON = static_folder() / "tray_icon.png"
+TRAY_ICON = static_folder() / "favicon.ico"
 PFP_FOLDER = parent_folder() / "users/profile_pictures"
 LOG = parent_folder().parent / "misc/logs.log"
 

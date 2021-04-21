@@ -57,13 +57,13 @@ class MessageBoxes(QWidget):
 
     __slots__ = "main_win", "parent", "events", "title"
 
-    def __init__(self, child: QMainWindow, parent: QMainWindow) -> None:
+    def __init__(self, parent: QMainWindow) -> None:
         """Class constructor."""
         super().__init__(parent)
-        self.main_win = child
+        self.main_win = parent.main_win
         self.parent = parent
         self.events = parent.events
-        self.title = child.windowTitle()
+        self.title = self.main_win.windowTitle()
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -528,12 +528,12 @@ class InputDialogs(QWidget):
 
     __slots__ = ("events", "main_win", "title")
 
-    def __init__(self, child: QMainWindow, parent: QMainWindow) -> None:
+    def __init__(self, parent: QMainWindow) -> None:
         """Class constructor."""
         super().__init__(parent)
         self.events = parent.events
-        self.main_win = child
-        self.title = child.windowTitle()
+        self.main_win = parent.main_win
+        self.title = self.main_win.windowTitle()
 
     def _input_password_dialog(
         self,
