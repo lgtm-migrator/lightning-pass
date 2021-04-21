@@ -494,7 +494,7 @@ class Account:
             return False
 
     def encrypt_vault_password(self, password: str | bytes) -> Union[bytes, bool]:
-        """Return encrypted password with the current ``vault_key``.
+        """Return encrypted password with the current ``master_key``.
 
         :param password: The password to encrypt
 

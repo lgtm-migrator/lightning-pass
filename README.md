@@ -33,12 +33,13 @@ Lightning Pass is a GUI application build with PyQt. Passoword generation, accou
 ## Installation
 
 *   Clone the repository
-*   Run `poetry install` in the cloned folder. [Poetry](https://python-poetry.org/) for more information.
+*   Run `poetry build` in the cloned folder. [Poetry](https://python-poetry.org/) for more information.
 *   Add your credentiuals into the `.env` file
 
 ## How to use?
 
-*   Run `python run.py` in the command line
+*   Head over to the location of the repo in your machine.
+*   Run the lightning_pass module or the python file in the bin folder.
 
 ## License
 

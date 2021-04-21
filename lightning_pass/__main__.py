@@ -1,4 +1,4 @@
-"""Run app."""
+"""Run the application."""
 
 import lightning_pass.gui.window as window
 
