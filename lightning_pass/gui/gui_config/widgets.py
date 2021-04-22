@@ -269,13 +269,18 @@ class WidgetUtil:
         :raises ValueError: if there was an attempt to set wrong index
 
         """
-        if 1 <= i <= self.parent.events.current_user.vault_pages_int() + 1:
+        if 1 <= i <= self.parent.ui.vault_stacked_widget.count() + 1:
             self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
 
     @property
     def current_vault_widget(self) -> QWidget:
         """Return the current QWidget on the vault_stacked_widget."""
         return self.parent.ui.vault_stacked_widget.currentWidget()
+
+    @property
+    def number_of_real_vault_pages(self) -> int:
+        """Return the amount of vault pages a user has registered."""
+        return len(self.parent.ui.menu_platforms.actions())
 
     def setup_vault_widget(self, page: Vault | None = None) -> None:
         """Set up and connect a new vault page.

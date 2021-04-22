@@ -457,10 +457,6 @@ class Account:
             if vault
         )
 
-    def vault_pages_int(self) -> int:
-        """Return an integer with the amount of vault pages a user has registered."""
-        return sum(1 for _ in self.vault_pages())
-
     @property
     def master_key(self) -> bool | bytes:
         """Return the current key derived from the master password."""

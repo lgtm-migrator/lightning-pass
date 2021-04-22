@@ -460,7 +460,8 @@ class Events:
         """
         self.widget_util.rebuild_vault_stacked_widget()
 
-        if self.current_user.vault_pages_int() <= 0:
+        # can't refer to the widget_util property because actions might no be set up yet
+        if sum(1 for _ in self.current_user.vault_pages()) <= 0:
             self.widget_util.setup_vault_widget()
         else:
             for page in self.current_user.vault_pages():
@@ -489,12 +490,12 @@ class Events:
         switches to new and unused page if one like that exists.
 
         """
-        if (page := self.current_user.vault_pages_int()) == (
+        if (high := len(self.parent.ui.menu_platforms.actions())) == (
             count := self.parent.ui.vault_stacked_widget.count() - 1
         ):
             # empty one not found -> create new one
             self.widget_util.setup_vault_widget()
-            self.parent.ui.vault_widget_instance.ui.vault_page_lcd_number.display(page)
+            self.parent.ui.vault_widget_instance.ui.vault_page_lcd_number.display(high)
         else:
             # empty one found -> switch to it
             self.widget_util.vault_stacked_widget_index = count
@@ -502,7 +503,7 @@ class Events:
     def remove_vault_page_event(self) -> None:
         """Remove the current vault page."""
         if (
-            pages := self.current_user.vault_pages_int()
+            pages := self.widget_util.number_of_real_vault_pages
         ) < self.widget_util.vault_stacked_widget_index:
             # user tried to remove a page which has not yet been submitted to the database ->
             # just clear the fields
