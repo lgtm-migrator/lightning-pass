@@ -2,35 +2,39 @@
 from __future__ import annotations
 
 import functools
-from typing import Any, Callable, NewType, TypeVar, overload
+import re
+from typing import Any, Callable, Mapping, NewType, TypeVar, overload
 
-F = TypeVar("F", bound=Callable[..., Any])
-condition = NewType("condition", Callable[[str], bool])
+from lightning_pass.util import regex
+
+_F = TypeVar("_F", bound=Callable[..., Any])
+_Condition = NewType("_Condition", Callable[[str], bool])
+_Event_args = NewType("_Event_args", tuple["Events", ...])
 
 
 @overload
-def _base_decorator(__func: F, _condition_object: condition, message_box: str) -> F:
+def _base_decorator(__func: _F, _condition_object: _Condition, message_box: str) -> _F:
     """Bare decorator usage."""
     ...
 
 
 @overload
 def _base_decorator(
-    __func: F,
+    __func: _F,
     *,
-    _condition_object: condition,
+    _condition_object: _Condition,
     message_box: str,
     page_to_access: str | None = None,
-) -> Callable[[F], F]:
+) -> Callable[[_F], _F]:
     """Decorator with arguments."""
     ...
 
 
 def _base_decorator(
-    __func: F = None,
+    __func: _F = None,
     /,
     *,
-    _condition_object: condition,
+    _condition_object: _Condition,
     _message_box: str,
     _base_obj: str | None = None,
     _box_parent_lbl: str | None = None,
@@ -56,7 +60,7 @@ def _base_decorator(
 
     """
 
-    def decorator(func: F) -> F:
+    def decorator(func: _F) -> _F:
         """Decorate the original function.
 
         :param func: Function to decorate
@@ -66,14 +70,14 @@ def _base_decorator(
         """
 
         @functools.wraps(func)
-        def wrapper(*args, **kwargs) -> F | None:
+        def wrapper(*args: _Event_args, **kwargs: Mapping) -> _F | None:
             """Wrap the original function.
 
             :param args: Positional arguments, first one should be the class attribute which contains
                 the information about the data we're trying to check
             :param kwargs: Optional keyword arguments
 
-            :return: executed function or None and show a message box indicating need log in
+            :return: executed function or None and show the specified message box
 
             """
             self = args[0]
@@ -93,7 +97,7 @@ def _base_decorator(
     return decorator
 
 
-def _func_executor(func: Callable, *args, **kwargs) -> None:
+def _func_executor(func: Callable, *args: _Event_args, **kwargs: Mapping) -> None:
     """Simple function execution wrapper.
 
     :param func: The function to execute
@@ -124,6 +128,38 @@ def _attr_checker(*, obj: Any, attr: str) -> bool:
         return False
 
 
+def widget_changer(func: _F) -> _F:
+    """Execute the given function only if the new widget page is not the same as the current one.
+
+    :param func: The function to decorate
+
+    :returns: the decorated function
+
+    """
+
+    @functools.wraps(func)
+    def wrapper(*args: _Event_args, **kwargs: Mapping) -> _F | None:
+        """Wrap the original function.
+
+        :param args: Positional arguments, first one 'should' be the ``Events`` instance
+        :param kwargs: Optional keyword arguments
+
+        :returns: The executed function if the condition is passed
+
+        """
+        self = args[0]
+        if (
+            not self.widget_util.current_widget
+            == re.search(regex.EVENT_SEARCH, func.__name__)[0]
+        ):
+            try:
+                return func(*args, **kwargs)
+            except TypeError:
+                return func(self)
+
+    return wrapper
+
+
 login_required = functools.partial(
     _base_decorator,
     _condition_object=functools.partial(_attr_checker, attr="current_user"),
@@ -147,8 +183,6 @@ vault_unlock_required = functools.partial(
 
 
 __all__ = [
-    "F",
-    "condition",
     "login_required",
     "master_password_required",
     "vault_unlock_required",

@@ -59,10 +59,12 @@ class Events:
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}({self.parent!r})"
 
+    @decorators.widget_changer
     def home_event(self) -> None:
         """Switch to home widget."""
         self.widget_util.set_current_widget("home")
 
+    @decorators.widget_changer
     def login_event(self) -> None:
         """Switch to login widget and reset previous values."""
         self.widget_util.set_current_widget("login")
@@ -81,7 +83,8 @@ class Events:
         else:
             self.account_event()
 
-    def register_event(self) -> None:
+    @decorators.widget_changer
+    def register_2_event(self) -> None:
         """Switch to register widget and reset previous values."""
         self.widget_util.set_current_widget("register_2")
 
@@ -109,10 +112,12 @@ class Events:
         else:
             self.widget_util.message_box("account_creation_box")
 
+    @decorators.widget_changer
     def forgot_password_event(self) -> None:
         """Switch to forgot password widget and reset previous email."""
         self.widget_util.set_current_widget("forgot_password")
 
+    @decorators.widget_changer
     def reset_token_event(self) -> None:
         """Switch to reset token page and reset previous values."""
         self.widget_util.set_current_widget("reset_token")
@@ -149,6 +154,7 @@ class Events:
         else:
             self.widget_util.message_box("invalid_token_box", "Reset Password")
 
+    @decorators.widget_changer
     def reset_password_event(self) -> None:
         """Switch to the reset password widget."""
         self.widget_util.set_current_widget("reset_password")
@@ -174,6 +180,7 @@ class Events:
             )
             del self.__current_token
 
+    @decorators.widget_changer
     @decorators.login_required(page_to_access="change password")
     def change_password_event(self) -> None:
         """Change password for current user."""
@@ -215,11 +222,12 @@ class Events:
             )
             self.change_password_event()
 
+    @decorators.widget_changer
     def generate_pass_event(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
         self.widget_util.set_current_widget("generate_pass")
-        self.parent.ui.pass_progress = 0
 
+    @decorators.widget_changer
     def generate_pass_phase2_event(self) -> None:
         """Switch to the second password generation widget and reset previous values.
 
@@ -261,6 +269,7 @@ class Events:
             self.parent.gen.options,
         )
 
+    @decorators.widget_changer
     @decorators.login_required(page_to_access="account")
     def account_event(self) -> None:
         """Switch to account widget and set current user values."""
@@ -279,8 +288,6 @@ class Events:
         )
 
         self.widget_util.set_current_widget("account")
-
-    decorators.login_required(page_to_access="account")
 
     def change_pfp_event(self) -> None:
         """Change profile picture of current user."""
@@ -345,6 +352,7 @@ class Events:
                     detail="email",
                 )
 
+    @decorators.widget_changer
     @decorators.login_required(page_to_access="master password")
     def master_password_event(self) -> None:
         """Switch to master password widget.
@@ -436,6 +444,7 @@ class Events:
             self.current_user._master_key_str = password
             self.widget_util.message_box("vault_unlocked_box")
 
+    @decorators.widget_changer
     @decorators.login_required(page_to_access="vault")
     @decorators.master_password_required(page_to_access="vault")
     @decorators.vault_unlock_required(page_to_access="vault")

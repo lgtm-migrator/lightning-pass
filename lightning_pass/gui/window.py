@@ -184,11 +184,6 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         qr.moveCenter(cp)
         self.move(qr.topLeft())
 
-    @property
-    def current_index(self) -> int:
-        """Return the current index of the main stacked widget."""
-        return self.ui.stacked_widget.currentIndex()
-
     @QtCore.pyqtSlot(QtCore.QPoint)
     def on_position_changed(self, pos: QtCore.QPoint) -> None:
         """Handle changes in mouse position over connected label.

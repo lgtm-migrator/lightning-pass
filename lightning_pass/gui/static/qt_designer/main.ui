@@ -39,7 +39,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>12</number>
+     <number>3</number>
     </property>
     <widget class="QWidget" name="loading">
      <property name="cursor">
@@ -1527,7 +1527,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="vault_dummy_page1">
          <property name="enabled">

@@ -36,7 +36,7 @@ class ClearPreviousWidget:
 
         """
         self.parent = parent
-        self.previous_index = parent.current_index
+        self.previous_index = parent.events.widget_util.current_index
 
     def __enter__(self):
         """Do nothing on enter."""
@@ -100,6 +100,16 @@ class WidgetUtil:
         for i in ("setFamily", "Segoe UI Light"), ("setPointSize", 10):
             getattr(font, i[0])(i[1])
         return font
+
+    @property
+    def current_widget(self) -> str:
+        """Return the current widget of the main stacked widget."""
+        return self.parent.ui.stacked_widget.currentWidget().objectName()
+
+    @property
+    def current_index(self) -> int:
+        """Return the current index of the main stacked widget."""
+        return self.parent.ui.stacked_widget.currentIndex()
 
     def set_current_widget(self, widget: str) -> None:
         """Set a new current widget.

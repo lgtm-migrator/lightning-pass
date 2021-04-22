@@ -7,6 +7,7 @@ import bcrypt
 from validator_collection import checkers
 
 import lightning_pass.util.credentials as credentials
+from lightning_pass.util import regex
 from lightning_pass.util.exceptions import ValidationFailure
 
 
@@ -80,9 +81,7 @@ class UsernameValidator(Validator):
         :returns: True if the validation is passed, False otherwise
 
         """
-        if not re.match(r"^[\w]{5,}$", username):
-            return False
-        return True
+        return bool(re.fullmatch(regex.USERNAME, username))
 
     @staticmethod
     def unique(username: str, should_exist: Optional[bool] = False) -> bool:
@@ -181,13 +180,7 @@ class PasswordValidator(Validator):
         :returns: True if the validation is passed, False otherwise
 
         """
-        if not re.match(
-            #   lowercase  uppercase   digits    special  length
-            r"^(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[^\w])\S{8,}$",
-            password,
-        ):
-            return False
-        return True
+        return bool(re.fullmatch(regex.PASSWORD, password))
 
     @staticmethod
     def unique(password: str, should_exist: bool = False) -> bool:

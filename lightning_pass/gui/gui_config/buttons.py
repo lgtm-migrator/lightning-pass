@@ -59,7 +59,7 @@ class Buttons:
         buttons = (
             # home
             Clickable("home_login_btn", "login_event"),
-            Clickable("home_register_btn", "register_event"),
+            Clickable("home_register_btn", "register_2_event"),
             Clickable("home_generate_password_btn", "generate_pass_event"),
             # login
             Clickable("log_main_btn", "home_event"),
@@ -124,7 +124,7 @@ class Buttons:
             Clickable("action_generate", "generate_pass_event"),
             # menu_users
             Clickable("action_login", "login_event"),
-            Clickable("action_register", "register_event"),
+            Clickable("action_register", "register_2_event"),
             Clickable("action_forgot_password", "forgot_password_event"),
             Clickable("action_reset_token", "reset_token_event"),
             # menu_account
