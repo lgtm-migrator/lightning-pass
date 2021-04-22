@@ -369,12 +369,19 @@ class WidgetUtil:
             ),
         )
 
-    def clear_platform_actions(self) -> None:
-        """Clear the current ``QActions`` connected to the current vault platforms."""
+    def clear_platform_actions(self, delete: bool = False) -> None:
+        """Clear the current ``QActions`` connected to the current vault platforms.
+
+        :param delete: If the actions should be deleted or only hidden if
+
+        """
         for menu in self.parent.ui.menu_bar.children():
             if isinstance(menu, QtWidgets.QMenu) and menu.title() == "platforms":
                 for action in menu.children():
-                    action.setVisible(False)
+                    if not delete:
+                        action.setVisible(False)
+                    else:
+                        action.deleteLater()
 
     def rehash_vault_password(self, vault: Vault):
         """Replace password in the given vault by a new one hashed with current master key.

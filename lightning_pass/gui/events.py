@@ -3,7 +3,8 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-from typing import TYPE_CHECKING, Any
+import webbrowser
+from typing import TYPE_CHECKING, Any, Optional
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -69,6 +70,8 @@ class Events:
 
     def login_user_event(self) -> None:
         """Try to login a user. If successful, show the account widget."""
+        # need to clean up data about previous users' vault platforms
+        self.logout_event(home=False)
         try:
             self.current_user = Account.login(
                 self.parent.ui.log_username_line_edit.text(),
@@ -299,11 +302,15 @@ class Events:
                 QtGui.QPixmap(self.current_user.profile_picture_path),
             )
 
-    def logout_event(self) -> None:
-        """Logout current user."""
-        self.widget_util.clear_platform_actions()
-        del self.current_user
-        self.home_event()
+    def logout_event(self, home: bool = True) -> None:
+        """Logout current user.
+
+        :param home: Whether to redirect user to the home page after logging out."""
+        self.widget_util.clear_platform_actions(delete=True)
+        with contextlib.suppress(AttributeError):
+            delattr(self, "current_user")
+        if home:
+            self.home_event()
 
     def edit_details_event(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
@@ -588,6 +595,8 @@ class Events:
                     "Vault",
                     self.widget_util.vault_widget_vault.platform_name,
                 )
+                # menu would disappear if only one page exists
+                self.widget_util.setup_vault_page_menu(new_vault)
 
             self.vault_event(previous_index=self.widget_util.vault_stacked_widget_index)
 
@@ -610,6 +619,16 @@ class Events:
         if args:
             ...
         self.parent.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
+
+    @staticmethod
+    def open_website_event(url: Optional[str]) -> None:
+        """Open a website in the default browser.
+
+        :param url: The URL to open
+
+        """
+        if url:
+            webbrowser.get().open(url, new=2)
 
 
 __all__ = [

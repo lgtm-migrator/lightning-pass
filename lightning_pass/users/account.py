@@ -45,7 +45,7 @@ if TYPE_CHECKING:
 class Check(NamedTuple):
     """Store data connected to one validation operation."""
 
-    func: Callable
+    func: Callable[..., bool]
     args: Sequence
     exc: Type[AccountException]
 
@@ -55,7 +55,7 @@ def checks_executor(checks: Generator[Check, None, None]) -> None:
 
     :param checks: All of the checks to execute
 
-    :raises AccountException: if any of the given checks fail
+    :raise Type[AccountException]: if any of the given checks fail
 
     """
     for check in checks:
@@ -230,12 +230,12 @@ class Account:
             (
                 self.password_validator.pattern,
                 (data.new_password,),
-                AccountDoesNotExist,
+                InvalidPassword,
             ),
             (
                 self.password_validator.match,
                 (data.new_password, data.confirm_new),
-                AccountDoesNotExist,
+                PasswordsDoNotMatch,
             ),
         )
         checks_executor((Check(*values) for values in checks))

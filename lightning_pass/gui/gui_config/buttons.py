@@ -201,7 +201,7 @@ class Buttons:
         events = self.parent.events
 
         parent.vault_open_web_tool_btn.clicked.connect(
-            lambda: webbrowser.get().open(parent.vault_web_line.text(), new=2),
+            lambda: events.open_website_event(parent.vault_web_line.text()),
         )
         for button in vault_copy_tool_buttons:
             getattr(parent, button.widget).clicked.connect(
