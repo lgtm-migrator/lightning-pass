@@ -4,7 +4,7 @@ Used for connecting each button on the GUI to various events or lambdas.
 
 """
 import webbrowser
-from typing import Any, NamedTuple
+from typing import Any, NamedTuple, Optional
 
 import clipboard
 from PyQt5 import QtCore, QtGui, QtWidgets
@@ -201,7 +201,7 @@ class Buttons:
         events = self.parent.events
 
         parent.vault_open_web_tool_btn.clicked.connect(
-            lambda: events.open_website_event(parent.vault_web_line.text()),
+            lambda: _open_website(parent.vault_web_line.text()),
         )
         for button in vault_copy_tool_buttons:
             getattr(parent, button.widget).clicked.connect(
@@ -222,7 +222,22 @@ class Buttons:
 
 
 def _copy_text(obj: QtWidgets.QLineEdit):
+    """Copy a text into clipboard.
+
+    :param obj: The source of the text to copy
+
+    """
     clipboard.copy(obj.text())
+
+
+def _open_website(url: Optional[str]) -> None:
+    """Open a website in the default browser.
+
+    :param url: The URL to open
+
+    """
+    if url:
+        webbrowser.get().open(url, new=2)
 
 
 __all__ = [

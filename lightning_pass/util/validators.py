@@ -13,6 +13,8 @@ from lightning_pass.util.exceptions import ValidationFailure
 class Validator(ABC):
     """Base class for validation of account data."""
 
+    __slots__ = ()
+
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}()"
@@ -50,6 +52,8 @@ class Validator(ABC):
 
 class UsernameValidator(Validator):
     """Validator for username."""
+
+    __slots__ = ()
 
     @classmethod
     def validate(cls, username: str) -> None:
@@ -102,6 +106,8 @@ class UsernameValidator(Validator):
 class EmailValidator(Validator):
     """Validator for email addresses."""
 
+    __slots__ = ()
+
     @classmethod
     def validate(cls, email: str):
         """Perform all validation checks for the given email.
@@ -144,6 +150,8 @@ class EmailValidator(Validator):
 
 class PasswordValidator(Validator):
     """Validator for password."""
+
+    __slots__ = ()
 
     @classmethod
     def validate(cls, email: str):

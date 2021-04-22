@@ -81,6 +81,8 @@ class WidgetUtil:
 
     """Various utilities to be used with event handling or account management."""
 
+    __slots__ = "parent"
+
     mouse_randomness = mouse_randomness
 
     def __init__(self, parent: QMainWindow):

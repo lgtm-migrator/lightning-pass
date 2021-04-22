@@ -80,6 +80,8 @@ def setup_tray_icon(app: QApplication, main_window: LightningPassWindow) -> None
 class SplashScreen(QtWidgets.QWidget):
     """Lightning Pass splash screen."""
 
+    __slots__ = "parent", "widget", "ui", "timer", "progress"
+
     def __init__(self, parent=None) -> None:
         """Widget constructor."""
         super().__init__(parent)
@@ -128,6 +130,8 @@ class SplashScreen(QtWidgets.QWidget):
 
 class LightningPassWindow(QtWidgets.QMainWindow):
     """Main Lightning Pass window."""
+
+    __slots__ = "main_win", "ui", "events", "buttons"
 
     def __init__(self, parent=None) -> None:
         """Construct the class."""
@@ -205,6 +209,8 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
 class VaultWidget(QtWidgets.QWidget):
     """The widget to be displayed on the left side of the vault page."""
+
+    __slots__ = "widget", "ui"
 
     def __init__(self):
         super().__init__()

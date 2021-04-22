@@ -69,6 +69,14 @@ _V = TypeVar("_V", bound=Validator)
 class Account:
     """This class holds information about the currently logged in user."""
 
+    __slots__ = (
+        "_user_id",
+        "_current_login_date",
+        "_vault_unlocked",
+        "_current_vault_unlock_date",
+        "_master_key_str",
+    )
+
     credentials = credentials
     database = database
     pwd_hashing = pwd_hashing

@@ -526,7 +526,7 @@ class InputDialogs(QWidget):
 
     """Show input dialog to the user."""
 
-    __slots__ = ("events", "main_win", "title")
+    __slots__ = "events", "main_win", "title"
 
     def __init__(self, parent: QMainWindow) -> None:
         """Class constructor."""

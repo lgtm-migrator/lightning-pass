@@ -3,8 +3,7 @@ from __future__ import annotations
 
 import contextlib
 import pathlib
-import webbrowser
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any
 
 import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
@@ -619,16 +618,6 @@ class Events:
         if args:
             ...
         self.parent.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
-
-    @staticmethod
-    def open_website_event(url: Optional[str]) -> None:
-        """Open a website in the default browser.
-
-        :param url: The URL to open
-
-        """
-        if url:
-            webbrowser.get().open(url, new=2)
 
 
 __all__ = [
