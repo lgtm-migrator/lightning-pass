@@ -93,7 +93,7 @@ class WidgetUtil:
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}({self.parent!r})"
 
-    @functools.cached_property
+    @functools.lru_cache(maxsize=None)
     def font(self):
         """Return the font used for all widgets except titles."""
         font = QtGui.QFont()
@@ -209,15 +209,7 @@ class WidgetUtil:
             6,
             1,
         )
-        self.clear_platform_actions()
-        if not hasattr(
-            self.parent.ui,
-            name := "menu_platform",
-        ):
-            self.setup_menu(
-                obj_name=name,
-                title="platforms",
-            )
+        self.parent.ui.menu_platforms.setEnabled(True)
 
     def setup_menu(self, obj_name: str, title: str) -> QMenu:
         """Setup a new ``QMenu`` tied to the root ``QMenuBar``.
@@ -228,39 +220,41 @@ class WidgetUtil:
         :returns: The new ``QMenu`` object
 
         """
-        setattr(
-            self.parent.ui,
-            obj_name,
-            QtWidgets.QMenu(self.parent.ui.menu_bar),
-        )
-        (menu := getattr(self.parent.ui, obj_name)).setTitle(title)
-        menu.setFont(self.font)
-        return menu
+        if not hasattr(self.parent.ui, obj_name):
+            setattr(
+                self.parent.ui,
+                obj_name,
+                QtWidgets.QMenu(self.parent.ui.menu_bar),
+            )
+            (menu := getattr(self.parent.ui, obj_name)).setTitle(title)
+            menu.setFont(self.font())
+        return getattr(self.parent.ui, obj_name)
 
     def setup_action(
         self,
         obj_name: str,
         text: str,
         event: Callable[[], None],
-        menu: str,
+        menu: QMenu,
     ) -> QAction:
         """Setup a new ``QAction``.
 
         :param obj_name: Reference to the new object
         :param text: Text on the actual widget
-        :param event: What will happen when the ``QAction`` is triggered
+        :param event: What will happen when the action is triggered
         :param menu: The root ``QMenu`` for the new action
 
-        :returns: The newly instantiated action
+        :returns: The newly instantiated ``QAction``
 
         """
         obj_name = f"action_{obj_name}"
-        setattr(self.parent.ui, obj_name, QtWidgets.QAction(self.parent.main_win))
-        (action := getattr(self.parent.ui, obj_name)).setText(text)
-        action.setFont(self.font)
-        action.triggered.connect(event)
-        getattr(self.parent.ui, menu).addAction(action)
-        return action
+        if not hasattr(self.parent.ui, obj_name):
+            setattr(self.parent.ui, obj_name, QtWidgets.QAction(self.parent.main_win))
+            (action := getattr(self.parent.ui, obj_name)).setText(text)
+            action.setFont(self.font())
+            action.triggered.connect(event)
+            menu.addAction(action)
+        return getattr(self.parent.ui, obj_name)
 
     @property
     def vault_stacked_widget_index(self) -> int:
@@ -275,7 +269,7 @@ class WidgetUtil:
 
         """
         if i < 1:
-            raise ValueError
+            raise ValueError("Vault index can't be lower than 1.'")
         self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
 
     def setup_vault_widget(self, page: Vault | None = None) -> None:
@@ -326,36 +320,16 @@ class WidgetUtil:
         except TypeError:
             w.clear()
 
-        self.setup_vault_page_menu(page)
-
-    def setup_vault_page_menu(self, page):
-        """Setup a ``QAction`` for the given vault page.
-
-        If the action already exists then just make it visible.
-
-        :param page: The data which will be used during the setup
-
-        """
-        if not hasattr(self.parent.ui, f"action_{page.platform_name}"):
-            self.setup_action(
-                obj_name=page.platform_name,
-                text=page.platform_name,
-                event=lambda: self.parent.events.menu_platform_action_event(
-                    # offset dummy page
-                    page.vault_index
-                    + 1,
-                ),
-                menu="menu_platform",
-            )
-        else:
-            with contextlib.suppress(AttributeError):
-                for menu in self.parent.ui.menu_bar.children():
-                    if (
-                        isinstance(menu, QtWidgets.QMenu)
-                        and menu.title() == "platforms"
-                    ):
-                        for action in menu.children():
-                            action.setVisible(True)
+        self.setup_action(
+            obj_name=page.platform_name,
+            text=page.platform_name,
+            event=lambda: self.parent.events.change_vault_page_event(
+                # offset dummy page
+                page.vault_index
+                + 1,
+            ),
+            menu=self.parent.ui.menu_platforms,
+        )
 
     @property
     def vault_widget_vault(self) -> Vault:
@@ -381,19 +355,10 @@ class WidgetUtil:
             ),
         )
 
-    def clear_platform_actions(self, delete: bool = False) -> None:
-        """Clear the current ``QActions`` connected to the current vault platforms.
-
-        :param delete: If the actions should be deleted or only hidden if
-
-        """
-        for menu in self.parent.ui.menu_bar.children():
-            if isinstance(menu, QtWidgets.QMenu) and menu.title() == "platforms":
-                for action in menu.children():
-                    if not delete:
-                        action.setVisible(False)
-                    else:
-                        action.deleteLater()
+    def clear_platform_actions(self) -> None:
+        """Clear the current ``QActions`` connected to the current platforms ``QMenu``."""
+        (m := self.parent.ui.menu_platforms).clear()
+        m.setEnabled(False)
 
     def rehash_vault_password(self, vault: Vault):
         """Replace password in the given vault by a new one hashed with current master key.

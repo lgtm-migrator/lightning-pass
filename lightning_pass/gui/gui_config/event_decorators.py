@@ -9,7 +9,7 @@ from lightning_pass.util import regex
 
 _F = TypeVar("_F", bound=Callable[..., Any])
 _Condition = NewType("_Condition", Callable[[str], bool])
-_Event_args = NewType("_Event_args", tuple["Events", ...])
+_EventArgs = NewType("_Event_args", tuple["Events", ...])
 
 
 @overload
@@ -70,7 +70,7 @@ def _base_decorator(
         """
 
         @functools.wraps(func)
-        def wrapper(*args: _Event_args, **kwargs: Mapping) -> _F | None:
+        def wrapper(*args: _EventArgs, **kwargs: Mapping) -> _F | None:
             """Wrap the original function.
 
             :param args: Positional arguments, first one should be the class attribute which contains
@@ -97,7 +97,7 @@ def _base_decorator(
     return decorator
 
 
-def _func_executor(func: Callable, *args: _Event_args, **kwargs: Mapping) -> None:
+def _func_executor(func: Callable, *args: _EventArgs, **kwargs: Mapping) -> None:
     """Simple function execution wrapper.
 
     :param func: The function to execute
@@ -138,7 +138,7 @@ def widget_changer(func: _F) -> _F:
     """
 
     @functools.wraps(func)
-    def wrapper(*args: _Event_args, **kwargs: Mapping) -> _F | None:
+    def wrapper(*args: _EventArgs, **kwargs: Mapping) -> _F | None:
         """Wrap the original function.
 
         :param args: Positional arguments, first one 'should' be the ``Events`` instance

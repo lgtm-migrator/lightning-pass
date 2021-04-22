@@ -176,6 +176,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
         self.ui.generate_pass_p2_prgrs_bar.setFormat("Progress - %p%")
+        self.ui.menu_platforms.setEnabled(False)
 
     def center(self) -> None:
         """Center main window."""

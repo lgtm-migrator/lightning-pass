@@ -1862,10 +1862,22 @@
     <addaction name="action_master_password"/>
     <addaction name="action_vault"/>
    </widget>
+   <widget class="QMenu" name="menu_platforms">
+    <property name="font">
+     <font>
+      <family>Segoe UI</family>
+      <pointsize>9</pointsize>
+     </font>
+    </property>
+    <property name="title">
+     <string>platforms</string>
+    </property>
+   </widget>
    <addaction name="menu_general"/>
    <addaction name="menu_password"/>
    <addaction name="menu_users"/>
    <addaction name="menu_account_2"/>
+   <addaction name="menu_platforms"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionlogin">

@@ -509,6 +509,8 @@ contain at least one special character."""
             # first element/character did not exist, return without showing anything
             return
 
+        updated_values = sorted([val.replace("_", "-") for val in updated_values])
+
         informative = (
             f"""{', '.join(updated_values[:-1])} and {updated_values[-1]} have been successfully updated."""
             if len(updated_values) > 1

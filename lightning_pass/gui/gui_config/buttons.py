@@ -97,7 +97,7 @@ class Buttons:
             Clickable("vault_add_page_btn", "add_vault_page_event"),
             Clickable("vault_remove_page_btn", "remove_vault_page_event"),
             Clickable("vault_menu_btn", "home_event"),
-            Clickable("vault_lock_btn", "vault_lock_event"),
+            Clickable("vault_lock_btn", "lock_vault_event"),
             # master_password
             Clickable("master_pass_menu_btn", "home_event"),
             Clickable("master_pass_save_btn", "master_password_submit_event"),
@@ -214,10 +214,10 @@ class Buttons:
         )
 
         parent.vault_forward_tool_btn.clicked.connect(
-            lambda: events.change_vault_page_event(1),
+            lambda: events.change_vault_page_event(1, calculate=True),
         )
         parent.vault_backward_tool_btn.clicked.connect(
-            lambda: events.change_vault_page_event(-1),
+            lambda: events.change_vault_page_event(-1, calculate=True),
         )
 
 

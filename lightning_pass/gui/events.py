@@ -311,8 +311,10 @@ class Events:
     def logout_event(self, home: bool = True) -> None:
         """Logout current user.
 
-        :param home: Whether to redirect user to the home page after logging out."""
-        self.widget_util.clear_platform_actions(delete=True)
+        :param home: Whether to redirect user to the home page after logging out.
+
+        """
+        self.widget_util.clear_platform_actions()
         with contextlib.suppress(AttributeError):
             delattr(self, "current_user")
         if home:
@@ -444,11 +446,13 @@ class Events:
             self.current_user._master_key_str = password
             self.widget_util.message_box("vault_unlocked_box")
 
-    @decorators.widget_changer
     @decorators.login_required(page_to_access="vault")
     @decorators.master_password_required(page_to_access="vault")
     @decorators.vault_unlock_required(page_to_access="vault")
-    def vault_event(self, previous_index: int | None = None) -> None:
+    def vault_event(
+        self,
+        previous_index: int | None = None,
+    ) -> None:
         """Switch to vault window.
 
         :param previous_index: The index of the window before rebuilding
@@ -462,10 +466,6 @@ class Events:
             for page in self.current_user.vault_pages():
                 self.widget_util.setup_vault_widget(page)
 
-        self.parent.ui.menu_bar.addAction(
-            getattr(self.parent.ui, "menu_platform").menuAction(),
-        )
-
         self.parent.ui.vault_username_lbl.setText(
             f"Current user: {self.current_user.username}",
         )
@@ -478,6 +478,7 @@ class Events:
         self.parent.ui.vault_date_lbl.setText(text)
 
         self.widget_util.set_current_widget("vault")
+
         if previous_index:
             self.parent.ui.vault_stacked_widget.setCurrentIndex(previous_index)
 
@@ -517,29 +518,19 @@ class Events:
                 self.widget_util.vault_stacked_widget_index - 1,
             )
             getattr(self.parent.ui, f"action_{platform}").deleteLater()
-            self.parent.events.widget_util.rebuild_vault_stacked_widget()
-
-            self.vault_event()
             self.widget_util.message_box(
                 "vault_page_deleted_box",
                 "Vault",
                 platform,
             )
 
-    def vault_lock_event(self) -> None:
+            self.vault_event()
+
+    def lock_vault_event(self) -> None:
         """Lock the vault of the current user."""
         self.current_user.vault_unlocked = False
         self.widget_util.clear_platform_actions()
         self.account_event()
-
-    def change_vault_page_event(self, index_change: int) -> None:
-        """Handle changes on the vault window.
-
-        :param index_change: Integer indicating how should the widget index be changed
-
-        """
-        with contextlib.suppress(ValueError):
-            self.widget_util.vault_stacked_widget_index += index_change
 
     def update_vault_page_event(self) -> None:
         """Add a new vault tied to the current user.
@@ -604,17 +595,24 @@ class Events:
                     self.widget_util.vault_widget_vault.platform_name,
                 )
                 # menu would disappear if only one page exists
-                self.widget_util.setup_vault_page_menu(new_vault)
+                self.widget_util.setup_vault_page(new_vault)
 
             self.vault_event(previous_index=self.widget_util.vault_stacked_widget_index)
 
-    def menu_platform_action_event(self, index: int):
-        """Handle changes on the vault stacked widget,
+    def change_vault_page_event(self, index: int, calculate: bool = False):
+        """Handle changes on the vault stacked widget.
 
         :param index: The index to access
+        :param calculate: If the index should be changed by the given amount
 
         """
-        self.vault_event(previous_index=index)
+        if calculate:
+            self.widget_util.vault_stacked_widget_index += index
+        else:
+            self.widget_util.vault_stacked_widget_index = index
+
+        if not self.widget_util.current_widget == (v := "vault"):
+            self.widget_util.set_current_widget(v)
 
     def toggle_stylesheet_light(self, *args: Any) -> None:
         """Change stylesheet to light mode."""
