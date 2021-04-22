@@ -73,6 +73,7 @@ VAULT_WIDGET_DATA: set[WidgetItem] = {
     WidgetItem("vault_web_line", fill_method="setText", fill_args="website"),
     WidgetItem("vault_username_line", fill_method="setText", fill_args="username"),
     WidgetItem("vault_email_line", fill_method="setText", fill_args="email"),
+    WidgetItem("vault_password_line", fill_method="setText", fill_args="password"),
     WidgetItem("vault_page_lcd_number", fill_method="display", fill_args="vault_index"),
 }
 
@@ -268,9 +269,13 @@ class WidgetUtil:
         :raises ValueError: if there was an attempt to set wrong index
 
         """
-        if i < 1:
-            raise ValueError("Vault index can't be lower than 1.'")
-        self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
+        if 1 <= i <= self.parent.events.current_user.vault_pages_int() + 1:
+            self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
+
+    @property
+    def current_vault_widget(self) -> QWidget:
+        """Return the current QWidget on the vault_stacked_widget."""
+        return self.parent.ui.vault_stacked_widget.currentWidget()
 
     def setup_vault_widget(self, page: Vault | None = None) -> None:
         """Set up and connect a new vault page.
@@ -303,22 +308,9 @@ class WidgetUtil:
         for data in VAULT_WIDGET_DATA:
             obj = getattr(self.parent.ui.vault_widget_instance.ui, data.name)
             method = getattr(obj, data.fill_method)
+            args = getattr(page, data.fill_args)
 
-            with contextlib.suppress(TypeError):
-                # information might be missing
-                args = getattr(page, data.fill_args)
-
-            try:
-                method(args)
-            except (TypeError, UnboundLocalError):
-                method()
-
-        try:
-            (w := self.parent.ui.vault_widget_instance.ui.vault_password_line).setText(
-                page.password,
-            )
-        except TypeError:
-            w.clear()
+            method(args)
 
         self.setup_action(
             obj_name=page.platform_name,
@@ -339,9 +331,7 @@ class WidgetUtil:
         Genexpr is used to filter the correct widget types and extract the text.
 
         """
-        children_objects = it.chain(
-            (self.parent.ui.vault_stacked_widget.currentWidget().children()),
-        )
+        children_objects = it.chain(self.current_vault_widget.children())
         return self.parent.events.current_user.vaults.Vault(
             *(
                 self.parent.events.current_user.user_id,
@@ -354,6 +344,12 @@ class WidgetUtil:
                 self.vault_stacked_widget_index - 1,
             ),
         )
+
+    def clear_current_vault_page(self):
+        """Clear all QLineEdit widgets on the current page."""
+        for widget in self.current_vault_widget.children():
+            if isinstance(widget, QtWidgets.QLineEdit):
+                widget.clear()
 
     def clear_platform_actions(self) -> None:
         """Clear the current ``QActions`` connected to the current platforms ``QMenu``."""

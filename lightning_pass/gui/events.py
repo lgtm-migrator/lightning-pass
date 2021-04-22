@@ -504,7 +504,9 @@ class Events:
         if (
             pages := self.current_user.vault_pages_int()
         ) < self.widget_util.vault_stacked_widget_index:
-            # no eligible page to remove
+            # user tried to remove a page which has not yet been submitted to the database ->
+            # just clear the fields
+            self.widget_util.clear_current_vault_page()
             return
 
         platform = self.widget_util.vault_widget_vault.platform_name
@@ -524,7 +526,7 @@ class Events:
                 platform,
             )
 
-            self.vault_event()
+            self.widget_util.vault_stacked_widget_index += -1
 
     def lock_vault_event(self) -> None:
         """Lock the vault of the current user."""
@@ -539,15 +541,17 @@ class Events:
         Used later to choose correct message box.
 
         """
+        vaults = self.current_user.vaults
+
         previous_vault = self.current_user.vaults.get_vault(
             self.current_user.user_id,
             self.widget_util.vault_widget_vault.vault_index,
         )
 
         try:
-            self.current_user.vaults.update_vault(
+            vaults.update_vault(
                 (
-                    new_vault := self.current_user.vaults.Vault(
+                    new_vault := vaults.Vault(
                         self.current_user.user_id,
                         self.widget_util.vault_widget_vault.platform_name,
                         self.widget_util.vault_widget_vault.website,
@@ -567,20 +571,25 @@ class Events:
         except VaultException:
             self.widget_util.message_box("invalid_vault_box", "Vault")
         else:
+            new_vault = vaults.Vault(*new_vault[:5], new_pass, *new_vault[6:])
+
             if previous_vault:
+                getattr(
+                    self.parent.ui,
+                    f"action_{previous_vault.platform_name}",
+                ).setText(new_vault.platform_name)
+
+                previous_vault = vaults.Vault(
+                    *previous_vault[:5],
+                    self.current_user.decrypt_vault_password(previous_vault.password),
+                    *previous_vault[6:],
+                )
 
                 updated_details = [
                     key
                     for key, val in zip(previous_vault._fields, previous_vault)
-                    # password check done separately, decryption needed
-                    if not key == "password" and not getattr(new_vault, str(key)) == val
+                    if not getattr(new_vault, str(key)) == val
                 ]
-
-                previous_pass = self.current_user.decrypt_vault_password(
-                    previous_vault.password,
-                )
-                if previous_pass != new_pass:
-                    updated_details.append("password")
 
                 self.widget_util.message_box(
                     "vault_updated_box",
@@ -596,8 +605,6 @@ class Events:
                 )
                 # menu would disappear if only one page exists
                 self.widget_util.setup_vault_page(new_vault)
-
-            self.vault_event(previous_index=self.widget_util.vault_stacked_widget_index)
 
     def change_vault_page_event(self, index: int, calculate: bool = False):
         """Handle changes on the vault stacked widget.
