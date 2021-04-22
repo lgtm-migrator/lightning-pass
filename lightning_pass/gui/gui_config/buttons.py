@@ -197,7 +197,7 @@ class Buttons:
             ),
         )
 
-        parent = self.parent.ui.vault_widget.ui
+        parent = self.parent.ui.vault_widget_instance.ui
         events = self.parent.events
 
         parent.vault_open_web_tool_btn.clicked.connect(

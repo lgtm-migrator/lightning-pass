@@ -267,20 +267,21 @@ class WidgetUtil:
         self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
 
     def setup_vault_widget(self, page: Vault | None = None) -> None:
-        """Set up and connect a new vault page
+        """Set up and connect a new vault page.
 
         :param page: Vault object containing the data which should be shown on the current page, defaults to None
 
         """
+        self.parent.ui.vault_widget_instance = self.parent.ui.vault_widget_obj()
         self.parent.ui.vault_stacked_widget.addWidget(
-            self.parent.ui.vault_widget_inst,
+            self.parent.ui.vault_widget_instance.widget,
         )
 
         if page:
             self.setup_vault_page(page)
 
         self.parent.ui.vault_stacked_widget.setCurrentWidget(
-            self.parent.ui.vault_widget.widget,
+            self.parent.ui.vault_widget_instance.widget,
         )
         self.parent.buttons.setup_vault_buttons()
 
@@ -294,7 +295,7 @@ class WidgetUtil:
 
         """
         for data in VAULT_WIDGET_DATA:
-            obj = getattr(self.parent.ui.vault_widget.ui, data.name)
+            obj = getattr(self.parent.ui.vault_widget_instance.ui, data.name)
             method = getattr(obj, data.fill_method)
 
             with contextlib.suppress(TypeError):
@@ -307,7 +308,7 @@ class WidgetUtil:
                 method()
 
         try:
-            (w := self.parent.ui.vault_widget.ui.vault_password_line).setText(
+            (w := self.parent.ui.vault_widget_instance.ui.vault_password_line).setText(
                 page.password,
             )
         except TypeError:

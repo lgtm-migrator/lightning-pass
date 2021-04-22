@@ -440,8 +440,13 @@ class Events:
 
         """
         self.widget_util.rebuild_vault_stacked_widget()
-        for page in self.current_user.vault_pages():
-            self.widget_util.setup_vault_widget(page)
+
+        if self.current_user.vault_pages_int() <= 0:
+            self.widget_util.setup_vault_widget()
+        else:
+            for page in self.current_user.vault_pages():
+                self.widget_util.setup_vault_widget(page)
+
         self.parent.ui.menu_bar.addAction(
             getattr(self.parent.ui, "menu_platform").menuAction(),
         )
@@ -468,19 +473,21 @@ class Events:
         switches to new and unused page if one like that exists.
 
         """
-        if (page := self.current_user.vault_pages_int) == (
+        if (page := self.current_user.vault_pages_int()) == (
             count := self.parent.ui.vault_stacked_widget.count() - 1
         ):
             # empty one not found -> create new one
             self.widget_util.setup_vault_widget()
-            self.parent.ui.vault_widget.ui.vault_page_lcd_number.display(page)
+            self.parent.ui.vault_widget_instance.ui.vault_page_lcd_number.display(page)
         else:
             # empty one found -> switch to it
             self.widget_util.vault_stacked_widget_index = count
 
     def remove_vault_page_event(self) -> None:
         """Remove the current vault page."""
-        if (pages := self.current_user.vault_pages_int()) < 1:
+        if (
+            pages := self.current_user.vault_pages_int()
+        ) < self.widget_util.vault_stacked_widget_index:
             # no eligible page to remove
             return
 

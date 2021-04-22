@@ -115,8 +115,6 @@ class SplashScreen(QtWidgets.QWidget):
             self.ui.loading_progress_bar.setFormat(f"%p% - Interface")
         elif self.progress == 65:
             self.ui.loading_progress_bar.setFormat(f"%p% - Database")
-        elif self.progress == 95:
-            self.ui.loading_progress_bar.setFormat(f"%p% - Done")
         elif self.progress > 100:
             self.timer.stop()
             self.widget.close()
@@ -139,7 +137,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.ui = main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
-        self.ui.vault_widget_inst = lambda: VaultWidget()
+        self.ui.vault_widget_obj = VaultWidget
 
         self.events = events.Events(self)
         self.buttons = buttons.Buttons(self)
@@ -173,6 +171,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         self.events.toggle_stylesheet_dark()  # Dark mode is the default theme.
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
+        self.ui.generate_pass_p2_prgrs_bar.setFormat("Progress - %p%")
 
     def center(self) -> None:
         """Center main window."""
