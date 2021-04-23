@@ -170,13 +170,14 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         splash.show()
 
     def extras(self) -> None:
-        """Additional setup for the window."""
+        """Additional setup for the application."""
         self.main_win.setWindowIcon(QtGui.QIcon(str(TRAY_ICON)))
         self.events.toggle_stylesheet_dark()  # Dark mode is the default theme.
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
         self.ui.generate_pass_p2_prgrs_bar.setFormat("Progress - %p%")
         self.ui.menu_platforms.setEnabled(False)
+        self.events.widget_util.clear_vault_stacked_widget()
 
     def center(self) -> None:
         """Center main window."""

@@ -196,23 +196,6 @@ class WidgetUtil:
         """
         return self.mouse_randomness.PwdGenerator(self.password_options)
 
-    def rebuild_vault_stacked_widget(self) -> None:
-        """Rebuild ``vault_stacked_widget``."""
-        self.parent.ui.vault_stacked_widget = QtWidgets.QStackedWidget(
-            self.parent.ui.vault,
-        )
-        self.parent.ui.vault_stacked_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
-        self.parent.ui.vault_stacked_widget.setFrameShadow(QtWidgets.QFrame.Plain)
-        self.parent.ui.vault_stacked_widget.setObjectName("vault_stacked_widget")
-        self.parent.ui.gridLayout_12.addWidget(
-            self.parent.ui.vault_stacked_widget,
-            0,
-            3,
-            6,
-            1,
-        )
-        self.parent.ui.menu_platforms.setEnabled(True)
-
     def setup_menu(self, obj_name: str, title: str) -> QMenu:
         """Setup a new ``QMenu`` tied to the root ``QMenuBar``.
 
@@ -256,6 +239,7 @@ class WidgetUtil:
             setattr(self.parent.ui, obj_name, QtWidgets.QAction(self.parent.main_win))
             (action := getattr(self.parent.ui, obj_name)).setText(text)
             action.setFont(self.font("Segoe UI", 9))
+        finally:
             action.triggered.connect(event)
 
         if obj_name not in menu.actions():
@@ -352,11 +336,17 @@ class WidgetUtil:
             ),
         )
 
-    def clear_current_vault_page(self):
+    def clear_current_vault_page(self) -> None:
         """Clear all QLineEdit widgets on the current page."""
         for widget in self.current_vault_widget_children():
             if isinstance(widget, QtWidgets.QLineEdit):
                 widget.clear()
+
+    def clear_vault_stacked_widget(self) -> None:
+        """Clear QWidgets in the vault_stacked_widget."""
+        for widget in self.parent.ui.vault_stacked_widget.children():
+            if isinstance(widget, QtWidgets.QWidget):
+                self.parent.ui.vault_stacked_widget.removeWidget(widget)
 
     def clear_platform_actions(self) -> None:
         """Clear the current ``QActions`` connected to the current platforms ``QMenu``."""

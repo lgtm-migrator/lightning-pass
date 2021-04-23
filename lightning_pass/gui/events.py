@@ -33,14 +33,16 @@ if TYPE_CHECKING:
 def _ord(day: int) -> str:
     """Return given day in a human readable string.
 
-    :param day: The day to convert to the human readable form
+    :param day: The day integer
 
     """
     suffix = "th", "st", "nd", "rd"
 
-    if (div := day % 10) in (1, 2, 3) and day not in (11, 12, 13):
-        return suffix[div]
-    return suffix[0]
+    return (
+        str(day) + suffix[div]
+        if (div := day % 10) in (1, 2, 3) and day not in (11, 12, 13)
+        else suffix[0]
+    )
 
 
 class Events:
@@ -279,7 +281,7 @@ class Events:
 
         date = self.current_user.current_login_date
         try:
-            text = f"Last login date: {date:%d}{_ord(date.day)} {date:%b. %Y, %H:%M}"
+            text = f"Last login date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
         except TypeError:
             text = "Last login date: None"
         self.parent.ui.account_last_log_date.setText(text)
@@ -317,6 +319,7 @@ class Events:
 
         """
         self.widget_util.clear_platform_actions()
+        self.widget_util.clear_vault_stacked_widget()
         with contextlib.suppress(AttributeError):
             delattr(self, "current_user")
         if home:
@@ -464,8 +467,6 @@ class Events:
         :param previous_index: The index of the window before rebuilding
 
         """
-        self.widget_util.rebuild_vault_stacked_widget()
-
         pages = self.current_user.vault_pages()
 
         try:
@@ -476,13 +477,15 @@ class Events:
             for page in it.chain((page,), pages):
                 self.widget_util.setup_vault_widget(page)
 
+        self.parent.ui.menu_platforms.setEnabled(True)
+
         self.parent.ui.vault_username_lbl.setText(
             f"Current user: {self.current_user.username}",
         )
 
         date = self.current_user.current_vault_unlock_date
         try:
-            text = f"Last unlock date: {date:%d}{_ord(date.day)} {date:%b. %Y, %H:%M}"
+            text = f"Last unlock date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
         except TypeError:
             text = "Last unlock date: None"
         self.parent.ui.vault_date_lbl.setText(text)
@@ -546,6 +549,7 @@ class Events:
     def lock_vault_event(self) -> None:
         """Lock the vault of the current user."""
         self.current_user.vault_unlocked = False
+        self.widget_util.clear_vault_stacked_widget()
         self.widget_util.clear_platform_actions()
         self.account_event()
 
