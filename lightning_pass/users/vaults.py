@@ -3,8 +3,7 @@ from __future__ import annotations
 
 from typing import NamedTuple, Union
 
-import lightning_pass.util.credentials as credentials
-import lightning_pass.util.database as database
+from lightning_pass.util import credentials, database
 from lightning_pass.util.exceptions import (
     InvalidEmail,
     InvalidURL,

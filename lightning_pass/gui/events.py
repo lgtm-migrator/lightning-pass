@@ -107,7 +107,7 @@ class HomeEvents(Events):
     def login_user(self) -> None:
         """Try to login a user. If successful, show the account widget."""
         # need to clean up data about previous users' vault platforms
-        self.parent.events.account.logout_event(home=False)
+        self.parent.events.account.logout(home=False)
         try:
             self.current_user = Account.login(
                 self.parent.ui.log_username_line_edit.text(),
@@ -116,7 +116,7 @@ class HomeEvents(Events):
         except AccountException:
             self.widget_util.message_box("invalid_login_box", "Login")
         else:
-            self.parent.events.account.account_event()
+            self.parent.events.account.account()
 
     @decorators.widget_changer
     def register_2(self) -> None:

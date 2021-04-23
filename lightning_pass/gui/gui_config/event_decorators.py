@@ -2,10 +2,7 @@
 from __future__ import annotations
 
 import functools
-import re
-from typing import Any, Callable, Mapping, NewType, TypeVar, overload
-
-from lightning_pass.util import regex
+from typing import Any, Callable, NewType, TypeVar, overload
 
 _F = TypeVar("_F", bound=Callable[..., Any])
 _Condition = NewType("_Condition", Callable[[str], bool])
@@ -70,7 +67,7 @@ def _base_decorator(
         """
 
         @functools.wraps(func)
-        def wrapper(*args: _EventArgs, **kwargs: Mapping) -> _F | None:
+        def wrapper(*args: _EventArgs, **kwargs: dict) -> _F | None:
             """Wrap the original function.
 
             :param args: Positional arguments, first one should be the class attribute which contains
@@ -81,7 +78,9 @@ def _base_decorator(
 
             """
             self = args[0]
-            if _condition_object(obj=getattr(self, _base_obj) if _base_obj else self):
+            if _condition_object(
+                obj=getattr(self, _base_obj) if _base_obj else self.parent.events,
+            ):
                 return _func_executor(func, *args, **kwargs)
 
             getattr(self.parent.ui.message_boxes, _message_box)(
@@ -97,7 +96,7 @@ def _base_decorator(
     return decorator
 
 
-def _func_executor(func: Callable, *args: _EventArgs, **kwargs: Mapping) -> None:
+def _func_executor(func: Callable, *args: _EventArgs, **kwargs: dict) -> None:
     """Simple function execution wrapper.
 
     :param func: The function to execute
@@ -138,7 +137,7 @@ def widget_changer(func: _F) -> _F:
     """
 
     @functools.wraps(func)
-    def wrapper(*args: _EventArgs, **kwargs: Mapping) -> _F | None:
+    def wrapper(*args: _EventArgs, **kwargs: dict) -> _F | None:
         """Wrap the original function.
 
         :param args: Positional arguments, first one 'should' be the ``Events`` instance
@@ -148,10 +147,7 @@ def widget_changer(func: _F) -> _F:
 
         """
         self = args[0]
-        if (
-            not self.widget_util.current_widget
-            == re.search(regex.EVENT_SEARCH, func.__name__)[0]
-        ):
+        if not self.widget_util.current_widget == func.__name__:
             try:
                 return func(*args, **kwargs)
             except TypeError:

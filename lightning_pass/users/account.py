@@ -15,10 +15,8 @@ from typing import (
     Union,
 )
 
-import lightning_pass.users.password_hashing as pwd_hashing
-import lightning_pass.users.vaults as vaults
-import lightning_pass.util.credentials as credentials
-import lightning_pass.util.database as database
+from lightning_pass.users import password_hashing, vaults
+from lightning_pass.util import credentials, database
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
     EmailAlreadyExists,
@@ -79,7 +77,7 @@ class Account:
 
     credentials = credentials
     database = database
-    pwd_hashing = pwd_hashing
+    pwd_hashing = password_hashing
     vaults = vaults
 
     username_validator: _V = UsernameValidator

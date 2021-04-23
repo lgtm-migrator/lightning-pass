@@ -15,7 +15,7 @@ from typing import (
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-import lightning_pass.gui.mouse_randomness as mouse_randomness
+from lightning_pass.gui import mouse_randomness
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow, QMenu, QWidget

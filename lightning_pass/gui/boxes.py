@@ -212,7 +212,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.main.forgot_password},
+            {"&Yes": self.events.home.forgot_password},
         )
 
         box = self._yes_no_box(event_handler, "Yes")
@@ -279,7 +279,7 @@ contain at least one special character."""
         )
 
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.main.login}),
+            event_handler_factory({"&Yes": self.events.home.login}),
         )
         box(
             parent_lbl,
@@ -295,7 +295,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.main.forgot_password},
+            {"&Yes": self.events.home.forgot_password},
         )
 
         box = self._yes_no_box(event_handler, "No")
@@ -326,8 +326,8 @@ contain at least one special character."""
         """
         event_handler = event_handler_factory(
             {
-                "&Yes": self.events.main.login,
-                "&No": self.events.main.register_2,
+                "&Yes": self.events.home.login,
+                "&No": self.events.home.register_2,
             },
         )
 
@@ -362,7 +362,7 @@ contain at least one special character."""
 
         """
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.main.reset_token}),
+            event_handler_factory({"&Yes": self.events.home.reset_token}),
             default_btn="Yes",
         )
         box(

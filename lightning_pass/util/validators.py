@@ -6,8 +6,7 @@ from typing import Optional, Union
 import bcrypt
 from validator_collection import checkers
 
-import lightning_pass.util.credentials as credentials
-from lightning_pass.util import regex
+from lightning_pass.util import credentials, regex
 from lightning_pass.util.exceptions import ValidationFailure
 
 

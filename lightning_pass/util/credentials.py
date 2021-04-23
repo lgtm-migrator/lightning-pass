@@ -8,8 +8,8 @@ from typing import NamedTuple, Optional, Union
 import validator_collection
 import yagmail
 
-import lightning_pass.util.database as database
 from lightning_pass.settings import PFP_FOLDER, Credentials
+from lightning_pass.util import database
 
 
 def _get_user_id(column: str, value: str) -> Union[int, bool]:

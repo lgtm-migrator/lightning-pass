@@ -5,7 +5,6 @@ import logging
 import sys
 from typing import TYPE_CHECKING
 
-import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from lightning_pass.gui import boxes, events
@@ -15,7 +14,7 @@ from lightning_pass.gui.static.qt_designer.output import (
     splash_screen,
     vault_widget,
 )
-from lightning_pass.settings import LOG, TRAY_ICON
+from lightning_pass.settings import LOG, TRAY_ICON, dark_stylesheet, light_stylesheet
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QApplication
@@ -88,7 +87,7 @@ class SplashScreen(QtWidgets.QWidget):
         self.parent = parent
 
         self.widget = QtWidgets.QWidget()
-        self.widget.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
+        self.widget.setStyleSheet(dark_stylesheet())
         self.widget.setWindowFlag(QtCore.Qt.FramelessWindowHint)
 
         self.ui = splash_screen.Ui_loading_widget()
@@ -138,6 +137,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
         super().__init__(parent=parent)
 
         self.main_win = QtWidgets.QMainWindow()
+
         self.ui = main.Ui_lightning_pass()
         self.ui.setupUi(self.main_win)
 
@@ -149,6 +149,9 @@ class LightningPassWindow(QtWidgets.QMainWindow):
 
         self.ui.message_boxes = boxes.MessageBoxes(self)
         self.ui.input_dialogs = boxes.InputDialogs(self)
+
+        self.light_stylesheet = light_stylesheet()
+        self.dark_stylesheet = dark_stylesheet()
 
         self.extras()
 
@@ -172,12 +175,12 @@ class LightningPassWindow(QtWidgets.QMainWindow):
     def extras(self) -> None:
         """Additional setup for the application."""
         self.main_win.setWindowIcon(QtGui.QIcon(str(TRAY_ICON)))
-        self.ui.action_dark.trigger()  # Dark mode is the default theme.
-        self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
+        self.ui.action_dark.trigger()  # dark mode is the default theme
         self.ui.generate_pass_p2_prgrs_bar.setFormat("Progress - %p%")
-        self.ui.menu_platforms.setEnabled(False)
         self.events.widget_util.clear_vault_stacked_widget()
+        self.ui.menu_platforms.setEnabled(False)
+        self.ui.stacked_widget.setCurrentWidget(self.ui.home)
 
     def center(self) -> None:
         """Center main window."""

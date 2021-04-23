@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import dotenv
+import qdarkstyle
 
 from lightning_pass.util import database
 
@@ -21,11 +22,19 @@ def static_folder() -> Path:
     return parent_folder() / "gui/static"
 
 
-LIGHT_STYLESHEET = static_folder() / "light.qss"
-DARK_STYLESHEET = static_folder() / "dark.qss"
 TRAY_ICON = static_folder() / "favicon.ico"
 PFP_FOLDER = parent_folder() / "users/profile_pictures"
 LOG = parent_folder().parent / "misc/logs.log"
+
+
+def light_stylesheet() -> str:
+    """Return the stylesheet to be associated with light mode."""
+    return ""
+
+
+def dark_stylesheet() -> str:
+    """Return the stylesheet to be associated with dark mode."""
+    return qdarkstyle.load_stylesheet(qt_api="PyQt5")
 
 
 dotenv.load_dotenv()
@@ -113,15 +122,3 @@ with database.database_manager() as db:
     db.execute(_CREDENTIALS_DDL)
     db.execute(_TOKENS_DDL)
     db.execute(_VAULTS_DDL)
-
-
-__all__ = [
-    "DARK_STYLESHEET",
-    "Credentials",
-    "LIGHT_STYLESHEET",
-    "LOG",
-    "PFP_FOLDER",
-    "TRAY_ICON",
-    "parent_folder",
-    "static_folder",
-]

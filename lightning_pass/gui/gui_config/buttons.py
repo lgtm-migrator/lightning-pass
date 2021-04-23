@@ -4,15 +4,16 @@ Used for connecting each button on the GUI to various events or lambdas.
 
 """
 import webbrowser
-from typing import Any, Callable, NamedTuple, Optional, Union
+from typing import Callable, NamedTuple, Optional, Union
 
 import clipboard
-import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
+
+from lightning_pass.util import regex
 
 
 class Clickable(NamedTuple):
-    """Store data on how to connect a clickable widget (``pushButton`` or ``QAction``)."""
+    """Store data on how to connect a clickable widget (``QPushButton`` or ``QAction``)."""
 
     widget: str
     event_type: str
@@ -20,7 +21,7 @@ class Clickable(NamedTuple):
 
 
 class VaultToolButton(NamedTuple):
-    """Store information about connecting a ``toolButton`` in the vault."""
+    """Store information about connecting a ``QToolButton`` in the vault."""
 
     widget: str
     item: str
@@ -35,8 +36,8 @@ class Buttons:
     def __init__(
         self,
         parent: QtWidgets.QMainWindow,
-        *args: Any,
-        **kwargs: Any,
+        *args: tuple,
+        **kwargs: dict,
     ) -> None:
         """Buttons constructor.
 
@@ -150,12 +151,10 @@ class Buttons:
             )
 
         self.parent.ui.action_light.triggered.connect(
-            lambda: self.parent.main_win.setStyleSheet(""),
+            lambda: self.parent.main_win.setStyleSheet(self.parent.light_stylesheet),
         )
-        self.parent.ui.action_light.triggered.connect(
-            lambda: self.parent.main_win.setStyleSheet(
-                qdarkstyle.load_stylesheet(qt_api="pyqt5"),
-            ),
+        self.parent.ui.action_dark.triggered.connect(
+            lambda: self.parent.main_win.setStyleSheet(self.parent.dark_stylesheet),
         )
 
     def data_validation(self) -> None:
@@ -177,7 +176,7 @@ class Buttons:
 
         for line in lines_to_validate:
             getattr(self.parent.ui, line).setValidator(
-                QtGui.QRegExpValidator(QtCore.QRegExp(r"[^\s ]+")),
+                QtGui.QRegExpValidator(QtCore.QRegExp(regex.NON_WHITESPACE.pattern)),
             )
 
     def setup_vault_buttons(self):
