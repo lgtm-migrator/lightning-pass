@@ -94,7 +94,7 @@ class WidgetUtil:
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}({self.parent!r})"
 
-    @functools.lru_cache(maxsize=None)
+    @functools.cache
     def font(self, family: str, size: int):
         """Return the specified font and memoize it.
 

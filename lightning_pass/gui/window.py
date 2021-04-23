@@ -71,7 +71,7 @@ def setup_tray_icon(app: QApplication, main_window: LightningPassWindow) -> None
     quit_action.triggered.connect(quit)
 
     generate_option = menu.addAction("Generate a password")
-    generate_option.triggered.connect(main_window.events.generate_pass_event)
+    generate_option.triggered.connect(main_window.events.generator.generate_pass)
 
     tray_icon.setContextMenu(menu)
     tray_icon.show()
@@ -172,7 +172,7 @@ class LightningPassWindow(QtWidgets.QMainWindow):
     def extras(self) -> None:
         """Additional setup for the application."""
         self.main_win.setWindowIcon(QtGui.QIcon(str(TRAY_ICON)))
-        self.events.toggle_stylesheet_dark()  # Dark mode is the default theme.
+        self.ui.action_dark.trigger()  # Dark mode is the default theme.
         self.ui.stacked_widget.setCurrentWidget(self.ui.home)
         self.center()
         self.ui.generate_pass_p2_prgrs_bar.setFormat("Progress - %p%")

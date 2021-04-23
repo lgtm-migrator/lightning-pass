@@ -212,7 +212,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.forgot_password_event},
+            {"&Yes": self.events.main.forgot_password},
         )
 
         box = self._yes_no_box(event_handler, "Yes")
@@ -279,7 +279,7 @@ contain at least one special character."""
         )
 
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.login_event}),
+            event_handler_factory({"&Yes": self.events.main.login}),
         )
         box(
             parent_lbl,
@@ -295,7 +295,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.forgot_password_event},
+            {"&Yes": self.events.main.forgot_password},
         )
 
         box = self._yes_no_box(event_handler, "No")
@@ -325,7 +325,10 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.login_event, "&No": self.events.register_2_event},
+            {
+                "&Yes": self.events.main.login,
+                "&No": self.events.main.register_2,
+            },
         )
 
         box = self._yes_no_box(event_handler, "Yes")
@@ -359,7 +362,7 @@ contain at least one special character."""
 
         """
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.reset_token_event}),
+            event_handler_factory({"&Yes": self.events.main.reset_token}),
             default_btn="Yes",
         )
         box(
@@ -376,7 +379,7 @@ contain at least one special character."""
 
         """
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.generate_pass_event}),
+            event_handler_factory({"&Yes": self.events.generator.generate_pass}),
         )
         box(
             parent_lbl,
@@ -397,7 +400,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.master_password_event},
+            {"&Yes": self.events.account.master_password},
         )
 
         text = (
@@ -426,7 +429,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.master_password_dialog_event},
+            {"&Yes": self.events.account.master_password_dialog},
         )
 
         text = (
@@ -452,8 +455,8 @@ contain at least one special character."""
         box = self._yes_no_box(
             event_handler_factory(
                 {
-                    "&Yes": lambda: self.events.vault_event(switch=True),
-                    "&No": lambda: self.events.vault_event(switch=False),
+                    "&Yes": lambda: self.events.vault.main(switch=True),
+                    "&No": lambda: self.events.vault.main(switch=False),
                 },
             ),
             default_btn="Yes",

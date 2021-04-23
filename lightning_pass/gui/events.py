@@ -2,11 +2,11 @@
 from __future__ import annotations
 
 import contextlib
+import functools
 import itertools as it
 import pathlib
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
-import qdarkstyle
 from PyQt5 import QtGui, QtWidgets
 
 import lightning_pass.gui.gui_config.event_decorators as decorators
@@ -46,36 +46,68 @@ def _ord(day: int) -> str:
 
 
 class Events:
-    """Used to provide logic to specific event functions."""
-
-    __current_token: str
+    """Class with all of the event classes."""
 
     def __init__(self, parent: QMainWindow) -> None:
         """Construct the class."""
-        super().__init__()
-        self.widget_util = WidgetUtil(parent)
         self.parent = parent
-
+        self.widget_util = WidgetUtil(parent)
         self.current_user = Account(0)
 
     def __repr__(self) -> str:
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}({self.parent!r})"
 
+    @property
+    @functools.cache
+    def home(self) -> HomeEvents:
+        """Return the main event class."""
+        return HomeEvents(self.parent)
+
+    @property
+    @functools.cache
+    def account(self) -> AccountEvents:
+        """Return the account event class."""
+        return AccountEvents(self.parent)
+
+    @property
+    @functools.cache
+    def generator(self) -> GeneratorEvents:
+        """Return the generator event class."""
+        return GeneratorEvents(self.parent)
+
+    @property
+    @functools.cache
+    def vault(self) -> VaultEvents:
+        """Return the vault event class."""
+        return VaultEvents(self.parent)
+
+
+class HomeEvents(Events):
+    """Provide logic to events connected to basic actions."""
+
+    __current_token: str
+
+    def __init__(self, parent: QMainWindow) -> None:
+        """Construct the class."""
+        super().__init__(parent)
+
     @decorators.widget_changer
-    def home_event(self) -> None:
+    def home(self) -> None:
         """Switch to home widget."""
         self.widget_util.set_current_widget("home")
 
+    main = home
+
     @decorators.widget_changer
-    def login_event(self) -> None:
+    def login(self) -> None:
         """Switch to login widget and reset previous values."""
         self.widget_util.set_current_widget("login")
 
-    def login_user_event(self) -> None:
+    def login_user(self) -> None:
         """Try to login a user. If successful, show the account widget."""
         # need to clean up data about previous users' vault platforms
-        self.logout_event(home=False)
+        self.parent.events.account.logout_event(home=False)
         try:
             self.current_user = Account.login(
                 self.parent.ui.log_username_line_edit.text(),
@@ -84,14 +116,14 @@ class Events:
         except AccountException:
             self.widget_util.message_box("invalid_login_box", "Login")
         else:
-            self.account_event()
+            self.parent.events.account.account_event()
 
     @decorators.widget_changer
-    def register_2_event(self) -> None:
+    def register_2(self) -> None:
         """Switch to register widget and reset previous values."""
         self.widget_util.set_current_widget("register_2")
 
-    def register_user_event(self) -> None:
+    def register_user(self) -> None:
         """Try to register a user. If successful, show login widget."""
         try:
             self.current_user = Account.register(
@@ -116,16 +148,16 @@ class Events:
             self.widget_util.message_box("account_creation_box")
 
     @decorators.widget_changer
-    def forgot_password_event(self) -> None:
+    def forgot_password(self) -> None:
         """Switch to forgot password widget and reset previous email."""
         self.widget_util.set_current_widget("forgot_password")
 
     @decorators.widget_changer
-    def reset_token_event(self) -> None:
+    def reset_token(self) -> None:
         """Switch to reset token page and reset previous values."""
         self.widget_util.set_current_widget("reset_token")
 
-    def send_token_event(self) -> None:
+    def send_token(self) -> None:
         """Send token and switch to token page."""
         try:
             Account.email_validator.pattern(
@@ -147,22 +179,22 @@ class Events:
 
             self.widget_util.message_box("reset_email_sent_box", "Forgot Password")
 
-    def submit_reset_token_event(self) -> None:
+    def submit_reset_token(self) -> None:
         """If submitted token is correct, proceed to password change widget."""
         if Account.credentials.validate_token(
             token := self.parent.ui.reset_token_token_line.text(),
         ):
             self.__current_token = token
-            self.reset_password_event()
+            self.reset_password()
         else:
             self.widget_util.message_box("invalid_token_box", "Reset Password")
 
     @decorators.widget_changer
-    def reset_password_event(self) -> None:
+    def reset_password(self) -> None:
         """Switch to the reset password widget."""
         self.widget_util.set_current_widget("reset_password")
 
-    def reset_password_submit_event(self) -> None:
+    def reset_password_submit(self) -> None:
         """Reset user's password."""
         try:
             # everything after the token hex is the user's database primary key
@@ -183,14 +215,44 @@ class Events:
             )
             del self.__current_token
 
+
+class AccountEvents(Events):
+    """Provide logic to events connected to account."""
+
+    def __init__(self, parent: QMainWindow) -> None:
+        """Construct the class."""
+        super().__init__(parent)
+
+    @decorators.widget_changer
+    @decorators.login_required(page_to_access="account")
+    def account(self) -> None:
+        """Switch to account widget and set current user values."""
+        self.parent.ui.account_username_line.setText(self.current_user.username)
+        self.parent.ui.account_email_line.setText(self.current_user.email)
+
+        date = self.current_user.current_login_date
+        try:
+            text = f"Last login date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
+        except TypeError:
+            text = "Last login date: None"
+        self.parent.ui.account_last_log_date.setText(text)
+
+        self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
+            QtGui.QPixmap(self.current_user.profile_picture_path),
+        )
+
+        self.widget_util.set_current_widget("account")
+
+    main = account
+
     @decorators.widget_changer
     @decorators.login_required(page_to_access="change password")
-    def change_password_event(self) -> None:
+    def change_password(self) -> None:
         """Change password for current user."""
         self.widget_util.set_current_widget("change_password")
 
     @decorators.login_required(page_to_access="change password")
-    def submit_change_password_event(self) -> None:
+    def submit_change_password(self) -> None:
         """Change user's password.
 
         Show message box if something goes wrong, otherwise move to login page.
@@ -223,76 +285,9 @@ class Events:
                 "Change Password",
                 "password",
             )
-            self.change_password_event()
+            self.change_password()
 
-    @decorators.widget_changer
-    def generate_pass_event(self) -> None:
-        """Switch to first password generation widget and reset previous password options."""
-        self.widget_util.set_current_widget("generate_pass")
-
-    @decorators.widget_changer
-    def generate_pass_phase2_event(self) -> None:
-        """Switch to the second password generation widget and reset previous values.
-
-        If no password options were checked, shows message box letting the user know about it.
-
-        """
-        if not self.parent.ui.generate_pass_p2_tracking_lbl.hasMouseTracking():
-            self.widget_util.mouse_randomness.MouseTracker.setup_tracker(
-                self.parent.ui.generate_pass_p2_tracking_lbl,
-                self.parent.on_position_changed,
-            )
-
-        if not any(
-            # exclude length
-            val
-            for val in self.widget_util.password_options
-            if isinstance(val, bool)
-        ):
-            self.widget_util.message_box("no_options_generate_box", "Generator")
-        else:
-            self.parent.gen = self.widget_util.get_generator()
-            self.parent.pass_progress = 0
-            self.parent.ui.generate_pass_p2_prgrs_bar.setValue(
-                self.parent.pass_progress,
-            )
-
-            self.widget_util.set_current_widget("generate_pass_phase2")
-
-    def generate_pass_again_event(self) -> None:
-        """Re-instantiate a new generator object with the same options.
-
-        Reset previous generation values.
-
-        """
-        self.parent.pass_progress = 0
-        self.parent.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
-        self.parent.ui.generate_pass_p2_final_pass_line.clear()
-        self.parent.gen = self.widget_util.mouse_randomness.PwdGenerator(
-            self.parent.gen.options,
-        )
-
-    @decorators.widget_changer
-    @decorators.login_required(page_to_access="account")
-    def account_event(self) -> None:
-        """Switch to account widget and set current user values."""
-        self.parent.ui.account_username_line.setText(self.current_user.username)
-        self.parent.ui.account_email_line.setText(self.current_user.email)
-
-        date = self.current_user.current_login_date
-        try:
-            text = f"Last login date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
-        except TypeError:
-            text = "Last login date: None"
-        self.parent.ui.account_last_log_date.setText(text)
-
-        self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
-            QtGui.QPixmap(self.current_user.profile_picture_path),
-        )
-
-        self.widget_util.set_current_widget("account")
-
-    def change_pfp_event(self) -> None:
+    def change_pfp(self) -> None:
         """Change profile picture of current user."""
         # dump used file filter
         fname, _ = QtWidgets.QFileDialog.getOpenFileName(
@@ -311,7 +306,7 @@ class Events:
                 QtGui.QPixmap(self.current_user.profile_picture_path),
             )
 
-    def logout_event(self, _=None, home: bool = True) -> None:
+    def logout(self, _=None, home: bool = True) -> None:
         """Logout current user.
 
         :param _: Dump the bool value passed in by the qt connection
@@ -323,9 +318,9 @@ class Events:
         with contextlib.suppress(AttributeError):
             delattr(self, "current_user")
         if home:
-            self.home_event()
+            self.parent.events.main.home()
 
-    def edit_details_event(self) -> None:
+    def edit_details(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
         if not self.current_user.username == (
             name := self.parent.ui.account_username_line.text()
@@ -361,7 +356,7 @@ class Events:
 
     @decorators.widget_changer
     @decorators.login_required(page_to_access="master password")
-    def master_password_event(self) -> None:
+    def master_password(self) -> None:
         """Switch to master password widget.
 
         If master password already exists, user is required to unlock vault to access this page.
@@ -380,7 +375,7 @@ class Events:
                 page="master password",
             )
 
-    def master_password_submit_event(self) -> None:
+    def master_password_submit(self) -> None:
         """Try to change or add a master password to a user account.
 
         :raises AccountDoesNotExist: If the normal password doesn't match
@@ -425,11 +420,11 @@ class Events:
                 "Master Password",
                 detail="Master password",
             )
-            self.account_event()
+            self.account()
 
     @decorators.login_required
     @decorators.master_password_required
-    def master_password_dialog_event(self) -> None:
+    def master_password_dialog(self) -> None:
         """Show an input dialog asking the user to enter their current master password.
 
         Either locks or unlocks the vault depending on the result.
@@ -451,10 +446,75 @@ class Events:
             self.current_user._master_key_str = password
             self.widget_util.message_box("vault_unlocked_box")
 
+
+class GeneratorEvents(Events):
+    """Provide logic to events connected to password generation."""
+
+    def __init__(self, parent: QMainWindow) -> None:
+        """Construct the class."""
+        super().__init__(parent)
+
+    @decorators.widget_changer
+    def generate_pass(self) -> None:
+        """Switch to first password generation widget and reset previous password options."""
+        self.widget_util.set_current_widget("generate_pass")
+
+    main = generate_pass
+
+    @decorators.widget_changer
+    def generate_pass_phase2(self) -> None:
+        """Switch to the second password generation widget and reset previous values.
+
+        If no password options were checked, shows message box letting the user know about it.
+
+        """
+        if not self.parent.ui.generate_pass_p2_tracking_lbl.hasMouseTracking():
+            self.widget_util.mouse_randomness.MouseTracker.setup_tracker(
+                self.parent.ui.generate_pass_p2_tracking_lbl,
+                self.parent.on_position_changed,
+            )
+
+        if not any(
+            # exclude length
+            val
+            for val in self.widget_util.password_options
+            if isinstance(val, bool)
+        ):
+            self.widget_util.message_box("no_options_generate_box", "Generator")
+        else:
+            self.parent.gen = self.widget_util.get_generator()
+            self.parent.pass_progress = 0
+            self.parent.ui.generate_pass_p2_prgrs_bar.setValue(
+                self.parent.pass_progress,
+            )
+
+            self.widget_util.set_current_widget("generate_pass_phase2")
+
+    def generate_pass_again(self) -> None:
+        """Re-instantiate a new generator object with the same options.
+
+        Reset previous generation values.
+
+        """
+        self.parent.pass_progress = 0
+        self.parent.ui.generate_pass_p2_prgrs_bar.setValue(self.parent.pass_progress)
+        self.parent.ui.generate_pass_p2_final_pass_line.clear()
+        self.parent.gen = self.widget_util.mouse_randomness.PwdGenerator(
+            self.parent.gen.options,
+        )
+
+
+class VaultEvents(Events):
+    """Provide logic to events connected to vault."""
+
+    def __init__(self, parent: QMainWindow) -> None:
+        """Construct the class."""
+        super().__init__(parent)
+
     @decorators.login_required(page_to_access="vault")
     @decorators.master_password_required(page_to_access="vault")
     @decorators.vault_unlock_required(page_to_access="vault")
-    def vault_event(
+    def vault(
         self,
         _=None,
         switch: bool = True,
@@ -496,7 +556,9 @@ class Events:
         if previous_index:
             self.parent.ui.vault_stacked_widget.setCurrentIndex(previous_index)
 
-    def add_vault_page_event(self) -> None:
+    main = vault
+
+    def add_vault_page(self) -> None:
         """Add a new vault page.
 
         Add new page if empty one was not found,
@@ -515,7 +577,7 @@ class Events:
             # empty one found -> switch to it
             self.widget_util.vault_stacked_widget_index = high + 1
 
-    def remove_vault_page_event(self) -> None:
+    def remove_vault_page(self) -> None:
         """Remove the current vault page."""
         if (
             self.widget_util.number_of_real_vault_pages
@@ -544,16 +606,16 @@ class Events:
                 platform,
             )
 
-            self.vault_event()
+            self.vault()
 
-    def lock_vault_event(self) -> None:
+    def lock_vault(self) -> None:
         """Lock the vault of the current user."""
         self.current_user.vault_unlocked = False
         self.widget_util.clear_vault_stacked_widget()
         self.widget_util.clear_platform_actions()
-        self.account_event()
+        self.parent.events.account.account()
 
-    def update_vault_page_event(self) -> None:
+    def update_vault_page(self) -> None:
         """Add a new vault tied to the current user.
 
         Checks if the vault previously existed and stores it.
@@ -625,7 +687,7 @@ class Events:
 
                 self.widget_util.setup_vault_page(new_vault)
 
-    def change_vault_page_event(self, index: int, calculate: bool = False):
+    def change_vault_page(self, index: int, calculate: bool = False):
         """Handle changes on the vault stacked widget.
 
         :param index: The index to access
@@ -639,18 +701,6 @@ class Events:
 
         if not self.widget_util.current_widget == (v := "vault"):
             self.widget_util.set_current_widget(v)
-
-    def toggle_stylesheet_light(self, *args: Any) -> None:
-        """Change stylesheet to light mode."""
-        if args:
-            ...
-        self.parent.main_win.setStyleSheet("")
-
-    def toggle_stylesheet_dark(self, *args: Any) -> None:
-        """Change stylesheet to dark mode."""
-        if args:
-            ...
-        self.parent.main_win.setStyleSheet(qdarkstyle.load_stylesheet(qt_api="pyqt5"))
 
 
 __all__ = [

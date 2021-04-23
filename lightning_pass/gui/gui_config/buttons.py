@@ -4,17 +4,19 @@ Used for connecting each button on the GUI to various events or lambdas.
 
 """
 import webbrowser
-from typing import Any, NamedTuple, Optional
+from typing import Any, Callable, NamedTuple, Optional, Union
 
 import clipboard
+import qdarkstyle
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
 class Clickable(NamedTuple):
-    """Store data on how to connect a clickable widget (``pushButton`` or ``QAction``)>."""
+    """Store data on how to connect a clickable widget (``pushButton`` or ``QAction``)."""
 
     widget: str
-    action: str
+    event_type: str
+    action: Union[str, Callable]
 
 
 class VaultToolButton(NamedTuple):
@@ -58,54 +60,62 @@ class Buttons:
         """Connect all buttons on all widgets"""
         buttons = (
             # home
-            Clickable("home_login_btn", "login_event"),
-            Clickable("home_register_btn", "register_2_event"),
-            Clickable("home_generate_password_btn", "generate_pass_event"),
+            Clickable("home_login_btn", "home", "login"),
+            Clickable("home_register_btn", "home", "register_2"),
+            Clickable("home_generate_password_btn", "generator", "generate_pass"),
             # login
-            Clickable("log_main_btn", "home_event"),
-            Clickable("log_forgot_pass_btn", "forgot_password_event"),
-            Clickable("log_login_btn_2", "login_user_event"),
+            Clickable("log_main_btn", "home", "home"),
+            Clickable("log_forgot_pass_btn", "home", "forgot_password"),
+            Clickable("log_login_btn_2", "home", "login_user"),
             # register
-            Clickable("reg_main_btn", "home_event"),
-            Clickable("reg_register_btn", "register_user_event"),
+            Clickable("reg_main_btn", "home", "home"),
+            Clickable("reg_register_btn", "home", "register_user"),
             # forgot_password
-            Clickable("forgot_pass_main_menu_btn", "home_event"),
-            Clickable("forgot_pass_reset_btn", "send_token_event"),
+            Clickable("forgot_pass_main_menu_btn", "home", "home"),
+            Clickable("forgot_pass_reset_btn", "home", "send_token"),
             # reset_token
-            Clickable("reset_token_main_btn", "home_event"),
-            Clickable("reset_token_submit_btn", "submit_reset_token_event"),
+            Clickable("reset_token_main_btn", "home", "home"),
+            Clickable("reset_token_submit_btn", "home", "submit_reset_token"),
             # reset_password
-            Clickable("reset_password_confirm_btn", "reset_password_submit_event"),
-            Clickable("reset_password_main_btn", "home_event"),
+            Clickable("reset_password_confirm_btn", "home", "reset_password_submit"),
+            Clickable("reset_password_main_btn", "home", "home"),
             # change_password
-            Clickable("change_password_main_btn", "home_event"),
-            Clickable("change_password_confirm_btn", "submit_change_password_event"),
+            Clickable("change_password_main_btn", "home", "home"),
+            Clickable(
+                "change_password_confirm_btn",
+                "account",
+                "submit_change_password",
+            ),
             # generate_pass
-            Clickable("generate_pass_generate_btn", "generate_pass_phase2_event"),
-            Clickable("generate_pass_main_menu_btn", "home_event"),
+            Clickable(
+                "generate_pass_generate_btn",
+                "generator",
+                "generate_pass_phase2",
+            ),
+            Clickable("generate_pass_main_menu_btn", "home", "home"),
             # generate_pass_phase2
-            Clickable("generate_pass_p2_main_btn", "home_event"),
-            Clickable("generate_pass_p2_reset_btn", "generate_pass_again_event"),
+            Clickable("generate_pass_p2_main_btn", "home", "home"),
+            Clickable("generate_pass_p2_reset_btn", "generator", "generate_pass_again"),
             # account
-            Clickable("account_main_menu_btn", "home_event"),
-            Clickable("account_change_pfp_btn", "change_pfp_event"),
-            Clickable("account_logout_btn", "logout_event"),
-            Clickable("account_change_pass_btn", "change_password_event"),
-            Clickable("account_edit_details_btn", "edit_details_event"),
-            Clickable("account_vault_btn", "vault_event"),
+            Clickable("account_main_menu_btn", "home", "home"),
+            Clickable("account_change_pfp_btn", "account", "change_pfp"),
+            Clickable("account_logout_btn", "account", "logout"),
+            Clickable("account_change_pass_btn", "account", "change_password"),
+            Clickable("account_edit_details_btn", "account", "edit_details"),
+            Clickable("account_vault_btn", "vault", "vault"),
             # vault
-            Clickable("vault_add_page_btn", "add_vault_page_event"),
-            Clickable("vault_remove_page_btn", "remove_vault_page_event"),
-            Clickable("vault_menu_btn", "home_event"),
-            Clickable("vault_lock_btn", "lock_vault_event"),
+            Clickable("vault_add_page_btn", "vault", "add_vault_page"),
+            Clickable("vault_remove_page_btn", "vault", "remove_vault_page"),
+            Clickable("vault_menu_btn", "home", "home"),
+            Clickable("vault_lock_btn", "vault", "lock_vault"),
             # master_password
-            Clickable("master_pass_menu_btn", "home_event"),
-            Clickable("master_pass_save_btn", "master_password_submit_event"),
+            Clickable("master_pass_menu_btn", "home", "home"),
+            Clickable("master_pass_save_btn", "account", "master_password_submit"),
         )
 
         for button in buttons:
             getattr(self.parent.ui, button.widget).clicked.connect(
-                getattr(self.parent.events, button.action),
+                getattr(getattr(self.parent.events, button.event_type), button.action),
             )
 
         # miscellaneous
@@ -119,43 +129,34 @@ class Buttons:
         """Connect all menu bar actions."""
         menu_bar = (
             # menu_general
-            Clickable("action_main_menu", "home_event"),
+            Clickable("action_main_menu", "home", "home"),
             # menu_password
-            Clickable("action_generate", "generate_pass_event"),
+            Clickable("action_generate", "generator", "generate_pass"),
             # menu_users
-            Clickable("action_login", "login_event"),
-            Clickable("action_register", "register_2_event"),
-            Clickable("action_forgot_password", "forgot_password_event"),
-            Clickable("action_reset_token", "reset_token_event"),
+            Clickable("action_login", "home", "login"),
+            Clickable("action_register", "home", "register_2"),
+            Clickable("action_forgot_password", "home", "forgot_password"),
+            Clickable("action_reset_token", "home", "reset_token"),
             # menu_account
-            Clickable("action_profile", "account_event"),
-            Clickable("action_change_password", "change_password_event"),
-            Clickable("action_vault", "vault_event"),
-            Clickable("action_master_password", "master_password_event"),
+            Clickable("action_profile", "account", "account"),
+            Clickable("action_change_password", "account", "change_password"),
+            Clickable("action_vault", "vault", "vault"),
+            Clickable("action_master_password", "account", "master_password"),
         )
 
         for button in menu_bar:
             getattr(self.parent.ui, button.widget).triggered.connect(
-                getattr(self.parent.events, button.action),
+                getattr(getattr(self.parent.events, button.event_type), button.action),
             )
 
-        menu_theme = (
-            # menu_general > themes
-            Clickable(
-                "action_light",
-                getattr(self.parent.events, "toggle_stylesheet_light"),
-            ),
-            Clickable(
-                "action_dark",
-                getattr(self.parent.events, "toggle_stylesheet_dark"),
+        self.parent.ui.action_light.triggered.connect(
+            lambda: self.parent.main_win.setStyleSheet(""),
+        )
+        self.parent.ui.action_light.triggered.connect(
+            lambda: self.parent.main_win.setStyleSheet(
+                qdarkstyle.load_stylesheet(qt_api="pyqt5"),
             ),
         )
-
-        for action in menu_theme:
-            getattr(self.parent.ui, action.widget).triggered.connect(
-                # since lambda has a default > dump the first bool passed in by the widget parent
-                lambda _, sheet=action.action: sheet(),
-            )
 
     def data_validation(self) -> None:
         """Disable whitespaces in some input fields."""
@@ -210,14 +211,14 @@ class Buttons:
             )
 
         parent.vault_update_btn.clicked.connect(
-            events.update_vault_page_event,
+            events.vault.update_vault_page,
         )
 
         parent.vault_forward_tool_btn.clicked.connect(
-            lambda: events.change_vault_page_event(1, calculate=True),
+            lambda: events.vault.change_vault_page(1, calculate=True),
         )
         parent.vault_backward_tool_btn.clicked.connect(
-            lambda: events.change_vault_page_event(-1, calculate=True),
+            lambda: events.vault.change_vault_page(-1, calculate=True),
         )
 
 
