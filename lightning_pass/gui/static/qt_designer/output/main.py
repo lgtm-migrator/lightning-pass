@@ -1225,7 +1225,7 @@ class Ui_lightning_pass(object):
         self.menu_bar.addAction(self.menu_platforms.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(3)
+        self.stacked_widget.setCurrentIndex(11)
         self.vault_stacked_widget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 

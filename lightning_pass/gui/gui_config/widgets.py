@@ -18,7 +18,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import lightning_pass.gui.mouse_randomness as mouse_randomness
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QAction, QMainWindow, QMenu, QWidget
+    from PyQt5.QtWidgets import QMainWindow, QMenu, QWidget
 
     from lightning_pass.gui.mouse_randomness import PasswordOptions, PwdGenerator
     from lightning_pass.users.vaults import Vault
@@ -95,11 +95,16 @@ class WidgetUtil:
         return f"{self.__class__.__qualname__}({self.parent!r})"
 
     @functools.lru_cache(maxsize=None)
-    def font(self):
-        """Return the font used for all widgets except titles."""
+    def font(self, family: str, size: int):
+        """Return the specified font and memoize it.
+
+        :param family: The font family
+        :param size: The font size
+
+        """
         font = QtGui.QFont()
-        for i in ("setFamily", "Segoe UI Light"), ("setPointSize", 10):
-            getattr(font, i[0])(i[1])
+        font.setFamily(family)
+        font.setPointSize(size)
         return font
 
     @property
@@ -199,10 +204,6 @@ class WidgetUtil:
         self.parent.ui.vault_stacked_widget.setFrameShape(QtWidgets.QFrame.NoFrame)
         self.parent.ui.vault_stacked_widget.setFrameShadow(QtWidgets.QFrame.Plain)
         self.parent.ui.vault_stacked_widget.setObjectName("vault_stacked_widget")
-        self.parent.ui.vault_dummy_page1 = QtWidgets.QWidget()
-        self.parent.ui.vault_dummy_page1.setEnabled(False)
-        self.parent.ui.vault_dummy_page1.setObjectName("vault_dummy_page1")
-        self.parent.ui.vault_stacked_widget.addWidget(self.parent.ui.vault_dummy_page1)
         self.parent.ui.gridLayout_12.addWidget(
             self.parent.ui.vault_stacked_widget,
             0,
@@ -228,7 +229,7 @@ class WidgetUtil:
                 QtWidgets.QMenu(self.parent.ui.menu_bar),
             )
             (menu := getattr(self.parent.ui, obj_name)).setTitle(title)
-            menu.setFont(self.font())
+            menu.setFont(self.font("Segoe UI Light", 10))
         return getattr(self.parent.ui, obj_name)
 
     def setup_action(
@@ -237,7 +238,7 @@ class WidgetUtil:
         text: str,
         event: Callable[[], None],
         menu: QMenu,
-    ) -> QAction:
+    ) -> None:
         """Setup a new ``QAction``.
 
         :param obj_name: Reference to the new object
@@ -249,13 +250,16 @@ class WidgetUtil:
 
         """
         obj_name = f"action_{obj_name}"
-        if not hasattr(self.parent.ui, obj_name):
+        try:
+            action = getattr(self.parent.ui, obj_name)
+        except AttributeError:
             setattr(self.parent.ui, obj_name, QtWidgets.QAction(self.parent.main_win))
             (action := getattr(self.parent.ui, obj_name)).setText(text)
-            action.setFont(self.font())
+            action.setFont(self.font("Segoe UI", 9))
             action.triggered.connect(event)
+
+        if obj_name not in menu.actions():
             menu.addAction(action)
-        return getattr(self.parent.ui, obj_name)
 
     @property
     def vault_stacked_widget_index(self) -> int:
@@ -264,12 +268,8 @@ class WidgetUtil:
 
     @vault_stacked_widget_index.setter
     def vault_stacked_widget_index(self, i) -> None:
-        """Set a new ``vault_stacked_widget_index``.
-
-        :raises ValueError: if there was an attempt to set wrong index
-
-        """
-        if 1 <= i <= self.parent.ui.vault_stacked_widget.count() + 1:
+        """Set a new index on the current vault_stacked_widget if new index is withing legal range."""
+        if 1 <= i <= (self.number_of_real_vault_pages + 1):
             self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
 
     @property
@@ -320,11 +320,7 @@ class WidgetUtil:
         self.setup_action(
             obj_name=page.platform_name,
             text=page.platform_name,
-            event=lambda: self.parent.events.change_vault_page_event(
-                # offset dummy page
-                page.vault_index
-                + 1,
-            ),
+            event=lambda: self.parent.events.change_vault_page_event(page.vault_index),
             menu=self.parent.ui.menu_platforms,
         )
 
@@ -345,8 +341,7 @@ class WidgetUtil:
                     for widget in children_objects
                     if isinstance(widget, QtWidgets.QLineEdit)
                 ),
-                # offset dummy page
-                self.vault_stacked_widget_index - 1,
+                self.vault_stacked_widget_index,
             ),
         )
 

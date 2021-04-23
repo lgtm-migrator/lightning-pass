@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import contextlib
+import itertools as it
 import pathlib
 from typing import TYPE_CHECKING, Any
 
@@ -308,7 +309,7 @@ class Events:
                 QtGui.QPixmap(self.current_user.profile_picture_path),
             )
 
-    def logout_event(self, home: bool = True) -> None:
+    def logout_event(self, _=None, home: bool = True) -> None:
         """Logout current user.
 
         :param home: Whether to redirect user to the home page after logging out.
@@ -451,20 +452,26 @@ class Events:
     @decorators.vault_unlock_required(page_to_access="vault")
     def vault_event(
         self,
+        _=None,
+        switch: bool = True,
         previous_index: int | None = None,
     ) -> None:
         """Switch to vault window.
 
+        :param switch: Whether to switch to the vault page or only set it up
         :param previous_index: The index of the window before rebuilding
 
         """
         self.widget_util.rebuild_vault_stacked_widget()
 
-        # can't refer to the widget_util property because actions might no be set up yet
-        if sum(1 for _ in self.current_user.vault_pages()) <= 0:
+        pages = self.current_user.vault_pages()
+
+        try:
+            page = next(pages)
+        except StopIteration:
             self.widget_util.setup_vault_widget()
         else:
-            for page in self.current_user.vault_pages():
+            for page in it.chain((page,), self.current_user.vault_pages()):
                 self.widget_util.setup_vault_widget(page)
 
         self.parent.ui.vault_username_lbl.setText(
@@ -478,7 +485,8 @@ class Events:
             text = "Last unlock date: None"
         self.parent.ui.vault_date_lbl.setText(text)
 
-        self.widget_util.set_current_widget("vault")
+        if switch:
+            self.widget_util.set_current_widget("vault")
 
         if previous_index:
             self.parent.ui.vault_stacked_widget.setCurrentIndex(previous_index)
@@ -486,12 +494,12 @@ class Events:
     def add_vault_page_event(self) -> None:
         """Add a new vault page.
 
-        Adds new page if empty one was not found,
-        switches to new and unused page if one like that exists.
+        Add new page if empty one was not found,
+        switch to new and unused page if one like that exists.
 
         """
-        if (high := len(self.parent.ui.menu_platforms.actions())) == (
-            count := self.parent.ui.vault_stacked_widget.count() - 1
+        if (high := self.widget_util.number_of_real_vault_pages) == (
+            count := (self.parent.ui.vault_stacked_widget.count() - 1)
         ):
             # empty one not found -> create new one
             self.widget_util.setup_vault_widget()
@@ -503,10 +511,10 @@ class Events:
     def remove_vault_page_event(self) -> None:
         """Remove the current vault page."""
         if (
-            pages := self.widget_util.number_of_real_vault_pages
+            self.widget_util.number_of_real_vault_pages
         ) < self.widget_util.vault_stacked_widget_index:
-            # user tried to remove a page which has not yet been submitted to the database ->
-            # just clear the fields
+            # user tried to remove a page which has not yet been submitted to the database
+            # -> just clear the fields
             self.widget_util.clear_current_vault_page()
             return
 
@@ -515,12 +523,23 @@ class Events:
             "Vault",
             platform,
         )
-        if text == "CONFIRM" and pages >= 1:
+        if text == "CONFIRM":
             self.current_user.vaults.delete_vault(
                 self.current_user.user_id,
-                self.widget_util.vault_stacked_widget_index - 1,
+                page := self.widget_util.vault_stacked_widget_index,
             )
+
+            for i in range(
+                page,
+                # end is not inclusive
+                self.parent.ui.vault_stacked_widget.count() + 1,
+            ):
+                self.parent.ui.vault_stacked_widget.removeWidget(
+                    self.parent.ui.vault_stacked_widget.widget(i),
+                )
+
             getattr(self.parent.ui, f"action_{platform}").deleteLater()
+
             self.widget_util.message_box(
                 "vault_page_deleted_box",
                 "Vault",
@@ -561,7 +580,7 @@ class Events:
                         self.current_user.encrypt_vault_password(
                             new_pass := self.widget_util.vault_widget_vault.password,
                         ),
-                        int(self.widget_util.vault_widget_vault.vault_index),
+                        int(self.widget_util.vault_stacked_widget_index),
                     )
                 ),
             )

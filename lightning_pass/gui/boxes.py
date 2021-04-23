@@ -67,7 +67,7 @@ class MessageBoxes(QWidget):
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__}({self.main_win!r}, {self.parent!r})"
+        return f"{self.__class__.__qualname__}({self.parent!r})"
 
     def message_box_factory(
         self,
@@ -280,7 +280,6 @@ contain at least one special character."""
 
         box = self._yes_no_box(
             event_handler_factory({"&Yes": self.events.login_event}),
-            "No",
         )
         box(
             parent_lbl,
@@ -326,7 +325,7 @@ contain at least one special character."""
 
         """
         event_handler = event_handler_factory(
-            {"&Yes": self.events.login_event, "&No": self.events.register_event},
+            {"&Yes": self.events.login_event, "&No": self.events.register_2_event},
         )
 
         box = self._yes_no_box(event_handler, "Yes")
@@ -361,7 +360,7 @@ contain at least one special character."""
         """
         box = self._yes_no_box(
             event_handler_factory({"&Yes": self.events.reset_token_event}),
-            "Yes",
+            default_btn="Yes",
         )
         box(
             parent_lbl,
@@ -378,7 +377,6 @@ contain at least one special character."""
         """
         box = self._yes_no_box(
             event_handler_factory({"&Yes": self.events.generate_pass_event}),
-            "No",
         )
         box(
             parent_lbl,
@@ -452,8 +450,13 @@ contain at least one special character."""
 
         """
         box = self._yes_no_box(
-            event_handler_factory({"&Yes": self.events.vault_event}),
-            "Yes",
+            event_handler_factory(
+                {
+                    "&Yes": lambda: self.events.vault_event(switch=True),
+                    "&No": lambda: self.events.vault_event(switch=False),
+                },
+            ),
+            default_btn="Yes",
         )
         box(
             parent_lbl,

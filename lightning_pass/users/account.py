@@ -442,6 +442,9 @@ class Account:
             db.execute(sql, (self.user_id,))
             result = db.fetchall()
 
+        if not result:
+            return None
+
         yield from (
             self.vaults.Vault(
                 # slice first element -> database primary key
