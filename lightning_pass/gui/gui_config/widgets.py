@@ -263,19 +263,22 @@ class WidgetUtil:
 
     @property
     def vault_stacked_widget_index(self) -> int:
-        """Return the current ``vault_stacked_widget`` index."""
-        return self.parent.ui.vault_stacked_widget.currentIndex()
+        """Return the current ``vault_stacked_widget`` index.
+
+        Add 1 to it because it starts at 0 -> widget start at 1 so they're human-readable.
+
+        """
+        return self.parent.ui.vault_stacked_widget.currentIndex() + 1
 
     @vault_stacked_widget_index.setter
     def vault_stacked_widget_index(self, i) -> None:
         """Set a new index on the current vault_stacked_widget if new index is withing legal range."""
         if 1 <= i <= (self.number_of_real_vault_pages + 1):
-            self.parent.ui.vault_stacked_widget.setCurrentIndex(i)
-
-    @property
-    def current_vault_widget(self) -> QWidget:
-        """Return the current QWidget on the vault_stacked_widget."""
-        return self.parent.ui.vault_stacked_widget.currentWidget()
+            self.parent.ui.vault_stacked_widget.setCurrentIndex(
+                # index starts at 0
+                i
+                - 1,
+            )
 
     @property
     def number_of_real_vault_pages(self) -> int:
@@ -324,6 +327,10 @@ class WidgetUtil:
             menu=self.parent.ui.menu_platforms,
         )
 
+    def current_vault_widget_children(self) -> Sequence[QWidget]:
+        """Return the current QWidget on the vault_stacked_widget."""
+        return self.parent.ui.vault_stacked_widget.currentWidget().children()
+
     @property
     def vault_widget_vault(self) -> Vault:
         """Return ``Vault`` instantiated with the current vault widget values.
@@ -332,7 +339,7 @@ class WidgetUtil:
         Genexpr is used to filter the correct widget types and extract the text.
 
         """
-        children_objects = it.chain(self.current_vault_widget.children())
+        children_objects = it.chain(self.current_vault_widget_children())
         return self.parent.events.current_user.vaults.Vault(
             *(
                 self.parent.events.current_user.user_id,
@@ -347,7 +354,7 @@ class WidgetUtil:
 
     def clear_current_vault_page(self):
         """Clear all QLineEdit widgets on the current page."""
-        for widget in self.current_vault_widget.children():
+        for widget in self.current_vault_widget_children():
             if isinstance(widget, QtWidgets.QLineEdit):
                 widget.clear()
 

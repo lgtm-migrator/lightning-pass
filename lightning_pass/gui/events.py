@@ -312,6 +312,7 @@ class Events:
     def logout_event(self, _=None, home: bool = True) -> None:
         """Logout current user.
 
+        :param _: Dump the bool value passed in by the qt connection
         :param home: Whether to redirect user to the home page after logging out.
 
         """
@@ -458,6 +459,7 @@ class Events:
     ) -> None:
         """Switch to vault window.
 
+        :param _: Dump the bool value passed in by the qt connection
         :param switch: Whether to switch to the vault page or only set it up
         :param previous_index: The index of the window before rebuilding
 
@@ -471,7 +473,7 @@ class Events:
         except StopIteration:
             self.widget_util.setup_vault_widget()
         else:
-            for page in it.chain((page,), self.current_user.vault_pages()):
+            for page in it.chain((page,), pages):
                 self.widget_util.setup_vault_widget(page)
 
         self.parent.ui.vault_username_lbl.setText(
@@ -499,14 +501,16 @@ class Events:
 
         """
         if (high := self.widget_util.number_of_real_vault_pages) == (
-            count := (self.parent.ui.vault_stacked_widget.count() - 1)
+            self.parent.ui.vault_stacked_widget.count()
         ):
             # empty one not found -> create new one
             self.widget_util.setup_vault_widget()
-            self.parent.ui.vault_widget_instance.ui.vault_page_lcd_number.display(high)
+            self.parent.ui.vault_widget_instance.ui.vault_page_lcd_number.display(
+                high + 1,
+            )
         else:
             # empty one found -> switch to it
-            self.widget_util.vault_stacked_widget_index = count
+            self.widget_util.vault_stacked_widget_index = high + 1
 
     def remove_vault_page_event(self) -> None:
         """Remove the current vault page."""
@@ -526,17 +530,8 @@ class Events:
         if text == "CONFIRM":
             self.current_user.vaults.delete_vault(
                 self.current_user.user_id,
-                page := self.widget_util.vault_stacked_widget_index,
+                self.widget_util.vault_stacked_widget_index,
             )
-
-            for i in range(
-                page,
-                # end is not inclusive
-                self.parent.ui.vault_stacked_widget.count() + 1,
-            ):
-                self.parent.ui.vault_stacked_widget.removeWidget(
-                    self.parent.ui.vault_stacked_widget.widget(i),
-                )
 
             getattr(self.parent.ui, f"action_{platform}").deleteLater()
 
@@ -546,7 +541,7 @@ class Events:
                 platform,
             )
 
-            self.widget_util.vault_stacked_widget_index += -1
+            self.vault_event()
 
     def lock_vault_event(self) -> None:
         """Lock the vault of the current user."""
@@ -563,7 +558,7 @@ class Events:
         """
         vaults = self.current_user.vaults
 
-        previous_vault = self.current_user.vaults.get_vault(
+        previous_vault = vaults.get_vault(
             self.current_user.user_id,
             self.widget_util.vault_widget_vault.vault_index,
         )
@@ -623,7 +618,7 @@ class Events:
                     "Vault",
                     self.widget_util.vault_widget_vault.platform_name,
                 )
-                # menu would disappear if only one page exists
+
                 self.widget_util.setup_vault_page(new_vault)
 
     def change_vault_page_event(self, index: int, calculate: bool = False):

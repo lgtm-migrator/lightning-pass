@@ -1,9 +1,9 @@
 """Module with project constants and DDLs for database."""
 from __future__ import annotations
 
-import dataclasses
 import os
 import shutil
+from dataclasses import dataclass
 from pathlib import Path
 
 import dotenv
@@ -31,7 +31,7 @@ LOG = parent_folder().parent / "misc/logs.log"
 dotenv.load_dotenv()
 
 
-@dataclasses.dataclass(frozen=True)
+@dataclass(frozen=True)
 class Credentials:
     """Store the credentials to be used while using a database and an email account."""
 
@@ -55,7 +55,7 @@ def _copy(self: Path, target: Path) -> None:
     shutil.copy(self, target)
 
 
-# monkey Patch copy functionality into every Path object
+# monkey patch copy functionality into every Path object
 # noinspection PyTypeHints
 Path.copy = _copy  # type: ignore
 
