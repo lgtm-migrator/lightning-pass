@@ -307,7 +307,7 @@ class WidgetUtil:
         self.setup_action(
             obj_name=page.platform_name,
             text=page.platform_name,
-            event=lambda: self.parent.events.change_vault_page_event(page.vault_index),
+            event=lambda: self.parent.events.vault.change_vault_page(page.vault_index),
             menu=self.parent.ui.menu_platforms,
         )
 

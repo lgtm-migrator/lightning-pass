@@ -78,8 +78,9 @@ def _base_decorator(
 
             """
             self = args[0]
+            events = self.parent.events
             if _condition_object(
-                obj=getattr(self, _base_obj) if _base_obj else self.parent.events,
+                obj=getattr(events, _base_obj) if _base_obj else events,
             ):
                 return _func_executor(func, *args, **kwargs)
 

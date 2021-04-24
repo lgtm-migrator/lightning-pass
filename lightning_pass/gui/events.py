@@ -106,17 +106,17 @@ class HomeEvents(Events):
 
     def login_user(self) -> None:
         """Try to login a user. If successful, show the account widget."""
-        # need to clean up data about previous users' vault platforms
+        # need to clean up data about previous users' vault platforms if there are any
         self.parent.events.account.logout(home=False)
         try:
-            self.current_user = Account.login(
+            self.parent.events.current_user = Account.login(
                 self.parent.ui.log_username_line_edit.text(),
                 self.parent.ui.log_password_line_edit.text(),
             )
         except AccountException:
             self.widget_util.message_box("invalid_login_box", "Login")
         else:
-            self.parent.events.account.account()
+            self.parent.events.account.main()
 
     @decorators.widget_changer
     def register_2(self) -> None:
@@ -126,7 +126,7 @@ class HomeEvents(Events):
     def register_user(self) -> None:
         """Try to register a user. If successful, show login widget."""
         try:
-            self.current_user = Account.register(
+            self.parent.events.current_user = Account.register(
                 self.parent.ui.reg_username_line.text(),
                 self.parent.ui.reg_password_line.text(),
                 self.parent.ui.reg_conf_pass_line.text(),
@@ -227,10 +227,12 @@ class AccountEvents(Events):
     @decorators.login_required(page_to_access="account")
     def account(self) -> None:
         """Switch to account widget and set current user values."""
-        self.parent.ui.account_username_line.setText(self.current_user.username)
-        self.parent.ui.account_email_line.setText(self.current_user.email)
+        self.parent.ui.account_username_line.setText(
+            self.parent.events.current_user.username,
+        )
+        self.parent.ui.account_email_line.setText(self.parent.events.current_user.email)
 
-        date = self.current_user.current_login_date
+        date = self.parent.events.current_user.current_login_date
         try:
             text = f"Last login date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
         except TypeError:
@@ -238,7 +240,7 @@ class AccountEvents(Events):
         self.parent.ui.account_last_log_date.setText(text)
 
         self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
-            QtGui.QPixmap(self.current_user.profile_picture_path),
+            QtGui.QPixmap(self.parent.events.current_user.profile_picture_path),
         )
 
         self.widget_util.set_current_widget("account")
@@ -259,11 +261,13 @@ class AccountEvents(Events):
 
         """
         try:
-            self.current_user.password = self.current_user.credentials.PasswordData(
-                self.current_user.password,
-                self.parent.ui.change_password_current_pass_line.text(),
-                self.parent.ui.change_password_new_pass_line.text(),
-                self.parent.ui.change_password_conf_new_line.text(),
+            self.parent.events.current_user.password = (
+                self.parent.events.current_user.credentials.PasswordData(
+                    self.parent.events.current_user.password,
+                    self.parent.ui.change_password_current_pass_line.text(),
+                    self.parent.ui.change_password_new_pass_line.text(),
+                    self.parent.ui.change_password_conf_new_line.text(),
+                )
             )
         except AccountDoesNotExist:
             self.widget_util.message_box("invalid_login_box", "Change Password")
@@ -297,13 +301,13 @@ class AccountEvents(Events):
             "Image files (*.jpg *.png)",
         )
         if fname:
-            self.current_user.profile_picture = (
+            self.parent.events.current_user.profile_picture = (
                 self.current_user.credentials.save_picture(
                     pathlib.Path(fname),
                 )
             )
             self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
-                QtGui.QPixmap(self.current_user.profile_picture_path),
+                QtGui.QPixmap(self.parent.events.current_user.profile_picture_path),
             )
 
     def logout(self, _=None, home: bool = True) -> None:
@@ -322,11 +326,11 @@ class AccountEvents(Events):
 
     def edit_details(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
-        if not self.current_user.username == (
+        if not self.parent.events.current_user.username == (
             name := self.parent.ui.account_username_line.text()
         ):
             try:
-                self.current_user.username = name
+                self.parent.events.current_user.username = name
             except InvalidUsername:
                 self.widget_util.message_box("invalid_username_box", "Account")
             except UsernameAlreadyExists:
@@ -338,11 +342,11 @@ class AccountEvents(Events):
                     detail="username",
                 )
 
-        if self.current_user.email != (
+        if not self.parent.events.current_user.email == (
             email := self.parent.ui.account_email_line.text()
         ):
             try:
-                self.current_user.email = email
+                self.parent.events.current_user.email = email
             except InvalidEmail:
                 self.widget_util.message_box("invalid_email_box", "Account")
             except EmailAlreadyExists:
@@ -364,9 +368,12 @@ class AccountEvents(Events):
         The key will be used while rehashing the saved vault passwords (if master password is changed).
 
         """
-        if not self.current_user.master_key:
+        if not self.parent.events.current_user.master_key:
             self.widget_util.set_current_widget("master_password")
-        elif self.current_user.vault_unlocked and self.current_user.vault_pages():
+        elif (
+            self.parent.events.current_user.vault_unlocked
+            and self.parent.events.current_user.vault_pages()
+        ):
             self.widget_util.set_current_widget("master_password")
         else:
             self.widget_util.message_box(
@@ -388,13 +395,15 @@ class AccountEvents(Events):
         :raises PasswordsDoNotMatch: If the 2 master passwords do not match
 
         """
-        prev_key = self.current_user.master_key
+        prev_key = self.parent.events.current_user.master_key
         try:
-            self.current_user.master_key = self.current_user.credentials.PasswordData(
-                self.current_user.password,
-                self.parent.ui.master_pass_current_pass_line.text(),
-                self.parent.ui.master_pass_master_pass_line.text(),
-                self.parent.ui.master_pass_conf_master_pass_line.text(),
+            self.parent.events.current_user.master_key = (
+                self.parent.events.current_user.credentials.PasswordData(
+                    self.parent.events.current_user.password,
+                    self.parent.ui.master_pass_current_pass_line.text(),
+                    self.parent.ui.master_pass_master_pass_line.text(),
+                    self.parent.ui.master_pass_conf_master_pass_line.text(),
+                )
             )
         except AccountDoesNotExist:
             self.widget_util.message_box("invalid_login_box", "Master Password")
@@ -412,7 +421,7 @@ class AccountEvents(Events):
             )
         else:
             # need to rehash currently saved vault passwords so they can be recognized by the new master key
-            for vault in self.current_user.vault_pages(key=prev_key):
+            for vault in self.parent.events.current_user.vault_pages(key=prev_key):
                 self.widget_util.rehash_vault_password(vault)
 
             self.widget_util.message_box(
@@ -420,7 +429,7 @@ class AccountEvents(Events):
                 "Master Password",
                 detail="Master password",
             )
-            self.account()
+            self.main()
 
     @decorators.login_required
     @decorators.master_password_required
@@ -432,18 +441,18 @@ class AccountEvents(Events):
         """
         password = self.parent.ui.input_dialogs.master_password_dialog(
             "Vault",
-            self.current_user.username,
+            self.parent.events.current_user.username,
         )
 
-        if not self.current_user.pwd_hashing.auth_derived_key(
+        if not self.parent.events.current_user.pwd_hashing.auth_derived_key(
             password,
-            self.current_user.hashed_vault_credentials,
+            self.parent.events.current_user.hashed_vault_credentials,
         ):
-            self.current_user.vault_unlocked = False
+            self.parent.events.current_user.vault_unlocked = False
             self.widget_util.message_box("invalid_login_box", "Vault")
         else:
-            self.current_user.vault_unlocked = True
-            self.current_user._master_key_str = password
+            self.parent.events.current_user.vault_unlocked = True
+            self.parent.events.current_user._master_key_str = password
             self.widget_util.message_box("vault_unlocked_box")
 
 
@@ -475,9 +484,9 @@ class GeneratorEvents(Events):
             )
 
         if not any(
-            # exclude length
             val
             for val in self.widget_util.password_options
+            # exclude length
             if isinstance(val, bool)
         ):
             self.widget_util.message_box("no_options_generate_box", "Generator")
@@ -527,7 +536,7 @@ class VaultEvents(Events):
         :param previous_index: The index of the window before rebuilding
 
         """
-        pages = self.current_user.vault_pages()
+        pages = self.parent.events.current_user.vault_pages()
 
         try:
             page = next(pages)
@@ -540,10 +549,10 @@ class VaultEvents(Events):
         self.parent.ui.menu_platforms.setEnabled(True)
 
         self.parent.ui.vault_username_lbl.setText(
-            f"Current user: {self.current_user.username}",
+            f"Current user: {self.parent.events.current_user.username}",
         )
 
-        date = self.current_user.current_vault_unlock_date
+        date = self.parent.events.current_user.current_vault_unlock_date
         try:
             text = f"Last unlock date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
         except TypeError:
@@ -593,8 +602,8 @@ class VaultEvents(Events):
             platform,
         )
         if text == "CONFIRM":
-            self.current_user.vaults.delete_vault(
-                self.current_user.user_id,
+            self.parent.events.current_user.vaults.delete_vault(
+                self.parent.events.current_user.user_id,
                 self.widget_util.vault_stacked_widget_index,
             )
 
@@ -622,10 +631,10 @@ class VaultEvents(Events):
         Used later to choose correct message box.
 
         """
-        vaults = self.current_user.vaults
+        vaults = self.parent.events.current_user.vaults
 
         previous_vault = vaults.get_vault(
-            self.current_user.user_id,
+            self.parent.events.current_user.user_id,
             self.widget_util.vault_widget_vault.vault_index,
         )
 
@@ -633,12 +642,12 @@ class VaultEvents(Events):
             vaults.update_vault(
                 (
                     new_vault := vaults.Vault(
-                        self.current_user.user_id,
+                        self.parent.events.current_user.user_id,
                         self.widget_util.vault_widget_vault.platform_name,
                         self.widget_util.vault_widget_vault.website,
                         self.widget_util.vault_widget_vault.username,
                         self.widget_util.vault_widget_vault.email,
-                        self.current_user.encrypt_vault_password(
+                        self.parent.events.current_user.encrypt_vault_password(
                             new_pass := self.widget_util.vault_widget_vault.password,
                         ),
                         int(self.widget_util.vault_stacked_widget_index),
@@ -662,7 +671,9 @@ class VaultEvents(Events):
 
                 previous_vault = vaults.Vault(
                     *previous_vault[:5],
-                    self.current_user.decrypt_vault_password(previous_vault.password),
+                    self.parent.events.current_user.decrypt_vault_password(
+                        previous_vault.password,
+                    ),
                     *previous_vault[6:],
                 )
 
