@@ -30,16 +30,17 @@ if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow
 
 
+@functools.cache
 def _ord(day: int) -> str:
-    """Return given day in a human readable string.
+    """Return given day in a human readable string and cache the result.
 
     :param day: The day integer
 
     """
     suffix = "th", "st", "nd", "rd"
 
-    return (
-        str(day) + suffix[div]
+    return str(day) + (
+        suffix[div]
         if (div := day % 10) in (1, 2, 3) and day not in (11, 12, 13)
         else suffix[0]
     )
@@ -536,6 +537,8 @@ class VaultEvents(Events):
         :param previous_index: The index of the window before rebuilding
 
         """
+        self.widget_util.clear_vault_stacked_widget()
+
         pages = self.parent.events.current_user.vault_pages()
 
         try:
@@ -579,9 +582,9 @@ class VaultEvents(Events):
         ):
             # empty one not found -> create new one
             self.widget_util.setup_vault_widget()
-            self.parent.ui.vault_widget_instance.ui.vault_page_lcd_number.display(
-                high + 1,
-            )
+            self.parent.ui.vault_stacked_widget.currentWidget().findChild(
+                QtWidgets.QLCDNumber,
+            ).display(high + 1)
         else:
             # empty one found -> switch to it
             self.widget_util.vault_stacked_widget_index = high + 1
@@ -615,7 +618,7 @@ class VaultEvents(Events):
                 platform,
             )
 
-            self.vault()
+            self.main()
 
     def lock_vault(self) -> None:
         """Lock the vault of the current user."""
