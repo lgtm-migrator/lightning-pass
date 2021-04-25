@@ -7,6 +7,7 @@ from typing import (
     Any,
     Callable,
     Iterator,
+    Mapping,
     NamedTuple,
     Optional,
     Sequence,
@@ -17,44 +18,10 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from lightning_pass.gui import mouse_randomness
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QMainWindow, QMenu, QWidget
+    from PyQt5.QtWidgets import QLineEdit, QMainWindow, QMenu, QWidget
 
     from lightning_pass.gui.mouse_randomness import PasswordOptions, PwdGenerator
     from lightning_pass.users.vaults import Vault
-
-
-class ClearPreviousWidget:
-    """Handle clearing the previous widget by accessing the WIDGET_DATA dict."""
-
-    __slots__ = "parent", "previous_index"
-
-    def __init__(self, parent):
-        """Context manager constructor.
-
-        :param parent: The parent where the widget is located
-
-        """
-        self.parent = parent
-        self.previous_index = parent.events.widget_util.current_index
-
-    def __enter__(self):
-        """Do nothing on enter."""
-
-    def __exit__(self, exc_type, exc_val, exc_tb):
-        """Clear the previous widget."""
-        widget_item: WidgetItem | None
-
-        for item in WIDGET_DATA[self.previous_index]:
-            if not item:
-                break
-
-            obj = getattr(self.parent.ui, item.name)
-            method = getattr(obj, item.clear_method)
-
-            try:
-                method(item.clear_args)
-            except TypeError:
-                method()
 
 
 class WidgetItem(NamedTuple):
@@ -107,27 +74,24 @@ class WidgetUtil:
         return font
 
     @property
-    def current_widget(self) -> str:
+    def current_widget(self) -> QWidget:
         """Return the current widget of the main stacked widget."""
-        return self.parent.ui.stacked_widget.currentWidget().objectName()
+        return self.parent.ui.stacked_widget.currentWidget()
 
-    @property
-    def current_index(self) -> int:
-        """Return the current index of the main stacked widget."""
-        return self.parent.ui.stacked_widget.currentIndex()
-
-    def set_current_widget(self, widget: str) -> None:
+    @current_widget.setter
+    def current_widget(self, widget: str) -> None:
         """Set a new current widget.
 
-        Clears previous widget with the ClearPreviousWidget ctx manager.
-
-        :param widget: The widget to switch to
+        :param widget: The new widget to switch to
 
         """
-        with ClearPreviousWidget(self.parent):
-            self.parent.ui.stacked_widget.setCurrentWidget(
-                getattr(self.parent.ui, widget),
-            )
+        if (name := (w := self.current_widget).objectName()) == "generate_pass":
+            self.reset_generator_page()
+        elif name not in ("account", "vault"):
+            for line in w.findChildren(QtWidgets.QLineEdit):
+                line.clear()
+
+        self.parent.ui.stacked_widget.setCurrentWidget(getattr(self.parent.ui, widget))
 
     @contextlib.contextmanager
     def disable_widget(*widgets: Sequence[QWidget]) -> Iterator[None]:
@@ -143,6 +107,16 @@ class WidgetUtil:
         finally:
             for widget in widgets:
                 widget.setEnabled(True)
+
+    @staticmethod
+    def set_text(widgets: Mapping[QLineEdit, str]) -> None:
+        """Set a new text on the given objects.
+
+        :param widgets: The mapping of widgets with their new text
+
+        """
+        for key, val in widgets.items():
+            key.setText(val)
 
     @staticmethod
     def waiting_loop(seconds: int) -> None:
@@ -166,7 +140,7 @@ class WidgetUtil:
         """
         getattr(self.parent.ui.message_boxes, message_box)(*args, **kwargs)
 
-    def input_dialog(self, input_dialog: str, *args: Any, **kwargs: Any) -> None:
+    def input_dialog(self, input_dialog: str, *args: tuple, **kwargs: dict) -> None:
         """Show a chosen message box with the given positional and keyword arguments.
 
         :param input_dialog: The input_dialog type to show
@@ -175,6 +149,11 @@ class WidgetUtil:
 
         """
         getattr(self.parent.ui.input_dialogs, input_dialog)(*args, **kwargs)
+
+    def clear_account_page(self) -> None:
+        """Clear the account page."""
+        for widget in self.parent.ui.account.findChildren(QtWidgets.QLineEdit):
+            widget.clear()
 
     @property
     def password_options(self) -> PasswordOptions:
@@ -194,6 +173,15 @@ class WidgetUtil:
 
         """
         return self.mouse_randomness.PwdGenerator(self.password_options)
+
+    def reset_generator_page(self) -> None:
+        """Change the password generator value back to the defaults."""
+        ui = self.parent.ui
+        ui.generate_pass_spin_box.setValue(16)
+        for spin_box in ui.stacked_widget.widget("generate_pass").findChildren(
+            QtWidgets.QSpinBox,
+        ):
+            spin_box.setChecked(True)
 
     def setup_menu(self, obj_name: str, title: str) -> QMenu:
         """Setup a new ``QMenu`` tied to the root ``QMenuBar``.
@@ -248,7 +236,7 @@ class WidgetUtil:
     def vault_stacked_widget_index(self) -> int:
         """Return the current ``vault_stacked_widget`` index.
 
-        Add 1 to it because it starts at 0 -> widget start at 1 so they're human-readable.
+        Add 1 to it because it starts at 0 -> widgets start at 1 so they're in human-readable form.
 
         """
         return self.parent.ui.vault_stacked_widget.currentIndex() + 1
@@ -328,7 +316,7 @@ class WidgetUtil:
         )
 
     def clear_current_vault_page(self) -> None:
-        """Clear all QLineEdit widgets on the current page."""
+        """Clear all ``QLineEdit`` widgets on the current vault page."""
         for widget in self.parent.ui.vault_stacked_widget.currentWidget().findChildren(
             QtWidgets.QLineEdit,
         ):
@@ -368,89 +356,8 @@ class WidgetUtil:
             )
             db.execute(sql, (enc, vault.user_id, vault.vault_index))
 
-    def update_vault_indexes(self) -> None:
-        """Update the vault indexes on all of the current vault pages."""
-
-
-WIDGET_DATA = (
-    # index: 0
-    {None},
-    # index: 1
-    {None},
-    # index: 2
-    {
-        WidgetItem("log_username_line_edit"),
-        WidgetItem("log_password_line_edit"),
-    },
-    # index: 3
-    {
-        WidgetItem("reg_username_line"),
-        WidgetItem("reg_password_line"),
-        WidgetItem("reg_conf_pass_line"),
-        WidgetItem("reg_email_line"),
-    },
-    # index: 4
-    {WidgetItem("forgot_pass_email_line")},
-    # index: 5
-    {WidgetItem("reset_token_token_line")},
-    # index: 6
-    {
-        WidgetItem("reset_password_new_pass_line"),
-        WidgetItem("reset_password_conf_new_pass_line"),
-    },
-    # index: 7
-    {
-        WidgetItem("change_password_current_pass_line"),
-        WidgetItem("change_password_new_pass_line"),
-        WidgetItem("change_password_conf_new_line"),
-    },
-    # index: 8
-    {
-        WidgetItem("generate_pass_spin_box", clear_method="setValue", clear_args=16),
-        WidgetItem(
-            "generate_pass_numbers_check",
-            clear_method="setChecked",
-            clear_args=True,
-        ),
-        WidgetItem(
-            "generate_pass_symbols_check",
-            clear_method="setChecked",
-            clear_args=True,
-        ),
-        WidgetItem(
-            "generate_pass_lower_check",
-            clear_method="setChecked",
-            clear_args=True,
-        ),
-        WidgetItem(
-            "generate_pass_upper_check",
-            clear_method="setChecked",
-            clear_args=True,
-        ),
-    },
-    # index: 9
-    {WidgetItem("generate_pass_p2_final_pass_line")},
-    # index: 10
-    {
-        WidgetItem("account_username_line"),
-        WidgetItem("account_email_line"),
-        WidgetItem("account_last_log_date"),
-        WidgetItem("account_pfp_pixmap_lbl"),
-    },
-    # index: 11
-    {None},
-    # index: 12
-    {
-        WidgetItem("master_pass_current_pass_line"),
-        WidgetItem("master_pass_master_pass_line"),
-        WidgetItem("master_pass_conf_master_pass_line"),
-    },
-)
-
 
 __all__ = [
-    "ClearPreviousWidget",
-    "WIDGET_DATA",
     "WidgetItem",
     "WidgetUtil",
 ]

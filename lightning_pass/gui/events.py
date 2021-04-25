@@ -7,7 +7,7 @@ import itertools as it
 import pathlib
 from typing import TYPE_CHECKING
 
-from PyQt5 import QtGui, QtWidgets
+from PyQt5 import QtWidgets
 
 import lightning_pass.gui.gui_config.event_decorators as decorators
 from lightning_pass.gui.gui_config.widgets import WidgetUtil
@@ -28,6 +28,8 @@ from lightning_pass.util.exceptions import (
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow
+
+import timeit
 
 
 @functools.cache
@@ -96,14 +98,14 @@ class HomeEvents(Events):
     @decorators.widget_changer
     def home(self) -> None:
         """Switch to home widget."""
-        self.widget_util.set_current_widget("home")
+        self.widget_util.current_widget = "home"
 
     main = home
 
     @decorators.widget_changer
     def login(self) -> None:
         """Switch to login widget and reset previous values."""
-        self.widget_util.set_current_widget("login")
+        self.widget_util.current_widget = "login"
 
     def login_user(self) -> None:
         """Try to login a user. If successful, show the account widget."""
@@ -122,7 +124,7 @@ class HomeEvents(Events):
     @decorators.widget_changer
     def register_2(self) -> None:
         """Switch to register widget and reset previous values."""
-        self.widget_util.set_current_widget("register_2")
+        self.widget_util.current_widget = "register_2"
 
     def register_user(self) -> None:
         """Try to register a user. If successful, show login widget."""
@@ -151,12 +153,12 @@ class HomeEvents(Events):
     @decorators.widget_changer
     def forgot_password(self) -> None:
         """Switch to forgot password widget and reset previous email."""
-        self.widget_util.set_current_widget("forgot_password")
+        self.widget_util.current_widget = "forgot_password"
 
     @decorators.widget_changer
     def reset_token(self) -> None:
         """Switch to reset token page and reset previous values."""
-        self.widget_util.set_current_widget("reset_token")
+        self.widget_util.current_widget = "reset_token"
 
     def send_token(self) -> None:
         """Send token and switch to token page."""
@@ -193,7 +195,7 @@ class HomeEvents(Events):
     @decorators.widget_changer
     def reset_password(self) -> None:
         """Switch to the reset password widget."""
-        self.widget_util.set_current_widget("reset_password")
+        self.widget_util.current_widget = "reset_password"
 
     def reset_password_submit(self) -> None:
         """Reset user's password."""
@@ -241,10 +243,10 @@ class AccountEvents(Events):
         self.parent.ui.account_last_log_date.setText(text)
 
         self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
-            QtGui.QPixmap(self.parent.events.current_user.profile_picture_path),
+            self.parent.events.current_user.profile_picture_pixmap(),
         )
 
-        self.widget_util.set_current_widget("account")
+        self.widget_util.current_widget = "account"
 
     main = account
 
@@ -252,7 +254,7 @@ class AccountEvents(Events):
     @decorators.login_required(page_to_access="change password")
     def change_password(self) -> None:
         """Change password for current user."""
-        self.widget_util.set_current_widget("change_password")
+        self.widget_util.current_widget = "change_password"
 
     @decorators.login_required(page_to_access="change password")
     def submit_change_password(self) -> None:
@@ -303,12 +305,12 @@ class AccountEvents(Events):
         )
         if fname:
             self.parent.events.current_user.profile_picture = (
-                self.current_user.credentials.save_picture(
+                self.parent.events.current_user.credentials.save_picture(
                     pathlib.Path(fname),
                 )
             )
             self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
-                QtGui.QPixmap(self.parent.events.current_user.profile_picture_path),
+                self.parent.events.current_user.profile_picture_pixmap(),
             )
 
     def logout(self, _=None, home: bool = True) -> None:
@@ -318,12 +320,13 @@ class AccountEvents(Events):
         :param home: Whether to redirect user to the home page after logging out.
 
         """
+        self.widget_util.clear_account_page()
         self.widget_util.clear_platform_actions()
         self.widget_util.clear_vault_stacked_widget()
         with contextlib.suppress(AttributeError):
             delattr(self, "current_user")
         if home:
-            self.parent.events.main.home()
+            self.parent.events.home.main()
 
     def edit_details(self) -> None:
         """Edit user details by changing them on their respective edit lines."""
@@ -370,12 +373,12 @@ class AccountEvents(Events):
 
         """
         if not self.parent.events.current_user.master_key:
-            self.widget_util.set_current_widget("master_password")
+            self.widget_util.current_widget = "master_password"
         elif (
             self.parent.events.current_user.vault_unlocked
             and self.parent.events.current_user.vault_pages()
         ):
-            self.widget_util.set_current_widget("master_password")
+            self.widget_util.current_widget = "master_password"
         else:
             self.widget_util.message_box(
                 "vault_unlock_required_box",
@@ -467,7 +470,7 @@ class GeneratorEvents(Events):
     @decorators.widget_changer
     def generate_pass(self) -> None:
         """Switch to first password generation widget and reset previous password options."""
-        self.widget_util.set_current_widget("generate_pass")
+        self.widget_util.current_widget = "generate_pass"
 
     main = generate_pass
 
@@ -498,7 +501,7 @@ class GeneratorEvents(Events):
                 self.parent.pass_progress,
             )
 
-            self.widget_util.set_current_widget("generate_pass_phase2")
+            self.widget_util.current_widget = "generate_pass_phase2"
 
     def generate_pass_again(self) -> None:
         """Re-instantiate a new generator object with the same options.
@@ -563,7 +566,7 @@ class VaultEvents(Events):
         self.parent.ui.vault_date_lbl.setText(text)
 
         if switch:
-            self.widget_util.set_current_widget("vault")
+            self.widget_util.current_widget = "vault"
 
         if previous_index:
             self.parent.ui.vault_stacked_widget.setCurrentIndex(previous_index)
@@ -625,7 +628,7 @@ class VaultEvents(Events):
         self.current_user.vault_unlocked = False
         self.widget_util.clear_vault_stacked_widget()
         self.widget_util.clear_platform_actions()
-        self.parent.events.account.account()
+        self.parent.events.account.main()
 
     def update_vault_page(self) -> None:
         """Add a new vault tied to the current user.
@@ -713,8 +716,8 @@ class VaultEvents(Events):
         else:
             self.widget_util.vault_stacked_widget_index = index
 
-        if not self.widget_util.current_widget == (v := "vault"):
-            self.widget_util.set_current_widget(v)
+        if not self.widget_util.current_widget.objectName() == (v := "vault"):
+            self.widget_util.current_widget = v
 
 
 __all__ = [

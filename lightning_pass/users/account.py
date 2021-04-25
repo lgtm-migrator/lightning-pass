@@ -15,6 +15,8 @@ from typing import (
     Union,
 )
 
+from PyQt5.QtGui import QPixmap
+
 from lightning_pass.users import password_hashing, vaults
 from lightning_pass.util import credentials, database
 from lightning_pass.util.exceptions import (
@@ -73,6 +75,7 @@ class Account:
         "_vault_unlocked",
         "_current_vault_unlock_date",
         "_master_key_str",
+        "_cache",
     )
 
     credentials = credentials
@@ -98,6 +101,12 @@ class Account:
         self._current_vault_unlock_date = self.get_value("last_vault_unlock_date")
 
         self._master_key_str = r""
+
+        self._cache = {
+            "username": self.get_value("username"),
+            "password": self.get_value("password"),
+            "email": self.get_value("email"),
+        }
 
     def __repr__(self) -> str:
         """Provide information about this class."""
@@ -277,7 +286,10 @@ class Account:
         :returns: user's username in database
 
         """
-        return self.get_value("username")
+        try:
+            return self._cache["username"]
+        except AttributeError:
+            return self.get_value("username")
 
     @username.setter
     def username(self, value: str) -> None:
@@ -296,6 +308,7 @@ class Account:
         checks_executor((Check(*values) for values in checks))
 
         self.set_value(value, "username")
+        self._cache |= {"username": value}
 
     @property
     def password(self) -> bytes:
@@ -304,7 +317,10 @@ class Account:
         :returns: user's password in database
 
         """
-        return self.get_value("password")
+        try:
+            return self._cache["password"]
+        except AttributeError:
+            return self.get_value("password")
 
     @password.setter
     def password(self, data: PasswordData) -> None:
@@ -316,9 +332,10 @@ class Account:
         self.validate_password_data(data)
 
         self.set_value(
-            self.pwd_hashing.hash_password(str(data.new_password)),
+            (hashed := self.pwd_hashing.hash_password(str(data.new_password))),
             "password",
         )
+        self._cache |= {"password": hashed}
 
     def reset_password(self, password: str, confirm_password: str) -> None:
         """Reset user's password."""
@@ -341,7 +358,10 @@ class Account:
         :returns: user's email in database
 
         """
-        return self.get_value("email")
+        try:
+            return self._cache["email"]
+        except AttributeError:
+            return self.get_value("email")
 
     @email.setter
     def email(self, value: str) -> None:
@@ -360,6 +380,7 @@ class Account:
         checks_executor(Check(*values) for values in checks)
 
         self.set_value(value, "email")
+        self._cache |= {"email": value}
 
     @property
     def profile_picture(self) -> str:
@@ -372,21 +393,24 @@ class Account:
 
     @profile_picture.setter
     def profile_picture(self, filename: str) -> None:
-        """Set new profile picture.
+        """Set new profile picture and reset the cache on the ``QPixmap`` method.
 
         :param filename: Filename of the new profile picture
 
         """
+        self.profile_picture_pixmap.cache_clear()
         self.set_value(filename, "profile_picture")
 
-    @property
-    def profile_picture_path(self) -> str:
-        """Profile picture path property.
+    @functools.cache
+    def profile_picture_pixmap(self) -> QPixmap:
+        """Return the current profile picture ``QPixmap``.
 
-        :returns: path to user's profile picture
+        :returns: The ``QPixmap`` of the profile picture
 
         """
-        return str(self.credentials.get_profile_picture_path(self.profile_picture))
+        return QPixmap(
+            str(self.credentials.get_profile_picture_path(self.profile_picture)),
+        )
 
     @property
     def current_login_date(self) -> datetime:

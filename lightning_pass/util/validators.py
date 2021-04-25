@@ -11,7 +11,7 @@ from lightning_pass.util.exceptions import ValidationFailure
 
 
 class Validator(ABC):
-    """Base class for validation of account data."""
+    """Base validator class."""
 
     __slots__ = ()
 
