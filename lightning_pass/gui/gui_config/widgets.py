@@ -7,7 +7,6 @@ from typing import (
     Any,
     Callable,
     Iterator,
-    Mapping,
     NamedTuple,
     Optional,
     Sequence,
@@ -18,7 +17,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from lightning_pass.gui import mouse_randomness
 
 if TYPE_CHECKING:
-    from PyQt5.QtWidgets import QLineEdit, QMainWindow, QMenu, QWidget
+    from PyQt5.QtWidgets import QMainWindow, QMenu, QWidget
 
     from lightning_pass.gui.mouse_randomness import PasswordOptions, PwdGenerator
     from lightning_pass.users.vaults import Vault
@@ -45,7 +44,6 @@ VAULT_WIDGET_DATA: set[WidgetItem] = {
 
 
 class WidgetUtil:
-
     """Various utilities to be used with event handling or account management."""
 
     __slots__ = "parent"
@@ -109,16 +107,6 @@ class WidgetUtil:
                 widget.setEnabled(True)
 
     @staticmethod
-    def set_text(widgets: Mapping[QLineEdit, str]) -> None:
-        """Set a new text on the given objects.
-
-        :param widgets: The mapping of widgets with their new text
-
-        """
-        for key, val in widgets.items():
-            key.setText(val)
-
-    @staticmethod
     def waiting_loop(seconds: int) -> None:
         """Stop the application for the given amount of seconds.
 
@@ -177,11 +165,11 @@ class WidgetUtil:
     def reset_generator_page(self) -> None:
         """Change the password generator value back to the defaults."""
         ui = self.parent.ui
-        ui.generate_pass_spin_box.setValue(16)
-        for spin_box in ui.stacked_widget.widget("generate_pass").findChildren(
-            QtWidgets.QSpinBox,
+        for check_box in (page := getattr(ui, "generate_pass")).findChildren(
+            QtWidgets.QCheckBox,
         ):
-            spin_box.setChecked(True)
+            check_box.setChecked(True)
+        page.findChild(QtWidgets.QSpinBox).setValue(16)
 
     def setup_menu(self, obj_name: str, title: str) -> QMenu:
         """Setup a new ``QMenu`` tied to the root ``QMenuBar``.

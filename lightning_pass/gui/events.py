@@ -540,6 +540,8 @@ class VaultEvents(Events):
         :param previous_index: The index of the window before rebuilding
 
         """
+        now = timeit.default_timer()
+
         self.widget_util.clear_vault_stacked_widget()
 
         pages = self.parent.events.current_user.vault_pages()
@@ -570,6 +572,8 @@ class VaultEvents(Events):
 
         if previous_index:
             self.parent.ui.vault_stacked_widget.setCurrentIndex(previous_index)
+
+        print(timeit.default_timer() - now)
 
     main = vault
 
@@ -703,6 +707,8 @@ class VaultEvents(Events):
                 )
 
                 self.widget_util.setup_vault_page(new_vault)
+
+            self.current_user.vault_pages.cache_clear()
 
     def change_vault_page(self, index: int, calculate: bool = False):
         """Handle changes on the vault stacked widget.

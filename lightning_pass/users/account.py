@@ -103,9 +103,9 @@ class Account:
         self._master_key_str = r""
 
         self._cache = {
-            "username": self.get_value("username"),
-            "password": self.get_value("password"),
-            "email": self.get_value("email"),
+            "username": self.username,
+            "password": self.password,
+            "email": self.email,
         }
 
     def __repr__(self) -> str:
@@ -398,8 +398,8 @@ class Account:
         :param filename: Filename of the new profile picture
 
         """
-        self.profile_picture_pixmap.cache_clear()
         self.set_value(filename, "profile_picture")
+        self.profile_picture_pixmap.cache_clear()
 
     @functools.cache
     def profile_picture_pixmap(self) -> QPixmap:

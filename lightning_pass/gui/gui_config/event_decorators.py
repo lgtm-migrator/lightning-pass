@@ -148,7 +148,7 @@ def widget_changer(func: _F) -> _F:
 
         """
         self = args[0]
-        if not self.widget_util.current_widget == func.__name__:
+        if not self.widget_util.current_widget.objectName() == func.__name__:
             try:
                 return func(*args, **kwargs)
             except TypeError:
