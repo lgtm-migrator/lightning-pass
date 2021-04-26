@@ -4,7 +4,7 @@ import functools
 import re
 import secrets
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Any, Optional, Pattern, Union
+from typing import TYPE_CHECKING, Any, Pattern, Union
 
 import bcrypt
 from validator_collection import checkers
@@ -23,7 +23,19 @@ from lightning_pass.util.exceptions import (
 
 if TYPE_CHECKING:
     from lightning_pass.users.account import Account
-    from lightning_pass.util.credentials import PasswordData
+
+
+def partial_class(cls, *args, **kwargs):
+    """Create a partial class like a function with ``functools.partial``.
+
+    :returns: The partial class
+
+    """
+
+    class Partial(cls):
+        __init__ = functools.partialmethod(cls.__init__, *args, **kwargs)
+
+    return Partial
 
 
 class Validator(ABC):
@@ -36,15 +48,16 @@ class Validator(ABC):
         return f"{self.__class__.__qualname__}()"
 
     def __set_name__(self, owner, name):
-        self.private_name = f"_{self.__class__.__name__[:-9].casefold()}"
-        self.public_name = self.private_name[1:]
+        """Set the field names."""
+        self.private_name = f"_{name}"
+        self.public_name = name
 
     def __get__(self, instance: Account, owner):
         """Return the currently stored value."""
         try:
             return instance._cache[self.public_name]
         except AttributeError:
-            return instance.get_value("email")
+            return instance.get_value(self.public_name)
 
     def __set__(self, instance: Account, value):
         """Validate, set and cache the new value."""
@@ -57,16 +70,17 @@ class Validator(ABC):
         instance._cache |= {self.public_name: value}
 
     @abstractmethod
-    def validate(self, value: Any) -> None:
+    def validate(self, value: Any, should_exist: bool = False) -> None:
         """Perform every validation of the child class.
 
         :param value: The item to validate
+        :param should_exist: To be passed into the unique check
 
         :raises Type[ValidationFailure]: if the validation fails
 
         """
         self.pattern(value)
-        self.unique(value)
+        self.unique(value, should_exist=should_exist)
 
     @abstractmethod
     def pattern(self, value: Union[str, bytes]) -> None:
@@ -102,16 +116,17 @@ class Username(Validator):
     def __init__(self, re_pattern: Pattern):
         self.re_pattern = re_pattern
 
-    def validate(self, username: str) -> None:
+    def validate(self, username: str, should_exist: bool = False) -> None:
         """Perform all validation checks for the given username.
 
         :param username: The username to be validated.
+        :param should_exist: To be passed into the unique check
 
         :raises Type[ValidationFailure]: if the validation fails
 
         """
         self.pattern(username)
-        self.unique(username)
+        self.unique(username, should_exist=should_exist)
 
     def pattern(self, username: str) -> None:
         """Check whether a given username matches the pattern used to instantiate this class.
@@ -124,7 +139,7 @@ class Username(Validator):
         if not re.fullmatch(self.re_pattern, username):
             raise InvalidUsername
 
-    def unique(self, username: str, should_exist: Optional[bool] = False) -> None:
+    def unique(self, username: str, should_exist: bool = False) -> None:
         """Check whether a username already exists in a database.
 
         :param username: Username to check
@@ -146,16 +161,17 @@ class Email(Validator):
 
     __slots__ = ()
 
-    def validate(self, email: str) -> None:
+    def validate(self, email: str, should_exist: bool = False) -> None:
         """Perform all validation checks for the given email.
 
         :param email: The email to be validated
+        :param should_exist: To be passed into the unique check
 
         :raises Type[ValidationFailure]: if the validation fails
 
         """
         self.pattern(email)
-        self.unique(email)
+        self.unique(email, should_exist=should_exist)
 
     def pattern(self, email: str) -> None:
         """Check the pattern of the given email.
@@ -168,7 +184,7 @@ class Email(Validator):
         if not checkers.is_email(email):
             raise InvalidEmail
 
-    def unique(self, email: str, should_exist: Optional[bool] = False) -> None:
+    def unique(self, email: str, should_exist: bool = False) -> None:
         """Check whether a username already exists in a database and if it matches a required pattern.
 
         :param email: The email to check
@@ -193,18 +209,28 @@ class Password(Validator):
     def __init__(self, re_pattern: Pattern):
         self.re_pattern = re_pattern
 
-    def validate(self, data: PasswordData):
+    def __set__(self, instance: Account, data: tuple[str, str]):
+        """Override the __set__ method so that it hashes the password."""
+        self.validate(data)
+
+        instance.set_value(
+            hashed := instance.pwd_hashing.hash_password(data[0]),
+            self.public_name,
+        )
+        instance._cache |= {self.public_name: hashed}
+
+    def validate(self, password_data: tuple[str, str], should_exist: bool = False):
         """Perform all validation checks.
 
-        :param data: The password to validate
+        :param password_data: The password to validate
+        :param should_exist: To be passed into the unique check
 
         :raises Type[ValidationFailure]: if the validation fails
 
         """
-        self.pattern(data.new_password)
-        self.unique(data.new_password)
-        self.match(data.new_password, data.confirm_new)
-        self.authenticate(data.confirm_previous, data.previous_password)
+        self.pattern(password_data[0])
+        self.unique(password_data[0], should_exist=should_exist)
+        self.match(password_data[0], password_data[1])
 
     def pattern(self, password: Union[str, bytes]) -> None:
         """Check whether password matches the pattern used when instantiating this class.
@@ -218,8 +244,7 @@ class Password(Validator):
             raise InvalidPassword
 
     def unique(self, password: str, should_exist: bool = False) -> bool:
-        """Return True since unique validation for passwords is not possible."""
-        return True
+        """Pass since unique validation for passwords is not possible."""
 
     @staticmethod
     def match(first: Union[str, bytes], second: Union[str, bytes]) -> None:
@@ -249,19 +274,6 @@ class Password(Validator):
         """
         if not bcrypt.checkpw(password.encode("utf-8"), stored.encode("utf-8")):
             raise AccountDoesNotExist
-
-
-def partial_class(cls, *args, **kwargs):
-    """Create a partial class like a function with ``functools.partial``.
-
-    :returns: The partial class
-
-    """
-
-    class Partial(cls):
-        __init__ = functools.partialmethod(cls.__init__, *args, **kwargs)
-
-    return Partial
 
 
 UsernameValidator = partial_class(

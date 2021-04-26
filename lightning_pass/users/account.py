@@ -19,15 +19,6 @@ from PyQt5.QtGui import QPixmap
 
 from lightning_pass.users import password_hashing, vaults
 from lightning_pass.util import credentials, database
-from lightning_pass.util.exceptions import (
-    AccountDoesNotExist,
-    EmailAlreadyExists,
-    InvalidEmail,
-    InvalidPassword,
-    InvalidUsername,
-    PasswordsDoNotMatch,
-    UsernameAlreadyExists,
-)
 from lightning_pass.util.validators import (
     EmailValidator,
     PasswordValidator,
@@ -83,10 +74,9 @@ class Account:
     pwd_hashing = password_hashing
     vaults = vaults
 
-    username = UsernameValidator()
-
-    password_validator: _V = PasswordValidator
-    email_validator: _V = EmailValidator
+    username: _V = UsernameValidator()
+    password: _V = PasswordValidator()
+    email: _V = EmailValidator()
 
     def __init__(self, user_id: int) -> None:
         """Construct the class.
@@ -141,19 +131,9 @@ class Account:
         :raises InvalidEmail: if email doesn't match the email pattern
 
         """
-        checks = (
-            (cls.username_validator.unique, (username,), UsernameAlreadyExists),
-            (cls.username_validator.pattern, (username,), InvalidUsername),
-            (cls.password_validator.pattern, (password,), InvalidPassword),
-            (
-                cls.password_validator.match,
-                (password, confirm_password),
-                PasswordsDoNotMatch,
-            ),
-            (cls.email_validator.unique, (email,), EmailAlreadyExists),
-            (cls.email_validator.pattern, (email,), InvalidEmail),
-        )
-        checks_executor((Check(*values) for values in checks))
+        cls.__dict__["username"].validate(username)
+        cls.__dict__["password"].validate((password, confirm_password))
+        cls.__dict__["email"].validate(email)
 
         with cls.database.database_manager() as db:
             # not using f-string due to SQL injection
@@ -178,26 +158,23 @@ class Account:
 
         :returns: ``Account`` object instantiated with current user id
 
-        :raises AccountDoesNotExist: if username wasn't found in the database
-        :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
+        :raises AccountDoesNotExist: if the username validation fails
 
         """
-        if not cls.username.unique(
-            username,
-            should_exist=True,
-        ) or not cls.password_validator.authenticate(
+        cls.__dict__["username"].validate(username, should_exist=True)
+        cls.__dict__["password"].authenticate(
             password,
             cls.credentials.get_user_item(
                 username,
                 "username",
                 "password",
             ),
-        ):
-            raise AccountDoesNotExist
+        )
 
         account = cls(cls.credentials.get_user_item(username, "username", "id"))
         account._current_login_date = account.get_value("last_login_date")
         account.update_date("last_login_date")
+
         return account
 
     def get_value(self, result_column: str) -> Union[str, bytes, datetime]:
@@ -231,30 +208,15 @@ class Account:
 
         :param data: The data container
 
-        :raises AccountDoesNotExist: If the authentication fails
         :raises InvalidPassword: If the new password doesn't match the required pattern
             Uses the validator of the current account
         :raises PasswordsDoNotMatch: If the passwords do not match
+        :raises AccountDoesNotExist: If the authentication fails
 
         """
-        checks = (
-            (
-                self.password_validator.authenticate,
-                (data.confirm_previous, self.password),
-                AccountDoesNotExist,
-            ),
-            (
-                self.password_validator.pattern,
-                (data.new_password,),
-                InvalidPassword,
-            ),
-            (
-                self.password_validator.match,
-                (data.new_password, data.confirm_new),
-                PasswordsDoNotMatch,
-            ),
-        )
-        checks_executor((Check(*values) for values in checks))
+        validator = self.__dict__["password"]
+        validator.validate((data.new_password, data.confirm_new))
+        validator.authenticate(data.new_password, self.password)
 
     def update_date(self, column: str) -> None:
         """Update database TIMESTAMP column with CURRENT_TIMESTAMP().
@@ -280,110 +242,16 @@ class Account:
         """Return database ID of the current account."""
         return self._user_id
 
-    '''
-    @property
-    def username(self) -> str:
-        """Username property.
-
-        :returns: user's username in database
-
-        """
-        try:
-            return self._cache["username"]
-        except AttributeError:
-            return self.get_value("username")
-
-    @username.setter
-    def username(self, value: str) -> None:
-        """Set new username.
-
-        :param str value: New username
-
-        :raises UsernameAlreadyExists: if username is already registered in the database
-        :raises InvalidUsername: if username doesn't match the required pattern
-
-        """
-        checks = (
-            (Check(self.username_validator.pattern, (value,), InvalidUsername)),
-            (Check(self.username_validator.unique, (value,), UsernameAlreadyExists)),
-        )
-        checks_executor((Check(*values) for values in checks))
-
-        self.set_value(value, "username")
-        self._cache |= {"username": value}
-        '''
-
-    @property
-    def password(self) -> bytes:
-        """Password property.
-
-        :returns: user's password in database
-
-        """
-        try:
-            return self._cache["password"]
-        except AttributeError:
-            return self.get_value("password")
-
-    @password.setter
-    def password(self, data: PasswordData) -> None:
-        """Password setter.
-
-        :param data: The data container with all the necessary details.
-
-        """
-        self.validate_password_data(data)
-
-        self.set_value(
-            (hashed := self.pwd_hashing.hash_password(str(data.new_password))),
-            "password",
-        )
-        self._cache |= {"password": hashed}
-
     def reset_password(self, password: str, confirm_password: str) -> None:
-        """Reset user's password."""
-        checks = (
-            (self.password_validator.pattern, (password,), InvalidPassword),
-            (
-                self.password_validator.match,
-                (password, confirm_password),
-                PasswordsDoNotMatch,
-            ),
-        )
-        checks_executor((Check(*values) for values in checks))
+        """Reset user's password.
+
+        :raises InvalidPassword: if the pattern check fails
+        :raises PasswordsDoNotMatch: if the two passwords do not match
+
+        """
+        self.__dict__["password"].validate((password, confirm_password))
 
         self.set_value(self.pwd_hashing.hash_password(password), "password")
-
-    @property
-    def email(self) -> str:
-        """Email property.
-
-        :returns: user's email in database
-
-        """
-        try:
-            return self._cache["email"]
-        except AttributeError:
-            return self.get_value("email")
-
-    @email.setter
-    def email(self, value: str) -> None:
-        """Set new email.
-
-        :param str value: New email
-
-        :raises EmailAlreadyExists: if email is already registered in the database
-        :raises InvalidEmail: if email doesn't match the email pattern
-
-        """
-        checks = (
-            (self.email_validator.pattern, (value,), InvalidEmail),
-            (self.email_validator.unique, (value,), PasswordsDoNotMatch),
-        )
-        checks_executor(Check(*values) for values in checks)
-
-        self.set_value(value, "email")
-        self._cache |= {"email": value}
 
     @property
     def profile_picture(self) -> str:
@@ -415,12 +283,11 @@ class Account:
             str(self.credentials.get_profile_picture_path(self.profile_picture)),
         )
 
-    @property
     def current_login_date(self) -> datetime:
         """Return the 'previous' date when the current user has been logged in."""
         return self._current_login_date
 
-    @functools.cached_property
+    @functools.cache
     def register_date(self) -> datetime:
         """Last login date property.
 
@@ -445,7 +312,6 @@ class Account:
             self.update_date("last_vault_unlock_date")
         self._vault_unlocked = value
 
-    @property
     def current_vault_unlock_date(self) -> datetime:
         """Return the 'previous' date when the vault of the current user has been unlocked."""
         return self._current_vault_unlock_date
@@ -491,7 +357,7 @@ class Account:
         try:
             return self.pwd_hashing.pbkdf3hmac_key(
                 self._master_key_str,
-                self.hashed_vault_credentials.salt,
+                self.hashed_vault_credentials().salt,
             )
         except AttributeError:
             return False
@@ -513,7 +379,6 @@ class Account:
         self.set_value(data.hash, "master_key")
         self.set_value(data.salt, "master_salt")
 
-    @property
     def hashed_vault_credentials(self) -> bool | HashedVaultCredentials:
         """Return the storage of vault hashing credentials."""
         try:

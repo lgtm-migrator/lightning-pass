@@ -333,7 +333,7 @@ class WidgetUtil:
         enc = user.encrypt_vault_password(vault.password)
 
         db = user.database
-        with db.EnableDBSafeMode(), db.database_manager() as db:
+        with db.enable_db_safe_mode(), db.database_manager() as db:
             sql = """UPDATE lightning_pass.vaults
                         SET password = {}
                       WHERE user_id = {}

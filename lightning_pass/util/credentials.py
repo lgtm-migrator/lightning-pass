@@ -238,7 +238,7 @@ def generate_reset_token(user_id: int) -> str:
     """
     token = secrets.token_hex(15) + str(user_id)
 
-    with database.EnableDBSafeMode(), database.database_manager() as db:
+    with database.enable_db_safe_mode(), database.database_manager() as db:
         sql = """DELETE FROM lightning_pass.tokens
                        WHERE creation_date < (NOW() - INTERVAL 30 MINUTE)"""
         db.execute(sql)

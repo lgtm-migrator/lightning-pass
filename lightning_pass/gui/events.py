@@ -163,7 +163,7 @@ class HomeEvents(Events):
     def send_token(self) -> None:
         """Send token and switch to token page."""
         try:
-            Account.email_validator.pattern(
+            Account.__dict__["email"].pattern(
                 email := self.parent.ui.forgot_pass_email_line.text(),
             )
         except ValidationFailure:
@@ -235,7 +235,7 @@ class AccountEvents(Events):
         )
         self.parent.ui.account_email_line.setText(self.parent.events.current_user.email)
 
-        date = self.parent.events.current_user.current_login_date
+        date = self.parent.events.current_user.current_login_date()
         try:
             text = f"Last login date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
         except TypeError:
@@ -263,17 +263,23 @@ class AccountEvents(Events):
         Show message box if something goes wrong, otherwise move to login page.
 
         """
+        validator = self.parent.events.current_user.__class__.__dict__["password"]
         try:
-            self.parent.events.current_user.password = (
-                self.parent.events.current_user.credentials.PasswordData(
-                    self.parent.events.current_user.password,
-                    self.parent.ui.change_password_current_pass_line.text(),
-                    self.parent.ui.change_password_new_pass_line.text(),
-                    self.parent.ui.change_password_conf_new_line.text(),
-                )
+            validator.authenticate(
+                self.parent.ui.change_password_current_pass_line.text(),
+                self.parent.events.current_user.password,
             )
         except AccountDoesNotExist:
             self.widget_util.message_box("invalid_login_box", "Change Password")
+            return
+
+        try:
+            validator.validate(
+                (
+                    self.parent.ui.change_password_new_pass_line.text(),
+                    self.parent.ui.change_password_conf_new_line.text(),
+                ),
+            )
         except InvalidPassword:
             self.widget_util.message_box(
                 "invalid_password_box",
@@ -450,7 +456,7 @@ class AccountEvents(Events):
 
         if not self.parent.events.current_user.pwd_hashing.auth_derived_key(
             password,
-            self.parent.events.current_user.hashed_vault_credentials,
+            self.parent.events.current_user.hashed_vault_credentials(),
         ):
             self.parent.events.current_user.vault_unlocked = False
             self.widget_util.message_box("invalid_login_box", "Vault")
@@ -560,7 +566,7 @@ class VaultEvents(Events):
             f"Current user: {self.parent.events.current_user.username}",
         )
 
-        date = self.parent.events.current_user.current_vault_unlock_date
+        date = self.parent.events.current_user.current_vault_unlock_date()
         try:
             text = f"Last unlock date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
         except TypeError:

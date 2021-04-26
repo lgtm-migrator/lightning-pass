@@ -117,7 +117,7 @@ def delete_vault(user_id: int, vault_index: int) -> None:
         )
         db.execute(sql, (user_id, vault_index))
 
-    with database.EnableDBSafeMode(), database.database_manager() as db:
+    with database.enable_db_safe_mode(), database.database_manager() as db:
         # not using f-string due to SQL injection
         sql = """UPDATE lightning_pass.vaults
                     SET vault_index = vault_index - 1

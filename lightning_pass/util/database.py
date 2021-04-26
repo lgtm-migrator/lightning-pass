@@ -43,25 +43,21 @@ def database_manager() -> Iterator[None]:
             con.close()
 
 
-class EnableDBSafeMode(contextlib.ContextDecorator):
-    """Context manager and a decorator to temporarily enable database safe mode."""
-
-    __slots__ = ()
-
-    def __enter__(self) -> None:
-        """Disable database safe mode on enter."""
-        with database_manager() as db:
-            sql = "SET SQL_SAFE_UPDATES = 0"
-            db.execute(sql)
-
-    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
-        """Enable safe mode again on exit."""
+@contextlib.contextmanager
+def enable_db_safe_mode() -> Iterator[None]:
+    """Enable database safe mode."""
+    with database_manager() as db:
+        sql = "SET SQL_SAFE_UPDATES = 0"
+        db.execute(sql)
+    try:
+        yield
+    finally:
         with database_manager() as db:
             sql = "SET SQL_SAFE_UPDATES = 1"
             db.execute(sql)
 
 
 __all__ = [
-    "EnableDBSafeMode",
+    "enable_db_safe_mode",
     "database_manager",
 ]
