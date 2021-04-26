@@ -45,9 +45,9 @@ def get_user_item(
 ) -> Union[bytes, int, str, datetime]:
     """Get any user value from any other user value detail and its column.
 
-    :param str user_identifier: Any user value stored in the database
-    :param str identifier_column: Database column of the given user value
-    :param str result_column: Column of the wanted value
+    :param user_identifier: Any user value stored in the database
+    :param identifier_column: Database column of the given user value
+    :param result_column: Column of the wanted value
 
     :returns: user item on success, False upon failure
 

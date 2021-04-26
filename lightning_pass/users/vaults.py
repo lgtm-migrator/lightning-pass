@@ -78,11 +78,11 @@ def update_vault(vault: Vault) -> None:
     vault = Vault(*vault[:2], url, *vault[3:])
 
     try:
-        EmailValidator.pattern(vault.email)
+        EmailValidator().pattern(vault.email)
     except ValidationFailure as e:
         raise InvalidEmail from e
 
-    if not all(val for key, val in zip(vault._fields, vault) if key != "vault_index"):
+    if not all(vault):
         raise VaultException
 
     if credentials.check_item_existence(

@@ -290,8 +290,8 @@ class WidgetUtil:
         Genexpr is used to filter the correct widget types and extract the text.
 
         """
-        return self.parent.events.current_user.vaults.Vault(
-            *(
+        return self.parent.events.current_user.vaults.Vault._make(
+            (
                 self.parent.events.current_user.user_id,
                 *(
                     widget.text()

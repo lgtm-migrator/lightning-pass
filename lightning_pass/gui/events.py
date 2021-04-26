@@ -560,6 +560,8 @@ class VaultEvents(Events):
             for page in it.chain((page,), pages):
                 self.widget_util.setup_vault_widget(page)
 
+        print(timeit.default_timer() - now)
+
         self.parent.ui.menu_platforms.setEnabled(True)
 
         self.parent.ui.vault_username_lbl.setText(
@@ -578,8 +580,6 @@ class VaultEvents(Events):
 
         if previous_index:
             self.parent.ui.vault_stacked_widget.setCurrentIndex(previous_index)
-
-        print(timeit.default_timer() - now)
 
     main = vault
 
@@ -649,24 +649,17 @@ class VaultEvents(Events):
         """
         vaults = self.parent.events.current_user.vaults
 
-        previous_vault = vaults.get_vault(
-            self.parent.events.current_user.user_id,
-            self.widget_util.vault_widget_vault.vault_index,
-        )
-
         try:
             vaults.update_vault(
                 (
-                    new_vault := vaults.Vault(
-                        self.parent.events.current_user.user_id,
-                        self.widget_util.vault_widget_vault.platform_name,
-                        self.widget_util.vault_widget_vault.website,
-                        self.widget_util.vault_widget_vault.username,
-                        self.widget_util.vault_widget_vault.email,
-                        self.parent.events.current_user.encrypt_vault_password(
-                            new_pass := self.widget_util.vault_widget_vault.password,
+                    new_vault := vaults.Vault._make(
+                        (
+                            *self.widget_util.vault_widget_vault[:-2],
+                            self.parent.events.current_user.encrypt_vault_password(
+                                new_pass := self.widget_util.vault_widget_vault.password,
+                            ),
+                            int(self.widget_util.vault_stacked_widget_index),
                         ),
-                        int(self.widget_util.vault_stacked_widget_index),
                     )
                 ),
             )
@@ -677,13 +670,14 @@ class VaultEvents(Events):
         except VaultException:
             self.widget_util.message_box("invalid_vault_box", "Vault")
         else:
+            previous_vault = vaults.get_vault(
+                self.parent.events.current_user.user_id,
+                self.widget_util.vault_widget_vault.vault_index,
+            )
+
             new_vault = vaults.Vault(*new_vault[:5], new_pass, *new_vault[6:])
 
             if previous_vault:
-                getattr(
-                    self.parent.ui,
-                    f"action_{previous_vault.platform_name}",
-                ).setText(new_vault.platform_name)
 
                 previous_vault = vaults.Vault(
                     *previous_vault[:5],
@@ -693,23 +687,43 @@ class VaultEvents(Events):
                     *previous_vault[6:],
                 )
 
-                updated_details = [
+                updated_details = {
                     key
                     for key, val in zip(previous_vault._fields, previous_vault)
                     if not getattr(new_vault, str(key)) == val
-                ]
+                }
+
+                if not updated_details:
+                    return
+
+                if "platform_name" in updated_details:
+                    new_platform = getattr(
+                        self.parent.ui,
+                        f"action_{previous_vault.platform_name}",
+                    )
+                    setattr(
+                        self.parent.ui,
+                        f"action_{new_vault.platform_name}",
+                        new_platform,
+                    )
+                    getattr(
+                        self.parent.ui,
+                        f"action_{new_vault.platform_name}",
+                    ).setText(
+                        new_vault.platform_name,
+                    )
 
                 self.widget_util.message_box(
                     "vault_updated_box",
                     "Vault",
-                    self.widget_util.vault_widget_vault.platform_name,
+                    new_vault.platform_name,
                     updated_details,
                 )
             else:
                 self.widget_util.message_box(
                     "vault_created_box",
                     "Vault",
-                    self.widget_util.vault_widget_vault.platform_name,
+                    new_vault.platform_name,
                 )
 
                 self.widget_util.setup_vault_page(new_vault)

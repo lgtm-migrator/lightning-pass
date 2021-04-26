@@ -54,20 +54,12 @@ class Validator(ABC):
 
     def __get__(self, instance: Account, owner):
         """Return the currently stored value."""
-        try:
-            return instance._cache[self.public_name]
-        except AttributeError:
-            return instance.get_value(self.public_name)
+        return instance.__getattr__(self.public_name)
 
     def __set__(self, instance: Account, value):
-        """Validate, set and cache the new value."""
+        """Validate and set the new value."""
         self.validate(value)
-
-        instance.set_value(
-            value,
-            self.public_name,
-        )
-        instance._cache |= {self.public_name: value}
+        setattr(instance, self.public_name, value)
 
     @abstractmethod
     def validate(self, value: Any, should_exist: bool = False) -> None:
@@ -212,12 +204,7 @@ class Password(Validator):
     def __set__(self, instance: Account, data: tuple[str, str]):
         """Override the __set__ method so that it hashes the password."""
         self.validate(data)
-
-        instance.set_value(
-            hashed := instance.pwd_hashing.hash_password(data[0]),
-            self.public_name,
-        )
-        instance._cache |= {self.public_name: hashed}
+        setattr(instance, self.public_name, instance.pwd_hashing.hash_password(data[0]))
 
     def validate(self, password_data: tuple[str, str], should_exist: bool = False):
         """Perform all validation checks.
@@ -290,8 +277,8 @@ EmailValidator = partial_class(
 
 
 __all__ = [
-    "Email",
-    "Password",
-    "Username",
+    "EmailValidator",
+    "PasswordValidator",
+    "UsernameValidator",
     "Validator",
 ]

@@ -3,20 +3,11 @@ from __future__ import annotations
 
 import functools
 from datetime import datetime
-from typing import (
-    TYPE_CHECKING,
-    Callable,
-    Generator,
-    NamedTuple,
-    Optional,
-    Sequence,
-    Type,
-    TypeVar,
-    Union,
-)
+from typing import TYPE_CHECKING, Generator, Optional, TypeVar, Union
 
 from PyQt5.QtGui import QPixmap
 
+from lightning_pass.settings import DATABASE_FIELDS
 from lightning_pass.users import password_hashing, vaults
 from lightning_pass.util import credentials, database
 from lightning_pass.util.validators import (
@@ -30,28 +21,6 @@ if TYPE_CHECKING:
     from lightning_pass.users.password_hashing import HashedVaultCredentials
     from lightning_pass.users.vaults import Vault
     from lightning_pass.util.credentials import PasswordData
-    from lightning_pass.util.exceptions import AccountException
-
-
-class Check(NamedTuple):
-    """Store data connected to one validation operation."""
-
-    func: Callable[..., bool]
-    args: Sequence
-    exc: Type[AccountException]
-
-
-def checks_executor(checks: Generator[Check, None, None]) -> None:
-    """Execute the given checks in Sequence.
-
-    :param checks: All of the checks to execute
-
-    :raise Type[AccountException]: if any of the given checks fail
-
-    """
-    for check in checks:
-        if not check.func(*check.args):
-            raise check.exc
 
 
 _V = TypeVar("_V", bound=Validator)
@@ -86,6 +55,8 @@ class Account:
         """
         self._user_id = user_id
 
+        self._cache = {}
+
         self._current_login_date = self.get_value("last_login_date")
 
         self._vault_unlocked = False
@@ -93,18 +64,37 @@ class Account:
 
         self._master_key_str = r""
 
-        self._cache = {
-            "username": self.username,
-            "password": self.password,
-            "email": self.email,
-        }
-
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__}({self.user_id!r})"
+        return f"{self.__class__.__qualname__!r}({self.user_id!r})"
 
     def __bool__(self):
         return bool(self.get_value("id"))
+
+    def __getattr__(self, key):
+        if key in DATABASE_FIELDS:
+            try:
+                return self._cache[key]
+            except KeyError:
+                value = self.credentials.get_user_item(self.user_id, "id", key)
+                self._cache |= {key: value}
+                return value
+        else:
+            raise AttributeError(
+                f"Object {self.__class__.__name__!r} has no attribute {key!r}.",
+            )
+
+    def __setattr__(self, key, value):
+        if key in DATABASE_FIELDS:
+            credentials.set_user_item(
+                user_identifier=self.user_id,
+                identifier_column="id",
+                result=value,
+                result_column=key,
+            )
+            self._cache |= {key: value}
+        else:
+            super().__setattr__(key, value)
 
     @classmethod
     def register(
@@ -180,25 +170,25 @@ class Account:
     def get_value(self, result_column: str) -> Union[str, bytes, datetime]:
         """Simplify getting user values.
 
-        :param str result_column: Column from which we're collecting the value
+        :param result_column: Column from which we're collecting the value
 
         :returns: the result value
 
         """
-        return self.credentials.get_user_item(self.user_id, "id", result_column)
+        return self.__getattr__(result_column)
 
     def set_value(
         self,
         result: Union[int, str, bytes, datetime],
         result_column: str,
     ) -> None:
-        """Simplify setting user values.
+        """Simplify setting and caching user values.
 
-        :param str result: Value which we're inserting
-        :param str result_column: Column where to insert the value
+        :param result: Value which we're inserting
+        :param result_column: Column where to insert the value
 
         """
-        self.credentials.set_user_item(self.user_id, "id", result, result_column)
+        setattr(self, result_column, result)
 
     def validate_password_data(self, data: PasswordData) -> None:
         """Validate given password data container.
@@ -260,7 +250,10 @@ class Account:
         :returns: user's profile picture in database
 
         """
-        return self.get_value("profile_picture")
+        try:
+            return self._cache["profile_picture"]
+        except KeyError:
+            return self.__getattr__("profile_picture")
 
     @profile_picture.setter
     def profile_picture(self, filename: str) -> None:
@@ -337,15 +330,17 @@ class Account:
             return None
 
         yield from (
-            self.vaults.Vault(
-                # slice first element -> database primary key
-                *vault[1:6],
-                self.decrypt_vault_password(
-                    # need raw string for decryption
-                    vault[6].encode("unicode_escape"),
-                    key if key else self.master_key,
+            self.vaults.Vault._make(
+                (
+                    # slice first element -> database primary key
+                    *vault[1:6],
+                    self.decrypt_vault_password(
+                        # need raw string for decryption
+                        vault[6].encode("unicode_escape"),
+                        key if key else self.master_key,
+                    ),
+                    *vault[7:],
                 ),
-                *vault[7:],
             )
             for vault in result
             if vault
@@ -382,9 +377,16 @@ class Account:
     def hashed_vault_credentials(self) -> bool | HashedVaultCredentials:
         """Return the storage of vault hashing credentials."""
         try:
+            key = self._cache["master_key"]
+            salt = self._cache["master_salt"]
+        except KeyError:
+            key = self.get_value("master_key")
+            salt = self.get_value("master_salt")
+
+        try:
             return self.pwd_hashing.HashedVaultCredentials(
-                self.get_value("master_key").encode("utf-8"),
-                self.get_value("master_salt").encode("utf-8"),
+                key.encode("utf-8"),
+                salt.encode("utf-8"),
             )
         except AttributeError:
             # if there are no results, encoding NoneType will result in the error
