@@ -5,7 +5,7 @@ class AccountException(Exception):
     """Base exception for all exceptions connected to account management."""
 
 
-class ValidationFailure(AccountException):
+class ValidationFailure(AccountException, ValueError):
     """Base exception for all exceptions connected to validation failures."""
 
 

@@ -83,7 +83,8 @@ class Account:
     pwd_hashing = password_hashing
     vaults = vaults
 
-    username_validator: _V = UsernameValidator
+    username = UsernameValidator()
+
     password_validator: _V = PasswordValidator
     email_validator: _V = EmailValidator
 
@@ -181,7 +182,7 @@ class Account:
         :raises AccountDoesNotExist: if password doesn't match with the hashed password in the database
 
         """
-        if not cls.username_validator.unique(
+        if not cls.username.unique(
             username,
             should_exist=True,
         ) or not cls.password_validator.authenticate(
@@ -279,6 +280,7 @@ class Account:
         """Return database ID of the current account."""
         return self._user_id
 
+    '''
     @property
     def username(self) -> str:
         """Username property.
@@ -309,6 +311,7 @@ class Account:
 
         self.set_value(value, "username")
         self._cache |= {"username": value}
+        '''
 
     @property
     def password(self) -> bytes:

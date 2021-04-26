@@ -708,8 +708,6 @@ class VaultEvents(Events):
 
                 self.widget_util.setup_vault_page(new_vault)
 
-            self.current_user.vault_pages.cache_clear()
-
     def change_vault_page(self, index: int, calculate: bool = False):
         """Handle changes on the vault stacked widget.
 
