@@ -2,52 +2,16 @@ image: python:latest
 
 before_script:
     - python --version
-    - python -m pip install -r requirements.txt
 
 stages:
     - build
-    - static analysis
     - test
 
-black:
-    stage: static analysis
+build:
+    stage: build
     script:
-        - black --check .
-    tags:
-        - ci
-
-flake8:
-    stage: static analysis
-    script:
-        - flake8 --ignore=E501,W503,PT014,PT006,I900,ANN101,ANN102,DAR201,DAR401,DAR402,R503,I005,CFQ002,I001 --exclude main.py, splash_screen.py
-    tags:
-        - ci
-
-pydocstyle:
-    stage: static analysis
-    script:
-        - pydocstyle
-    tags:
-        - ci
-
-pylama:
-    stage: static analysis
-    script:
-        - pylama -i E501
-    tags:
-        - ci
-
-pylint:
-    stage: static analysis
-    script:
-        - pylint --disable=W0201,I1101,E0611,C0301,R0801,C0103,R0401,C0415,R0913 lightning_pass --ignore main.py, splash_screen.py
-    tags:
-        - ci
-
-mypy:
-    stage: static analysis
-    script:
-        - mypy lightning_pass --ignore-missing-imports
+        - python -m pip install poetry
+        - poetry build
     tags:
         - ci
 
