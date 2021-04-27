@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 from lightning_pass.gui import boxes, events
-from lightning_pass.gui.gui_config import buttons
+from lightning_pass.gui.gui_util import buttons
 from lightning_pass.gui.static.qt_designer.output import (
     main,
     splash_screen,

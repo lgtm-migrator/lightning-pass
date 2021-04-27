@@ -9,8 +9,8 @@ from typing import TYPE_CHECKING
 
 from PyQt5 import QtWidgets
 
-import lightning_pass.gui.gui_config.event_decorators as decorators
-from lightning_pass.gui.gui_config.widgets import WidgetUtil
+import lightning_pass.gui.gui_util.event_decorators as decorators
+from lightning_pass.gui.gui_util.widgets import WidgetUtil
 from lightning_pass.users.account import Account
 from lightning_pass.util.exceptions import (
     AccountDoesNotExist,
@@ -28,8 +28,6 @@ from lightning_pass.util.exceptions import (
 
 if TYPE_CHECKING:
     from PyQt5.QtWidgets import QMainWindow
-
-import timeit
 
 
 @functools.cache
@@ -544,8 +542,6 @@ class VaultEvents(Events):
         :param previous_index: The index of the window before rebuilding
 
         """
-        now = timeit.default_timer()
-
         self.widget_util.clear_vault_stacked_widget()
 
         pages = self.parent.events.current_user.vault_pages()
@@ -558,8 +554,6 @@ class VaultEvents(Events):
             for page in it.chain((page,), pages):
                 self.widget_util.setup_vault_widget(page)
 
-        print(timeit.default_timer() - now)
-
         self.parent.ui.menu_platforms.setEnabled(True)
 
         self.parent.ui.vault_username_lbl.setText(
@@ -569,7 +563,7 @@ class VaultEvents(Events):
         date = self.parent.events.current_user.current_vault_unlock_date()
         try:
             text = f"Last unlock date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
-        except TypeError:
+        except AttributeError:
             text = "Last unlock date: None"
         self.parent.ui.vault_date_lbl.setText(text)
 

@@ -1,6 +1,6 @@
 """Subpackage containing everything connected to the GUI part of the project."""
 __all__ = [
-    "gui_config",
+    "gui_util",
     "static",
     "events",
     "boxes",

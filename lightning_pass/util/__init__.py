@@ -1,2 +1,2 @@
-"""Subpackage containing all of the util modules."""
+"""Subpackage containing all of general utility modules."""
 __all__ = ["exceptions", "credentials"]

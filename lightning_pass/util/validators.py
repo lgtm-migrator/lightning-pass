@@ -1,3 +1,4 @@
+"""Validate account credentials and user input."""
 from __future__ import annotations
 
 import functools
@@ -33,9 +34,12 @@ def partial_class(cls, *args, **kwargs):
     """
 
     class Partial(cls):
+        """Class which inherits the base class so it can use its' __init__ method."""
+
         __init__ = functools.partialmethod(cls.__init__, *args, **kwargs)
 
-        def __repr__(self):
+        def __repr__(self) -> str:
+            """Provide information about the parent class."""
             return f"Partial class of {cls.__qualname__!r} in {cls.__module__!r}"
 
     return Partial

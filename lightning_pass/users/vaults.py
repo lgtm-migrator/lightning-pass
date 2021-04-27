@@ -1,4 +1,4 @@
-"""Module containing the Vault class."""
+"""Module containing helper functions to manage vaults."""
 from __future__ import annotations
 
 from typing import NamedTuple, Union

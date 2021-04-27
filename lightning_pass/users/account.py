@@ -356,7 +356,9 @@ class Account:
         """Return the storage of vault hashing credentials."""
         try:
             return self.pwd_hashing.HashedVaultCredentials(
-                self.master_key,
+                credentials.get_user_item(self.user_id, "id", "master_key").encode(
+                    "utf-8",
+                ),
                 self.master_salt.encode("utf-8"),
             )
         except AttributeError:
