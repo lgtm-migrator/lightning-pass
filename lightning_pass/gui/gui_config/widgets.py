@@ -85,7 +85,7 @@ class WidgetUtil:
         """
         if (name := (w := self.current_widget).objectName()) == "generate_pass":
             self.reset_generator_page()
-        elif name not in ("account", "vault"):
+        elif name not in {"account", "vault"}:
             for line in w.findChildren(QtWidgets.QLineEdit):
                 line.clear()
 

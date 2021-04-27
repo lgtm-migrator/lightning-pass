@@ -23,6 +23,13 @@ if TYPE_CHECKING:
     from lightning_pass.util.credentials import PasswordData
 
 
+class CacheDict(dict):
+    def __setitem__(self, key, value):
+        if key not in DATABASE_FIELDS:
+            raise KeyError(f"Caching of the key {key!r} is not supported.")
+        dict.__setitem__(self, key, value)
+
+
 _V = TypeVar("_V", bound=Validator)
 
 
@@ -55,23 +62,31 @@ class Account:
         """
         self._user_id = user_id
 
-        self._cache = {}
+        self._cache = CacheDict()
 
-        self._current_login_date = self.get_value("last_login_date")
+        self._current_login_date = self.last_login_date
 
         self._vault_unlocked = False
-        self._current_vault_unlock_date = self.get_value("last_vault_unlock_date")
+        self._current_vault_unlock_date = self.last_vault_unlock_date
 
         self._master_key_str = r""
 
     def __repr__(self) -> str:
         """Provide information about this class."""
-        return f"{self.__class__.__qualname__!r}({self.user_id!r})"
+        return f"{self.__class__.__qualname__}({self.user_id!r})"
 
-    def __bool__(self):
-        return bool(self.get_value("id"))
+    def __bool__(self) -> bool:
+        """Return the boolean value of instances' user id."""
+        return bool(self.user_id)
 
-    def __getattr__(self, key):
+    def __getattr__(self, key) -> Union[bytes, int, str, datetime]:
+        """Return the key associated with the same in key in database, otherwise raise error.
+
+        :param key: Key of the looked up attribute
+
+        :raises AttributeError: if the key is not in the database
+
+        """
         if key in DATABASE_FIELDS:
             try:
                 return self._cache[key]
@@ -81,10 +96,16 @@ class Account:
                 return value
         else:
             raise AttributeError(
-                f"Object {self.__class__.__name__!r} has no attribute {key!r}.",
+                f"Object {self!r} has no attribute {key!r}.",
             )
 
-    def __setattr__(self, key, value):
+    def __setattr__(self, key, value) -> None:
+        """Set a new attribute, use database if the key is in database (and _cache the new value).
+
+        :param key: The key of the new attribute
+        :param value: The value of the new attribute
+
+        """
         if key in DATABASE_FIELDS:
             credentials.set_user_item(
                 user_identifier=self.user_id,
@@ -162,20 +183,10 @@ class Account:
         )
 
         account = cls(cls.credentials.get_user_item(username, "username", "id"))
-        account._current_login_date = account.get_value("last_login_date")
+        account._current_login_date = account.last_login_date
         account.update_date("last_login_date")
 
         return account
-
-    def get_value(self, result_column: str) -> Union[str, bytes, datetime]:
-        """Simplify getting user values.
-
-        :param result_column: Column from which we're collecting the value
-
-        :returns: the result value
-
-        """
-        return self.__getattr__(result_column)
 
     def set_value(
         self,
@@ -188,7 +199,8 @@ class Account:
         :param result_column: Column where to insert the value
 
         """
-        setattr(self, result_column, result)
+        credentials.set_user_item(self.user_id, "id", result, result_column)
+        self._cache |= {result_column: result}
 
     def validate_password_data(self, data: PasswordData) -> None:
         """Validate given password data container.
@@ -204,7 +216,7 @@ class Account:
         :raises AccountDoesNotExist: If the authentication fails
 
         """
-        validator = self.__dict__["password"]
+        validator = self.__class__.__dict__["password"]
         validator.validate((data.new_password, data.confirm_new))
         validator.authenticate(data.new_password, self.password)
 
@@ -239,31 +251,9 @@ class Account:
         :raises PasswordsDoNotMatch: if the two passwords do not match
 
         """
-        self.__dict__["password"].validate((password, confirm_password))
+        self.__class__.__dict__["password"].validate((password, confirm_password))
 
-        self.set_value(self.pwd_hashing.hash_password(password), "password")
-
-    @property
-    def profile_picture(self) -> str:
-        """Profile picture property.
-
-        :returns: user's profile picture in database
-
-        """
-        try:
-            return self._cache["profile_picture"]
-        except KeyError:
-            return self.__getattr__("profile_picture")
-
-    @profile_picture.setter
-    def profile_picture(self, filename: str) -> None:
-        """Set new profile picture and reset the cache on the ``QPixmap`` method.
-
-        :param filename: Filename of the new profile picture
-
-        """
-        self.set_value(filename, "profile_picture")
-        self.profile_picture_pixmap.cache_clear()
+        self.__setattr__("password", self.pwd_hashing.hash_password(password))
 
     @functools.cache
     def profile_picture_pixmap(self) -> QPixmap:
@@ -280,18 +270,6 @@ class Account:
         """Return the 'previous' date when the current user has been logged in."""
         return self._current_login_date
 
-    @functools.cache
-    def register_date(self) -> datetime:
-        """Last login date property.
-
-        Lru caching the register date to avoid unnecessary database queries,
-        (register_date needs to be collected only once, it is not possible to change it.)
-
-        :returns: the register date of current user
-
-        """
-        return self.get_value("register_date")
-
     @property
     def vault_unlocked(self) -> bool:
         """Return the current state of vault."""
@@ -301,7 +279,7 @@ class Account:
     def vault_unlocked(self, value: bool) -> None:
         """Unlock the vault and set a new vault unlock date."""
         if value:
-            self._current_vault_unlock_date = self.get_value("last_vault_unlock_date")
+            self._current_vault_unlock_date = self.last_vault_unlock_date
             self.update_date("last_vault_unlock_date")
         self._vault_unlocked = value
 
@@ -351,8 +329,8 @@ class Account:
         """Return the current key derived from the master password."""
         try:
             return self.pwd_hashing.pbkdf3hmac_key(
-                self._master_key_str,
-                self.hashed_vault_credentials().salt,
+                self._master_key_str.encode("utf-8"),
+                self.master_salt.encode("utf-8"),
             )
         except AttributeError:
             return False
@@ -377,16 +355,9 @@ class Account:
     def hashed_vault_credentials(self) -> bool | HashedVaultCredentials:
         """Return the storage of vault hashing credentials."""
         try:
-            key = self._cache["master_key"]
-            salt = self._cache["master_salt"]
-        except KeyError:
-            key = self.get_value("master_key")
-            salt = self.get_value("master_salt")
-
-        try:
             return self.pwd_hashing.HashedVaultCredentials(
-                key.encode("utf-8"),
-                salt.encode("utf-8"),
+                self.master_key,
+                self.master_salt.encode("utf-8"),
             )
         except AttributeError:
             # if there are no results, encoding NoneType will result in the error

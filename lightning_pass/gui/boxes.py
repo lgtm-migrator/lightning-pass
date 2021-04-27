@@ -1,7 +1,7 @@
 """Module containing the MessageBoxes and InputDialogs classes."""
 import contextlib
 import functools
-from typing import Callable, MutableSequence, NamedTuple, Optional, Union
+from typing import Callable, NamedTuple, Optional, Union
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import (
@@ -500,7 +500,7 @@ contain at least one special character."""
         self,
         parent_lbl: str,
         platform: str,
-        updated_values: MutableSequence[str],
+        updated_values: set[str],
     ) -> None:
         """Show a message box indicating that a new vault page has been updated.
 
@@ -509,16 +509,14 @@ contain at least one special character."""
         :param updated_values: Values that have been updated
 
         """
-        try:
-            updated_values[0] = updated_values[0].capitalize()
-        except IndexError:
-            # first element/character did not exist, return without showing anything
+        if not updated_values:
             return
 
         updated_values = sorted([val.replace("_", "-") for val in updated_values])
+        updated_values[0] = updated_values[0].capitalize()
 
         informative = (
-            f"""{', '.join(updated_values[:-1])} and {updated_values[-1]} have been successfully updated."""
+            f"{', '.join(updated_values[:-1])} and {updated_values[-1]} have been successfully updated."
             if len(updated_values) > 1
             else f"{updated_values[0]} has been successfully updated."
         )

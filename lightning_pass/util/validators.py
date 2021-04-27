@@ -26,7 +26,7 @@ if TYPE_CHECKING:
 
 
 def partial_class(cls, *args, **kwargs):
-    """Create a partial class like a function with ``functools.partial``.
+    """Create a partial class like a partial function with ``functools.partial``.
 
     :returns: The partial class
 
@@ -34,6 +34,9 @@ def partial_class(cls, *args, **kwargs):
 
     class Partial(cls):
         __init__ = functools.partialmethod(cls.__init__, *args, **kwargs)
+
+        def __repr__(self):
+            return f"Partial class of {cls.__qualname__!r} in {cls.__module__!r}"
 
     return Partial
 

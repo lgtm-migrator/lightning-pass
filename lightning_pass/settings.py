@@ -132,6 +132,5 @@ DATABASE_FIELDS = {
     "last_login_date",
     "register_date",
     "last_vault_unlock_date",
-    "master_key",
     "master_salt",
 }

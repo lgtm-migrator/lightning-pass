@@ -43,7 +43,7 @@ def _ord(day: int) -> str:
 
     return str(day) + (
         suffix[div]
-        if (div := day % 10) in (1, 2, 3) and day not in (11, 12, 13)
+        if (div := day % 10) in {1, 2, 3} and day not in {11, 12, 13}
         else suffix[0]
     )
 
@@ -61,26 +61,22 @@ class Events:
         """Provide information about this class."""
         return f"{self.__class__.__qualname__}({self.parent!r})"
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def home(self) -> HomeEvents:
         """Return the main event class."""
         return HomeEvents(self.parent)
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def account(self) -> AccountEvents:
         """Return the account event class."""
         return AccountEvents(self.parent)
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def generator(self) -> GeneratorEvents:
         """Return the generator event class."""
         return GeneratorEvents(self.parent)
 
-    @property
-    @functools.cache
+    @functools.cached_property
     def vault(self) -> VaultEvents:
         """Return the vault event class."""
         return VaultEvents(self.parent)
@@ -238,7 +234,7 @@ class AccountEvents(Events):
         date = self.parent.events.current_user.current_login_date()
         try:
             text = f"Last login date: {_ord(date.day)} {date:%b. %Y, %H:%M}"
-        except TypeError:
+        except AttributeError:
             text = "Last login date: None"
         self.parent.ui.account_last_log_date.setText(text)
 
@@ -310,13 +306,17 @@ class AccountEvents(Events):
             "Image files (*.jpg *.png)",
         )
         if fname:
-            self.parent.events.current_user.profile_picture = (
+            user = self.parent.events.current_user
+            user.profile_picture = (
                 self.parent.events.current_user.credentials.save_picture(
                     pathlib.Path(fname),
                 )
             )
+
+            user.profile_picture_pixmap.cache_clear()
+
             self.parent.ui.account_pfp_pixmap_lbl.setPixmap(
-                self.parent.events.current_user.profile_picture_pixmap(),
+                user.profile_picture_pixmap(),
             )
 
     def logout(self, _=None, home: bool = True) -> None:
@@ -492,12 +492,10 @@ class GeneratorEvents(Events):
                 self.parent.ui.generate_pass_p2_tracking_lbl,
                 self.parent.on_position_changed,
             )
-
+        # at least one option must be checked
         if not any(
-            val
-            for val in self.widget_util.password_options
-            # exclude length
-            if isinstance(val, bool)
+            # filter length
+            filter(lambda x: isinstance(x, bool), self.widget_util.password_options),
         ):
             self.widget_util.message_box("no_options_generate_box", "Generator")
         else:
@@ -679,12 +677,14 @@ class VaultEvents(Events):
 
             if previous_vault:
 
-                previous_vault = vaults.Vault(
-                    *previous_vault[:5],
-                    self.parent.events.current_user.decrypt_vault_password(
-                        previous_vault.password,
+                previous_vault = vaults.Vault._make(
+                    (
+                        *previous_vault[:5],
+                        self.parent.events.current_user.decrypt_vault_password(
+                            previous_vault.password,
+                        ),
+                        *previous_vault[6:],
                     ),
-                    *previous_vault[6:],
                 )
 
                 updated_details = {
