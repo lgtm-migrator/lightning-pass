@@ -122,15 +122,3 @@ with database.database_manager() as db:
     db.execute(_CREDENTIALS_DDL)
     db.execute(_TOKENS_DDL)
     db.execute(_VAULTS_DDL)
-
-DATABASE_FIELDS = {
-    "id",
-    "username",
-    "password",
-    "email",
-    "profile_picture",
-    "last_login_date",
-    "register_date",
-    "last_vault_unlock_date",
-    "master_salt",
-}

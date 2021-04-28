@@ -7,7 +7,6 @@ from typing import TYPE_CHECKING, Generator, Optional, TypeVar, Union
 
 from PyQt5.QtGui import QPixmap
 
-from lightning_pass.settings import DATABASE_FIELDS
 from lightning_pass.users import password_hashing, vaults
 from lightning_pass.util import credentials, database
 from lightning_pass.util.validators import (
@@ -25,7 +24,7 @@ if TYPE_CHECKING:
 
 class CacheDict(dict):
     def __setitem__(self, key, value):
-        if key not in DATABASE_FIELDS:
+        if key not in database.DATABASE_FIELDS:
             raise KeyError(f"Caching of the key {key!r} is not supported.")
         dict.__setitem__(self, key, value)
 
@@ -87,7 +86,7 @@ class Account:
         :raises AttributeError: if the key is not in the database
 
         """
-        if key in DATABASE_FIELDS:
+        if key in database.DATABASE_FIELDS:
             try:
                 return self._cache[key]
             except KeyError:
@@ -106,7 +105,7 @@ class Account:
         :param value: The value of the new attribute
 
         """
-        if key in DATABASE_FIELDS:
+        if key in database.DATABASE_FIELDS:
             credentials.set_user_item(
                 user_identifier=self.user_id,
                 identifier_column="id",

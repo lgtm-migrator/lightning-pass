@@ -9,6 +9,19 @@ if TYPE_CHECKING:
     from mysql.connector.cursor import MySQLCursor
 
 
+DATABASE_FIELDS = {
+    "id",
+    "username",
+    "password",
+    "email",
+    "profile_picture",
+    "last_login_date",
+    "register_date",
+    "last_vault_unlock_date",
+    "master_salt",
+}
+
+
 @contextlib.contextmanager
 def database_manager() -> Iterator[None]:
     """Manage database queries easily with context manager.
