@@ -118,7 +118,22 @@ _VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
 ) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
 """
 
-with database.database_manager() as db:
-    db.execute(_CREDENTIALS_DDL)
-    db.execute(_TOKENS_DDL)
-    db.execute(_VAULTS_DDL)
+DATABASE_FIELDS = {
+    "id",
+    "username",
+    "password",
+    "email",
+    "profile_picture",
+    "last_login_date",
+    "register_date",
+    "last_vault_unlock_date",
+    "master_salt",
+}
+
+
+def setup_database() -> None:
+    """Setup the three databases."""
+    with database.database_manager() as db:
+        db.execute(_CREDENTIALS_DDL)
+        db.execute(_TOKENS_DDL)
+        db.execute(_VAULTS_DDL)
