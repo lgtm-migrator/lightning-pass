@@ -12,8 +12,9 @@ build:
     script:
         - python -m pip install --upgrade pip
         - python -m pip install poetry
-        - poetry config virtualenvs.create false
-        - poetry install
+        - poetry --version
+        - poetry config virtualenvs.in-projects true
+        - poetry install --no-interaction --no-ansi
     tags:
         - ci
 
