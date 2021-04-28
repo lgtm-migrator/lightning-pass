@@ -70,7 +70,11 @@ class Account:
             self._current_login_date = None
 
         self._vault_unlocked = False
-        self._current_vault_unlock_date = self.last_vault_unlock_date
+
+        try:
+            self._current_vault_unlock_date = self.last_vault_unlock_date
+        except AttributeError:
+            self._current_vault_unlock_date = None
 
         self._master_key_str = r""
 
