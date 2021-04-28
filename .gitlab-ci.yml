@@ -12,15 +12,15 @@ build:
     script:
         - python -m pip install --upgrade pip
         - python -m pip install poetry
-        - poetry --version
-        - poetry config virtualenvs.in-projects true
-        - poetry install --no-interaction --no-ansi
+        - python -m poetry --version
+        - python -m poetry config virtualenvs.in-projects true
+        - python -m poetry install --no-interaction --no-ansi
     tags:
         - ci
 
 pytest:
     stage: test
     script:
-        - poetry run pytest -s --no-qt-log
+        - python -m poetry run pytest -s --no-qt-log
     tags:
         - ci
