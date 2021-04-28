@@ -64,7 +64,10 @@ class Account:
 
         self._cache = CacheDict()
 
-        self._current_login_date = self.last_login_date
+        try:
+            self._current_login_date = self.last_login_date
+        except AttributeError:
+            self._current_login_date = None
 
         self._vault_unlocked = False
         self._current_vault_unlock_date = self.last_vault_unlock_date
@@ -79,7 +82,7 @@ class Account:
         """Return the boolean value of instances' user id."""
         return bool(self.user_id)
 
-    def __getattr__(self, key) -> Union[bytes, int, str, datetime]:
+    def __getattr__(self, key) -> Optional[Union[bytes, int, str, datetime]]:
         """Return the key associated with the same in key in database, otherwise raise error.
 
         :param key: Key of the looked up attribute
@@ -87,7 +90,7 @@ class Account:
         :raises AttributeError: if the key is not in the database
 
         """
-        if key in DATABASE_FIELDS:
+        if key in DATABASE_FIELDS and self:
             try:
                 return self._cache[key]
             except KeyError:
