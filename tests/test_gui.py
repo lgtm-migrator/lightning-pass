@@ -28,14 +28,16 @@ def app(qtbot: QtBot) -> LightningPassWindow:
     [
         ("home_login_btn", 2),
         ("home_register_btn", 3),
-        ("home_generate_password_btn", 7),
+        ("home_generate_password_btn", 8),
         ("log_main_btn", 1),
         ("log_forgot_pass_btn", 4),
         ("reg_main_btn", 1),
         ("forgot_pass_main_menu_btn", 1),
+        ("reset_token_main_btn", 1),
+        ("reset_password_main_btn", 1),
+        ("change_password_main_btn", 1),
         ("generate_pass_main_menu_btn", 1),
         ("generate_pass_p2_main_btn", 1),
-        ("account_main_menu_btn", 1),
     ],
 )
 def test_buttons(
@@ -74,7 +76,7 @@ def test_buttons(
     "menu_bar_action, index",
     [
         ("action_main_menu", 1),
-        ("action_generate", 7),
+        ("action_generate", 8),
         ("action_login", 2),
         ("action_register", 3),
         ("action_forgot_password", 4),

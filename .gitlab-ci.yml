@@ -11,7 +11,7 @@ build:
     stage: build
     script:
         - python -m pip install poetry
-        - poetry build
+        - poetry install
     tags:
         - ci
 

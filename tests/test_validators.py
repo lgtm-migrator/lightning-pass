@@ -2,6 +2,11 @@ from __future__ import annotations
 
 import pytest
 
+from lightning_pass.util.exceptions import (
+    InvalidEmail,
+    InvalidPassword,
+    InvalidUsername,
+)
 from lightning_pass.util.validators import (
     EmailValidator,
     PasswordValidator,
@@ -28,49 +33,53 @@ def email_validator() -> EmailValidator:
 
 
 @pytest.mark.parametrize(
-    "username, result",
+    "username",
     [
-        ("Username", True),
-        ("number1", True),
-        ("11111", True),
-        ("special*", False),
-        ("", False),
+        "User",
+        "       ",
+        "1111",
+        "special*",
+        " username ",
+        "\a\a\a\a\\" "",
     ],
 )
-def test_username_pattern(username_validator, username, result):
-    assert username_validator.pattern(username) is result
+def test_username_pattern(username_validator, username):
+    with pytest.raises(InvalidUsername):
+        username_validator.pattern(username)
 
 
 @pytest.mark.parametrize(
-    "email, result",
+    "email",
     [
-        ("email@company.com", True),
-        ("@company.com", False),
-        ("email.com", False),
-        ("email@company", False),
-        ("", False),
+        "email@company..com",
+        "@company.com",
+        "email.com",
+        "email@company",
+        "@",
+        "  ",
+        "@email@email.com",
+        "email@email.c",
+        "email @ company.com",
     ],
 )
-def test_email_pattern(email_validator, email, result):
-    assert email_validator.pattern(email) is result
+def test_email_pattern(email_validator, email):
+    with pytest.raises(InvalidEmail):
+        email_validator.pattern(email)
 
 
 @pytest.mark.parametrize(
-    "password, result",
+    "password",
     [
-        ("Pass123+", True),
-        ("******Aa7", True),
-        ("2Short<", False),
-        ("no_upper1+", False),
-        ("*UPPPER_ONLY1", False),
-        ("", False),
-        ("Whitespaces12*    ", False),
-        ("  Password123+   ", False),
+        "Pass123456",
+        "******aa7",
+        "2Short<",
+        "no_upper1+",
+        "*UPPPER_ONLY1",
+        "",
+        "Whitespaces12*    ",
+        "  Password123+   ",
     ],
 )
-def test_password_pattern(password_validator, password, result):
-    assert password_validator.pattern(password) is result
-
-
-def test_password_unique(password_validator):
-    assert password_validator.unique("") is False
+def test_password_pattern(password_validator, password):
+    with pytest.raises(InvalidPassword):
+        password_validator.pattern(password)

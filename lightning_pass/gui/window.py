@@ -41,7 +41,7 @@ def run_main_window(splash: bool = True) -> None:
     app = QtWidgets.QApplication(sys.argv)
 
     main_window = LightningPassWindow()
-    setup_tray_icon(app, main_window)
+    setup_tray_menu(app, main_window)
 
     if splash:
         main_window.load()
@@ -51,7 +51,7 @@ def run_main_window(splash: bool = True) -> None:
     app.exec()
 
 
-def setup_tray_icon(app: QApplication, main_window: LightningPassWindow) -> None:
+def setup_tray_menu(app: QApplication, main_window: LightningPassWindow) -> None:
     """Setup a tray icon for the main window.
 
     :param app: The currently running``QApplication`` instance
@@ -229,5 +229,5 @@ __all__ = [
     "VaultWidget",
     "logger",
     "run_main_window",
-    "setup_tray_icon",
+    "setup_tray_menu",
 ]
