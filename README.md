@@ -1,6 +1,6 @@
 # Lightning Pass
 
-Lightning Pass is a GUI application build with PyQt. Passoword generation, account management and password manager are the main features of this project.
+Lightning Pass is a GUI application build with PyQt. Password generation, account management and password manager are the main features of this project.
 
 ## Preview
 
@@ -24,7 +24,7 @@ Lightning Pass is a GUI application build with PyQt. Passoword generation, accou
 
 ## What I've learned
 
-*   Python - factory for decorator factories, coroutines, contextlib, functools and strengthened knowledge in many other areas
+*   Python - Advanced decorator, descriptor and context manager usage. Gained more familiarity with standard library modules like functools or contextlib
 *   PyQT - QSS files and stylesheets, QtDesigner, QtSlots - mouse tracking, QStackedWidget, QInputDialog and many more...
 *   Cryptography - hashing and symmetric encryption by deriving a key from "master password"
 *   SQL/MySQL - table relationships, unique keys, proper way to handle SQL injection
@@ -33,8 +33,8 @@ Lightning Pass is a GUI application build with PyQt. Passoword generation, accou
 ## Installation
 
 *   Clone the repository
-*   Run `poetry build` in the cloned folder. [Poetry](https://python-poetry.org/) for more information.
-*   Add your credentiuals into the `.env` file
+*   Run `poetry install --no-dev` in the cloned folder. [Poetry](https://python-poetry.org/) for more information.
+*   Add your credentiuals into a `.env` file
 
 ## How to use?
 

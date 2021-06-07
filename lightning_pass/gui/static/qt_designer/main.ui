@@ -39,7 +39,7 @@
      </font>
     </property>
     <property name="currentIndex">
-     <number>8</number>
+     <number>10</number>
     </property>
     <widget class="QWidget" name="loading">
      <property name="cursor">
