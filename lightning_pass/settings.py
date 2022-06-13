@@ -85,7 +85,7 @@ _CREDENTIALS_DDL = """CREATE TABLE IF NOT EXISTS `credentials` (
   UNIQUE KEY `username_UNIQUE` (`username`),
   UNIQUE KEY `email_UNIQUE` (`email`),
   UNIQUE KEY `id_UNIQUE` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 """
 
 _TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
@@ -99,7 +99,7 @@ _TOKENS_DDL = """CREATE TABLE IF NOT EXISTS `tokens` (
   UNIQUE KEY `token_UNIQUE` (`token`),
   KEY `id_idx` (`user_id`),
   CONSTRAINT `user_id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 """
 
 _VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
@@ -115,7 +115,7 @@ _VAULTS_DDL = """CREATE TABLE IF NOT EXISTS `vaults` (
   UNIQUE KEY `id_UNIQUE` (`id`),
   KEY `id_idx` (`user_id`),
   CONSTRAINT `id` FOREIGN KEY (`user_id`) REFERENCES `credentials` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+) ENGINE=InnoDB AUTO_INCREMENT=56 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
 """
 
 DATABASE_FIELDS = {
@@ -127,7 +127,9 @@ DATABASE_FIELDS = {
     "last_login_date",
     "register_date",
     "last_vault_unlock_date",
-    "master_salt",
+    "master_password",
+    "vault_key",
+    "vault_salt",
 }
 
 

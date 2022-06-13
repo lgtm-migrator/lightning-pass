@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'splash_screen.ui'
+# Form implementation generated from reading ui file 'lightning_pass/gui/static/qt_designer/splash_screen.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #

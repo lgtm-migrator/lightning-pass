@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'main.ui'
+# Form implementation generated from reading ui file 'lightning_pass/gui/static/qt_designer/main.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
@@ -672,7 +672,9 @@ class Ui_lightning_pass(object):
         self.account_pfp_pixmap_lbl.setStyleSheet("border: 2px dashed")
         self.account_pfp_pixmap_lbl.setText("")
         self.account_pfp_pixmap_lbl.setPixmap(
-            QtGui.QPixmap("C:/Users/Luky/.designer/profile_pictures/default.png"),
+            QtGui.QPixmap(
+                "lightning_pass/gui/static/qt_designer/../../../users/profile_pictures/default.png",
+            ),
         )
         self.account_pfp_pixmap_lbl.setScaledContents(True)
         self.account_pfp_pixmap_lbl.setObjectName("account_pfp_pixmap_lbl")
@@ -1082,7 +1084,7 @@ class Ui_lightning_pass(object):
         self.stacked_widget.addWidget(self.master_password)
         lightning_pass.setCentralWidget(self.centralwidget)
         self.menu_bar = QtWidgets.QMenuBar(lightning_pass)
-        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 705, 26))
+        self.menu_bar.setGeometry(QtCore.QRect(0, 0, 705, 35))
         self.menu_bar.setObjectName("menu_bar")
         self.menu_users = QtWidgets.QMenu(self.menu_bar)
         font = QtGui.QFont()
@@ -1225,7 +1227,7 @@ class Ui_lightning_pass(object):
         self.menu_bar.addAction(self.menu_platforms.menuAction())
 
         self.retranslateUi(lightning_pass)
-        self.stacked_widget.setCurrentIndex(11)
+        self.stacked_widget.setCurrentIndex(9)
         self.vault_stacked_widget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(lightning_pass)
 

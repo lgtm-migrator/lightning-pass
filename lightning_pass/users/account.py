@@ -337,7 +337,7 @@ class Account:
         try:
             return self.pwd_hashing.pbkdf3hmac_key(
                 self._master_key_str.encode("utf-8"),
-                self.master_salt.encode("utf-8"),
+                self.vault_salt.encode("utf-8"),
             )
         except AttributeError:
             return False
@@ -356,17 +356,17 @@ class Account:
         self.validate_password_data(data)
 
         data = self.pwd_hashing.hash_master_password(data.new_password)
-        self.set_value(data.hash, "master_key")
-        self.set_value(data.salt, "master_salt")
+        self.set_value(data.hash, "vault_key")
+        self.set_value(data.salt, "vault_salt")
 
     def hashed_vault_credentials(self) -> bool | HashedVaultCredentials:
         """Return the storage of vault hashing credentials."""
         try:
             return self.pwd_hashing.HashedVaultCredentials(
-                credentials.get_user_item(self.user_id, "id", "master_key").encode(
+                credentials.get_user_item(self.user_id, "id", "vault_key").encode(
                     "utf-8",
                 ),
-                self.master_salt.encode("utf-8"),
+                self.vault_salt.encode("utf-8"),
             )
         except AttributeError:
             # if there are no results, encoding NoneType will result in the error

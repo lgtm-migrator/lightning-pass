@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# Form implementation generated from reading ui file 'vault_widget.ui'
+# Form implementation generated from reading ui file 'lightning_pass/gui/static/qt_designer/vault_widget.ui'
 #
 # Created by: PyQt5 UI code generator 5.15.4
 #
